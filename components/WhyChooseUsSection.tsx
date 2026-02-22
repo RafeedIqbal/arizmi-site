@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const FEATURES = [
   {
@@ -34,8 +34,47 @@ export default function WhyChooseUsSection() {
     new Array(FEATURES.length).fill(false)
   );
 
-  const toggle = (i: number) => {
-    setRevealed((prev) => prev.map((v, j) => (j === i ? !v : v)));
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    // Only apply scroll reveal on mobile/small screens
+    const checkMobile = () => window.matchMedia("(max-width: 768px)").matches;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!checkMobile()) return;
+
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = Number((entry.target as HTMLElement).dataset.index);
+            if (!isNaN(index)) {
+              setRevealed((prev) => {
+                if (prev[index]) return prev;
+                const next = [...prev];
+                next[index] = true;
+                return next;
+              });
+            }
+          }
+        });
+      },
+      { threshold: 0.6 } // reveal when 60% visible
+    );
+
+    cardRefs.current.forEach((el) => {
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const handleReveal = (i: number) => {
+    setRevealed((prev) => {
+      if (prev[i]) return prev;
+      const next = [...prev];
+      next[i] = true;
+      return next;
+    });
   };
 
   return (
@@ -68,15 +107,6 @@ export default function WhyChooseUsSection() {
           >
             Why choose us
           </h2>
-          <p
-            style={{
-              color: "var(--text-muted)",
-              fontSize: "1rem",
-              marginTop: "1rem",
-            }}
-          >
-            Tap each card to reveal
-          </p>
         </div>
 
         <div
@@ -87,10 +117,14 @@ export default function WhyChooseUsSection() {
           }}
         >
           {FEATURES.map((feature, i) => (
-            <button
+            <div
               key={i}
-              onClick={() => toggle(i)}
-              aria-expanded={revealed[i]}
+              ref={(el) => {
+                cardRefs.current[i] = el;
+              }}
+              data-index={i}
+              onMouseEnter={() => handleReveal(i)}
+              onTouchStart={() => handleReveal(i)}
               style={{
                 background: "var(--surface)",
                 backgroundImage: revealed[i]
@@ -102,10 +136,10 @@ export default function WhyChooseUsSection() {
                 borderRadius: "12px",
                 padding: "2rem",
                 textAlign: "left",
-                cursor: "pointer",
-                transition: "opacity 0.4s ease, border-color 0.4s ease, background-image 0.4s ease, transform 0.2s ease",
-                willChange: "opacity",
-                transform: revealed[i] ? "none" : "none",
+                transition: "border-color 0.6s ease, background-image 0.6s ease",
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.625rem",
               }}
             >
               <h3
@@ -113,9 +147,11 @@ export default function WhyChooseUsSection() {
                   color: revealed[i] ? "var(--text)" : "var(--text-muted)",
                   fontSize: "1.0625rem",
                   fontWeight: 600,
-                  marginBottom: "0.625rem",
+                  margin: 0,
                   lineHeight: 1.3,
-                  transition: "color 0.4s ease",
+                  filter: revealed[i] ? "blur(0px)" : "blur(6px)",
+                  opacity: revealed[i] ? 1 : 0.4,
+                  transition: "color 0.6s ease, filter 0.6s ease, opacity 0.6s ease",
                 }}
               >
                 {feature.title}
@@ -125,15 +161,15 @@ export default function WhyChooseUsSection() {
                   color: "var(--text-muted)",
                   fontSize: "0.9375rem",
                   lineHeight: 1.6,
-                  opacity: revealed[i] ? 1 : 0,
-                  maxHeight: revealed[i] ? "200px" : "0px",
-                  overflow: "hidden",
-                  transition: "opacity 0.4s ease, max-height 0.4s ease",
+                  margin: 0,
+                  filter: revealed[i] ? "blur(0px)" : "blur(8px)",
+                  opacity: revealed[i] ? 1 : 0.2,
+                  transition: "filter 0.6s ease, opacity 0.6s ease",
                 }}
               >
                 {feature.body}
               </p>
-            </button>
+            </div>
           ))}
         </div>
       </div>

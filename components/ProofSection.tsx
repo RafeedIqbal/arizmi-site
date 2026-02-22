@@ -39,32 +39,44 @@ const PROJECTS = [
   },
 ];
 
-const CARD_TOP_BASE = 88;
-const STACK_OFFSET = 24;
-
 export default function ProofSection() {
   const rootRef = useRef<HTMLElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      cardRefs.current.forEach((card, i) => {
-        if (!card || i === PROJECTS.length - 1) return;
-        const next = cardRefs.current[i + 1];
-        if (!next) return;
+    const cards = cardRefs.current.filter(Boolean) as HTMLDivElement[];
+    if (cards.length < 2) return;
 
-        // Scale down each card as the next one slides in
-        gsap.to(card, {
-          scale: 0.96 - i * 0.01,
-          ease: "none",
-          scrollTrigger: {
-            trigger: next,
-            start: "top 88%",
-            end: `top ${CARD_TOP_BASE + (i + 1) * STACK_OFFSET + 8}px`,
-            scrub: 1,
-          },
-        });
+    const ctx = gsap.context(() => {
+      // Cards after the first start off-screen below the viewport
+      cards.forEach((card, i) => {
+        if (i > 0) gsap.set(card, { y: "100vh" });
       });
+
+      // Pinned timeline — each card transition gets 100vh of scroll
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: rootRef.current,
+          start: "top top",
+          end: `+=${(cards.length - 1) * 100}%`,
+          pin: true,
+          scrub: 1,
+          anticipatePin: 1,
+        },
+      });
+
+      // Animate each subsequent card sliding up over the previous one
+      for (let i = 1; i < cards.length; i++) {
+        const pos = i - 1;
+
+        // Move all previous cards up by 40px to create a stacked effect
+        for (let j = 0; j < i; j++) {
+          tl.to(cards[j], { y: (j - i) * 40, duration: 1, ease: "none" }, pos);
+        }
+
+        // Slide next card up from below viewport
+        tl.to(cards[i], { y: 0, duration: 1, ease: "none" }, pos);
+      }
     }, rootRef);
 
     return () => ctx.revert();
@@ -74,14 +86,20 @@ export default function ProofSection() {
     <section
       id="work"
       ref={rootRef}
-      style={{ padding: "var(--section-py) 0 clamp(3rem, 6vw, 6rem)" }}
+      style={{
+        height: "100vh",
+        position: "relative",
+        overflow: "hidden",
+      }}
     >
-      {/* Header */}
+      {/* Header — positioned below navbar */}
       <div
         style={{
           textAlign: "center",
-          marginBottom: "clamp(2.5rem, 5vw, 5rem)",
-          padding: "0 var(--section-px)",
+          paddingTop: "clamp(4.5rem, 8vw, 6rem)",
+          paddingBottom: "clamp(1rem, 2vw, 1.5rem)",
+          paddingLeft: "var(--section-px)",
+          paddingRight: "var(--section-px)",
         }}
       >
         <p
@@ -107,12 +125,14 @@ export default function ProofSection() {
         </h2>
       </div>
 
-      {/* Sticky stacking cards */}
+      {/* Card stack — centered on viewport */}
       <div
         style={{
-          maxWidth: "860px",
-          margin: "0 auto",
-          padding: "0 var(--section-px)",
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "min(1024px, calc(100% - var(--section-px) * 2))",
         }}
       >
         {PROJECTS.map((project, i) => (
@@ -122,10 +142,10 @@ export default function ProofSection() {
               cardRefs.current[i] = el;
             }}
             style={{
-              position: "sticky",
-              top: `${CARD_TOP_BASE + i * STACK_OFFSET}px`,
-              marginBottom:
-                i < PROJECTS.length - 1 ? "max(180px, 35vh)" : 0,
+              position: i === 0 ? "relative" : "absolute",
+              top: i === 0 ? undefined : 0,
+              left: i === 0 ? undefined : 0,
+              right: i === 0 ? undefined : 0,
               background: "var(--surface)",
               border: "1px solid var(--border)",
               borderRadius: "clamp(16px, 2vw, 24px)",
@@ -142,11 +162,12 @@ export default function ProofSection() {
                 style={{
                   background: project.gradient,
                   borderRight: `1px solid ${project.accentColor}18`,
-                  padding: "clamp(2rem, 3vw, 3rem) clamp(1.5rem, 2.5vw, 2.5rem)",
+                  padding:
+                    "clamp(2rem, 3vw, 3rem) clamp(1.5rem, 2.5vw, 2.5rem)",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between",
-                  minHeight: "clamp(200px, 30vw, 320px)",
+                  minHeight: "clamp(260px, 35vw, 380px)",
                   position: "relative",
                   overflow: "hidden",
                 }}
@@ -192,7 +213,8 @@ export default function ProofSection() {
               {/* Right: content */}
               <div
                 style={{
-                  padding: "clamp(2rem, 3vw, 3rem) clamp(1.5rem, 2.5vw, 2.5rem)",
+                  padding:
+                    "clamp(2rem, 3vw, 3rem) clamp(1.5rem, 2.5vw, 2.5rem)",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "center",

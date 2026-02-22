@@ -141,7 +141,7 @@ export default function HowItWorksSection() {
                   width: "32px",
                   height: "32px",
                   borderRadius: "50%",
-                  background: "var(--accent-dim)",
+                  background: "linear-gradient(var(--accent-dim), var(--accent-dim)), var(--bg)",
                   border: "1px solid rgba(89, 176, 255, 0.35)",
                   display: "flex",
                   alignItems: "center",
