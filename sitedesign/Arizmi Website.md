@@ -1,3 +1,6 @@
+This is a site for a start-up called Arizmi. Try to make it look modern and premium. Follow the section designs outlined below, referencing the images and sites listed below. I have provided the paths to HTML versions of the sites.
+
+
 # ⭐Navigation Bar
 
 [https://www.framer.com/marketplace/components/floating-nav/](https://www.framer.com/marketplace/components/floating-nav/)
@@ -14,6 +17,8 @@ Transparent, minimal, and modern
 
 [https://nakula.framer.website/?utm\_source=framer](https://nakula.framer.website/?utm_source=framer)
 
+@/Users/rafeediqbal/websites/nakula
+
 What to copy:
 
 - Logo+Text starts big, and goes small as you scroll down  
@@ -29,6 +34,8 @@ What to copy:
 
 [https://nakula.framer.website/?utm\_source=framer](https://nakula.framer.website/?utm_source=framer)
 
+@/Users/rafeediqbal/websites/nakula
+
 Text highlights as user scrolls down
 
 Your technical co-founder, combining both business strategy and software engineering to turn your idea into a successful business.
@@ -38,6 +45,8 @@ Your technical co-founder, combining both business strategy and software enginee
 ![][image4]
 
 [https://perform.framer.website/](https://perform.framer.website/)
+
+@/Users/rafeediqbal/websites/perform
 
 Let’s use the scrolling overlapping card component from this website, with each card having a product that we’re working on:
 
@@ -51,6 +60,8 @@ Just stick some placeholder text on the cards, and I’ll create the copy later
 
 [https://darling.framer.website/](https://darling.framer.website/)
 
+@/Users/rafeediqbal/websites/darling
+
 ![][image5]
 
 Can we use an interactive timeline effect here, so as the user scrolls down, the line animates down too
@@ -60,6 +71,8 @@ Rather than large images, we’ll have three cards \- possibly with this kind of
 ![][image6]
 
 [https://calisto.framer.website/](https://calisto.framer.website/)
+
+@/Users/rafeediqbal/websites/calisto
 
 Very minimal animations on each card
 
@@ -77,6 +90,8 @@ I’ll provide better copy later
 # ⭐Why Choose Us
 
 [https://landio.framer.website/](https://landio.framer.website/)
+
+@/Users/rafeediqbal/websites/landio
 
 ![][image7]
 
