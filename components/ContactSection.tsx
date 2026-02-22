@@ -11,7 +11,7 @@ export default function ContactSection() {
       <section
         id="contact"
         style={{
-          padding: "8rem 2rem 10rem",
+          padding: "var(--section-py) var(--section-px) clamp(5rem, 10vw, 10rem)",
           textAlign: "center",
         }}
       >
@@ -61,7 +61,11 @@ export default function ContactSection() {
             }}
           >
             <a
-              href="#" // TODO: replace with Calendly URL
+              href="#contact"
+              onClick={(e) => {
+                e.preventDefault();
+                // TODO: replace with Calendly URL when ready
+              }}
               style={{
                 background: "var(--accent)",
                 color: "#000",

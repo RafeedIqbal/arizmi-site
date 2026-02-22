@@ -51,7 +51,7 @@ export default function ServicesSection() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: "0 2rem",
+        padding: "0 var(--section-px)",
       }}
     >
       <p

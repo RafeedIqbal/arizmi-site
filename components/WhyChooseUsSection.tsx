@@ -42,11 +42,11 @@ export default function WhyChooseUsSection() {
     <section
       id="why"
       style={{
-        padding: "8rem 2rem",
+        padding: "var(--section-py) var(--section-px)",
       }}
     >
       <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: "4rem" }}>
+        <div style={{ textAlign: "center", marginBottom: "clamp(2.5rem, 4vw, 4rem)" }}>
           <p
             style={{
               color: "var(--accent)",
@@ -75,14 +75,14 @@ export default function WhyChooseUsSection() {
               marginTop: "1rem",
             }}
           >
-            Click each card to reveal
+            Tap each card to reveal
           </p>
         </div>
 
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))",
             gap: "1.25rem",
           }}
         >
@@ -90,29 +90,32 @@ export default function WhyChooseUsSection() {
             <button
               key={i}
               onClick={() => toggle(i)}
+              aria-expanded={revealed[i]}
               style={{
                 background: "var(--surface)",
                 backgroundImage: revealed[i]
                   ? "radial-gradient(circle at top right, var(--accent-dim), transparent 60%)"
                   : "none",
-                border: "1px solid var(--border)",
+                border: revealed[i]
+                  ? "1px solid rgba(89, 176, 255, 0.2)"
+                  : "1px solid var(--border)",
                 borderRadius: "12px",
                 padding: "2rem",
                 textAlign: "left",
                 cursor: "pointer",
-                filter: revealed[i] ? "blur(0px)" : "blur(6px)",
-                opacity: revealed[i] ? 1 : 0.4,
-                transition: "filter 0.4s ease, opacity 0.4s ease, background-image 0.4s ease",
-                willChange: "filter, opacity",
+                transition: "opacity 0.4s ease, border-color 0.4s ease, background-image 0.4s ease, transform 0.2s ease",
+                willChange: "opacity",
+                transform: revealed[i] ? "none" : "none",
               }}
             >
               <h3
                 style={{
-                  color: "var(--text)",
+                  color: revealed[i] ? "var(--text)" : "var(--text-muted)",
                   fontSize: "1.0625rem",
                   fontWeight: 600,
                   marginBottom: "0.625rem",
                   lineHeight: 1.3,
+                  transition: "color 0.4s ease",
                 }}
               >
                 {feature.title}
@@ -122,6 +125,10 @@ export default function WhyChooseUsSection() {
                   color: "var(--text-muted)",
                   fontSize: "0.9375rem",
                   lineHeight: 1.6,
+                  opacity: revealed[i] ? 1 : 0,
+                  maxHeight: revealed[i] ? "200px" : "0px",
+                  overflow: "hidden",
+                  transition: "opacity 0.4s ease, max-height 0.4s ease",
                 }}
               >
                 {feature.body}

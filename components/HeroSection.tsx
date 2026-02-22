@@ -104,7 +104,7 @@ export default function HeroSection() {
       id="hero"
       ref={rootRef}
       style={{
-        height: "200vh",
+        height: "clamp(150vh, 180vh, 200vh)",
         position: "relative",
       }}
     >
@@ -116,7 +116,7 @@ export default function HeroSection() {
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: "clamp(200px, 40vw, 500px)",
+          width: "clamp(180px, 35vw, 500px)",
           zIndex: 105,
           pointerEvents: "none",
         }}
@@ -151,9 +151,9 @@ export default function HeroSection() {
           style={{
             position: "absolute",
             top: "1.5rem",
-            bottom: "7rem",
-            left: "clamp(1.5rem, 5vw, 4rem)",
-            right: "clamp(1.5rem, 5vw, 4rem)",
+            bottom: "clamp(5rem, 8vw, 7rem)",
+            left: "var(--section-px)",
+            right: "var(--section-px)",
             border: "2px dashed rgba(255, 255, 255, 0.12)",
             background: "rgba(255, 255, 255, 0.03)",
             borderRadius: "16px",
@@ -173,13 +173,13 @@ export default function HeroSection() {
           ref={bottomRef}
           style={{
             position: "absolute",
-            bottom: "3rem",
-            left: "2rem",
-            right: "2rem",
+            bottom: "clamp(1.5rem, 3vw, 3rem)",
+            left: "var(--section-px)",
+            right: "var(--section-px)",
             display: "flex",
             alignItems: "flex-end",
             justifyContent: "space-between",
-            gap: "2rem",
+            gap: "1.5rem",
             flexWrap: "wrap",
             zIndex: 2,
           }}
@@ -187,7 +187,7 @@ export default function HeroSection() {
           <h1
             style={{
               fontFamily: "var(--font-inter)",
-              fontSize: "clamp(1.5rem, 3vw, 2.5rem)",
+              fontSize: "clamp(1.25rem, 3vw, 2.5rem)",
               fontWeight: 900,
               lineHeight: 1.15,
               letterSpacing: "-0.02em",
@@ -205,10 +205,10 @@ export default function HeroSection() {
             style={{
               background: "var(--accent)",
               color: "#000",
-              padding: "0.875rem 2.5rem",
+              padding: "0.75rem 2rem",
               borderRadius: "9999px",
               fontWeight: 600,
-              fontSize: "1rem",
+              fontSize: "clamp(0.875rem, 1vw, 1rem)",
               textDecoration: "none",
               display: "inline-block",
               whiteSpace: "nowrap",

@@ -72,7 +72,7 @@ export default function HowItWorksSection() {
       id="process"
       ref={rootRef}
       style={{
-        padding: "8rem 2rem",
+        padding: "var(--section-py) var(--section-px)",
       }}
     >
       <div
@@ -81,7 +81,7 @@ export default function HowItWorksSection() {
           margin: "0 auto",
         }}
       >
-        <div style={{ textAlign: "center", marginBottom: "5rem" }}>
+        <div style={{ textAlign: "center", marginBottom: "clamp(2.5rem, 5vw, 5rem)" }}>
           <p
             style={{
               color: "var(--accent)",
@@ -105,14 +105,7 @@ export default function HowItWorksSection() {
           </h2>
         </div>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "64px 1fr",
-            gap: "0 2.5rem",
-            alignItems: "stretch",
-          }}
-        >
+        <div className="timeline-grid">
           {/* Timeline spine */}
           <div style={{ position: "relative", display: "flex", justifyContent: "center" }}>
             {/* Track background */}
@@ -145,8 +138,8 @@ export default function HowItWorksSection() {
                   top: `${i * 33.33 + 5}%`,
                   left: "50%",
                   transform: "translateX(-50%)",
-                  width: "36px",
-                  height: "36px",
+                  width: "32px",
+                  height: "32px",
                   borderRadius: "50%",
                   background: "var(--accent-dim)",
                   border: "1px solid rgba(89, 176, 255, 0.35)",
@@ -154,7 +147,7 @@ export default function HowItWorksSection() {
                   alignItems: "center",
                   justifyContent: "center",
                   color: "var(--accent)",
-                  fontSize: "0.8125rem",
+                  fontSize: "0.75rem",
                   fontWeight: 700,
                   zIndex: 2,
                 }}
@@ -182,7 +175,7 @@ export default function HowItWorksSection() {
                   background: "var(--surface-alt)",
                   border: "1px solid var(--accent-dim)",
                   borderRadius: "16px",
-                  padding: "2rem 2.5rem",
+                  padding: "clamp(1.5rem, 2vw, 2rem) clamp(1.25rem, 2.5vw, 2.5rem)",
                   boxShadow:
                     "0 1px 3px rgba(0,0,0,0.4), 0 4px 16px rgba(89,176,255,0.05)",
                   willChange: "transform, opacity",
@@ -190,7 +183,7 @@ export default function HowItWorksSection() {
               >
                 <h3
                   style={{
-                    fontSize: "1.25rem",
+                    fontSize: "clamp(1.1rem, 1.5vw, 1.25rem)",
                     fontWeight: 700,
                     marginBottom: "0.625rem",
                     color: "var(--text)",

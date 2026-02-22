@@ -71,13 +71,17 @@ export default function ProofSection() {
   }, []);
 
   return (
-    <section id="work" ref={rootRef} style={{ padding: "8rem 0 6rem" }}>
+    <section
+      id="work"
+      ref={rootRef}
+      style={{ padding: "var(--section-py) 0 clamp(3rem, 6vw, 6rem)" }}
+    >
       {/* Header */}
       <div
         style={{
           textAlign: "center",
-          marginBottom: "5rem",
-          padding: "0 2rem",
+          marginBottom: "clamp(2.5rem, 5vw, 5rem)",
+          padding: "0 var(--section-px)",
         }}
       >
         <p
@@ -108,7 +112,7 @@ export default function ProofSection() {
         style={{
           maxWidth: "860px",
           margin: "0 auto",
-          padding: "0 2rem",
+          padding: "0 var(--section-px)",
         }}
       >
         {PROJECTS.map((project, i) => (
@@ -124,7 +128,7 @@ export default function ProofSection() {
                 i < PROJECTS.length - 1 ? "max(180px, 35vh)" : 0,
               background: "var(--surface)",
               border: "1px solid var(--border)",
-              borderRadius: "24px",
+              borderRadius: "clamp(16px, 2vw, 24px)",
               overflow: "hidden",
               boxShadow:
                 "0 8px 48px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.05) inset",
@@ -138,11 +142,11 @@ export default function ProofSection() {
                 style={{
                   background: project.gradient,
                   borderRight: `1px solid ${project.accentColor}18`,
-                  padding: "3rem 2.5rem",
+                  padding: "clamp(2rem, 3vw, 3rem) clamp(1.5rem, 2.5vw, 2.5rem)",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between",
-                  minHeight: "320px",
+                  minHeight: "clamp(200px, 30vw, 320px)",
                   position: "relative",
                   overflow: "hidden",
                 }}
@@ -162,7 +166,7 @@ export default function ProofSection() {
                   {/* Ghost number */}
                   <div
                     style={{
-                      fontSize: "clamp(5rem, 10vw, 8rem)",
+                      fontSize: "clamp(4rem, 8vw, 8rem)",
                       fontFamily: "var(--font-instrument-serif)",
                       fontWeight: 400,
                       color: project.accentColor,
@@ -188,7 +192,7 @@ export default function ProofSection() {
               {/* Right: content */}
               <div
                 style={{
-                  padding: "3rem 2.5rem",
+                  padding: "clamp(2rem, 3vw, 3rem) clamp(1.5rem, 2.5vw, 2.5rem)",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "center",
@@ -213,7 +217,7 @@ export default function ProofSection() {
                 </span>
                 <h3
                   style={{
-                    fontSize: "clamp(1.625rem, 3vw, 2.25rem)",
+                    fontSize: "clamp(1.5rem, 3vw, 2.25rem)",
                     fontFamily: "var(--font-instrument-serif)",
                     fontWeight: 400,
                     color: "var(--text)",

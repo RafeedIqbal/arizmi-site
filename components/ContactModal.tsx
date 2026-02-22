@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 interface Props {
@@ -31,6 +31,7 @@ const labelStyle: React.CSSProperties = {
 export default function ContactModal({ onClose }: Props) {
   const [mounted, setMounted] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -38,6 +39,10 @@ export default function ContactModal({ onClose }: Props) {
       if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", handleEsc);
+
+    // Focus trap: focus the close button on open
+    setTimeout(() => closeRef.current?.focus(), 50);
+
     return () => window.removeEventListener("keydown", handleEsc);
   }, [onClose]);
 
@@ -52,6 +57,9 @@ export default function ContactModal({ onClose }: Props) {
 
   return createPortal(
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Contact form"
       onClick={onClose}
       style={{
         position: "fixed",
@@ -72,7 +80,7 @@ export default function ContactModal({ onClose }: Props) {
           background: "var(--surface-alt)",
           border: "1px solid var(--border)",
           borderRadius: "20px",
-          padding: "2.5rem",
+          padding: "clamp(1.5rem, 3vw, 2.5rem)",
           width: "min(480px, 100%)",
           maxHeight: "90vh",
           overflowY: "auto",
@@ -97,7 +105,9 @@ export default function ContactModal({ onClose }: Props) {
             Get in touch
           </h2>
           <button
+            ref={closeRef}
             onClick={onClose}
+            aria-label="Close dialog"
             style={{
               background: "none",
               border: "1px solid var(--border)",
@@ -120,8 +130,11 @@ export default function ContactModal({ onClose }: Props) {
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: "1.25rem" }}>
-            <label style={labelStyle}>Name</label>
+            <label htmlFor="contact-name" style={labelStyle}>
+              Name
+            </label>
             <input
+              id="contact-name"
               type="text"
               required
               placeholder="Your name"
@@ -132,8 +145,11 @@ export default function ContactModal({ onClose }: Props) {
           </div>
 
           <div style={{ marginBottom: "1.25rem" }}>
-            <label style={labelStyle}>Email</label>
+            <label htmlFor="contact-email" style={labelStyle}>
+              Email
+            </label>
             <input
+              id="contact-email"
               type="email"
               required
               placeholder="you@example.com"
@@ -144,8 +160,11 @@ export default function ContactModal({ onClose }: Props) {
           </div>
 
           <div style={{ marginBottom: "2rem" }}>
-            <label style={labelStyle}>Message</label>
+            <label htmlFor="contact-message" style={labelStyle}>
+              Message
+            </label>
             <textarea
+              id="contact-message"
               required
               placeholder="Tell us about your idea..."
               rows={5}
