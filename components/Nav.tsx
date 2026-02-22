@@ -101,103 +101,138 @@ export default function Nav() {
     return () => mq.removeEventListener("change", handler);
   }, []);
 
-  return (
-    <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] whitespace-nowrap max-w-[calc(100vw-2rem)]">
-      <div className="flex items-center gap-1 bg-black/40 backdrop-blur-xl border border-white/[0.08] rounded-full py-2.5 pl-5 pr-3 sm:pl-6">
-        <a
-          ref={textRef}
-          href="#hero"
-          onClick={(e) => scrollTo(e, "#hero")}
-          className="text-[var(--text)] font-bold text-sm mr-3 no-underline overflow-hidden hidden sm:inline-block"
-          style={{ display: undefined }}
-        >
-          Arizmi
-        </a>
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const handler = (e: MouseEvent) => {
+      const nav = (e.target as HTMLElement).closest("nav");
+      if (!nav) setMobileOpen(false);
+    };
+    document.addEventListener("click", handler);
+    return () => document.removeEventListener("click", handler);
+  }, [mobileOpen]);
 
-        {/* Desktop links */}
-        <div className="hidden sm:flex items-center gap-1">
-          {links.map(({ label, href }) => {
-            const id = href.replace("#", "");
-            const isActive = active === id;
-            return (
-              <a
-                key={label}
-                href={href}
-                onClick={(e) => scrollTo(e, href)}
-                className={`
-                  text-sm no-underline rounded-full px-3 py-1.5
-                  transition-all duration-200
-                  ${
-                    isActive
+  return (
+    <>
+      {/* Desktop nav — centered pill */}
+      <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] whitespace-nowrap hidden sm:block">
+        <div className="flex items-center gap-1 bg-black/40 backdrop-blur-xl border border-white/[0.08] rounded-full py-2.5 pl-6 pr-3">
+          <a
+            ref={textRef}
+            href="#hero"
+            onClick={(e) => scrollTo(e, "#hero")}
+            className="text-[var(--text)] font-bold text-sm mr-3 no-underline overflow-hidden"
+          >
+            Arizmi
+          </a>
+
+          <div className="flex items-center gap-1">
+            {links.map(({ label, href }) => {
+              const id = href.replace("#", "");
+              const isActive = active === id;
+              return (
+                <a
+                  key={label}
+                  href={href}
+                  onClick={(e) => scrollTo(e, href)}
+                  className={`
+                    text-sm no-underline rounded-full px-3 py-1.5
+                    transition-all duration-200
+                    ${isActive
                       ? "text-[var(--text)] bg-white/[0.08]"
                       : "text-white/40 hover:text-white/70"
-                  }
-                `}
-              >
-                {label}
-              </a>
-            );
-          })}
-        </div>
+                    }
+                  `}
+                >
+                  {label}
+                </a>
+              );
+            })}
+          </div>
 
-        {/* Desktop CTA */}
-        <a
-          href="#contact"
-          onClick={(e) => scrollTo(e, "#contact")}
-          className={`
-            text-sm no-underline rounded-full px-5 py-1.5 ml-1.5
-            transition-all duration-200 border hidden sm:inline-block
-            ${
-              active === "contact"
-                ? "bg-[var(--accent)] text-[var(--bg)] border-[var(--accent)]"
-                : "text-[var(--accent)] border-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--bg)]"
-            }
-          `}
-        >
-          Get Started
-        </a>
-
-        {/* Mobile: show compact nav links inline */}
-        <div className="flex sm:hidden items-center gap-0.5">
-          {links.map(({ label, href }) => {
-            const id = href.replace("#", "");
-            const isActive = active === id;
-            return (
-              <a
-                key={label}
-                href={href}
-                onClick={(e) => scrollTo(e, href)}
-                className={`
-                  text-xs no-underline rounded-full px-2 py-1
-                  transition-all duration-200
-                  ${
-                    isActive
-                      ? "text-[var(--text)] bg-white/[0.08]"
-                      : "text-white/40"
-                  }
-                `}
-              >
-                {label}
-              </a>
-            );
-          })}
           <a
             href="#contact"
             onClick={(e) => scrollTo(e, "#contact")}
             className={`
-              text-xs no-underline rounded-full px-3 py-1 ml-0.5
+              text-sm no-underline rounded-full px-5 py-1.5 ml-1.5
               transition-all duration-200 border
-              ${
-                active === "contact"
-                  ? "bg-[var(--accent)] text-[var(--bg)] border-[var(--accent)]"
-                  : "text-[var(--accent)] border-[var(--accent)]"
+              ${active === "contact"
+                ? "bg-[var(--accent)] text-[var(--bg)] border-[var(--accent)]"
+                : "text-[var(--accent)] border-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--bg)]"
               }
             `}
           >
-            Start
+            Get Started
           </a>
         </div>
-      </div>
-    </nav>
+      </nav>
+
+      {/* Mobile nav — compact burger, right-aligned */}
+      <nav className="fixed top-4 right-4 z-[100] sm:hidden flex flex-col items-end">
+        <button
+          onClick={() => setMobileOpen((prev) => !prev)}
+          className="flex items-center justify-center w-10 h-10 rounded-full bg-black/40 backdrop-blur-xl border border-white/[0.08]"
+          aria-label="Toggle menu"
+        >
+          <div className="flex flex-col items-center justify-center gap-[5px] w-[18px]">
+            <span
+              className={`block h-[1.5px] w-full bg-[var(--text)] rounded-full transition-transform duration-300 origin-center ${mobileOpen ? "rotate-45 translate-y-[3.25px]" : ""
+                }`}
+            />
+            <span
+              className={`block h-[1.5px] w-full bg-[var(--text)] rounded-full transition-transform duration-300 origin-center ${mobileOpen ? "-rotate-45 -translate-y-[3.25px]" : ""
+                }`}
+            />
+          </div>
+        </button>
+
+        {/* Mobile dropdown */}
+        <div
+          className={`
+            absolute top-full right-0 mt-2 origin-top-right min-w-[180px]
+            transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]
+            ${mobileOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-2 pointer-events-none"}
+          `}
+        >
+          <div className="bg-black/60 backdrop-blur-xl border border-white/[0.08] rounded-2xl p-3 flex flex-col gap-0.5">
+            {links.map(({ label, href }) => {
+              const id = href.replace("#", "");
+              const isActive = active === id;
+              return (
+                <a
+                  key={label}
+                  href={href}
+                  onClick={(e) => scrollTo(e, href)}
+                  className={`
+                    text-sm no-underline rounded-xl px-4 py-2.5 whitespace-nowrap
+                    transition-all duration-200
+                    ${isActive
+                      ? "text-[var(--text)] bg-white/[0.08]"
+                      : "text-white/50 hover:text-white/70 hover:bg-white/[0.04]"
+                    }
+                  `}
+                >
+                  {label}
+                </a>
+              );
+            })}
+            <a
+              href="#contact"
+              onClick={(e) => scrollTo(e, "#contact")}
+              className={`
+                text-sm no-underline rounded-xl px-4 py-2.5 mt-1 whitespace-nowrap
+                transition-all duration-200 border text-center
+                ${active === "contact"
+                  ? "bg-[var(--accent)] text-[var(--bg)] border-[var(--accent)]"
+                  : "text-[var(--accent)] border-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--bg)]"
+                }
+              `}
+            >
+              Get Started
+            </a>
+          </div>
+        </div>
+      </nav>
+    </>
   );
 }

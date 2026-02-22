@@ -14,50 +14,27 @@ export default function HeroSection() {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    const logo = logoRef.current;
     const root = rootRef.current;
-    if (!logo || !root) return;
+    if (!root) return;
 
     const ctx = gsap.context(() => {
-      // Capture logo's initial centered position
-      const logoRect = logo.getBoundingClientRect();
-      const startTop = logoRect.top;
-      const startLeft = logoRect.left;
-      const startWidth = logoRect.width;
+      // Phase 1: Logo shrinks down from 4x to 1x
+      gsap.fromTo(
+        logoRef.current,
+        { scale: 4 },
+        {
+          scale: 1,
+          ease: "none",
+          scrollTrigger: {
+            trigger: root,
+            start: "top top",
+            end: "40% top",
+            scrub: 0.5,
+          },
+        }
+      );
 
-      // Target: 40px logo in top-left of viewport
-      const targetWidth = 40;
-      const targetTop = 14;
-      const targetLeft = 24;
-      const scaleTo = targetWidth / startWidth;
-
-      // Pin logo to its current visual position so GSAP can animate freely
-      gsap.set(logo, {
-        position: "fixed",
-        top: startTop,
-        left: startLeft,
-        xPercent: 0,
-        yPercent: 0,
-        x: 0,
-        y: 0,
-        transformOrigin: "top left",
-      });
-
-      // Phase 1 — Logo shrinks to top-left (first half of scroll)
-      gsap.to(logo, {
-        top: targetTop,
-        left: targetLeft,
-        scale: scaleTo,
-        ease: "none",
-        scrollTrigger: {
-          trigger: root,
-          start: "top top",
-          end: "center top",
-          scrub: 0.5,
-        },
-      });
-
-      // Phase 2 — Hero image fades out with parallax
+      // Hero image fades out with parallax
       gsap.to(imageRef.current, {
         opacity: 0,
         y: -100,
@@ -71,7 +48,7 @@ export default function HeroSection() {
         },
       });
 
-      // Phase 2 — Bottom bar fades out with parallax
+      // Bottom bar fades out with parallax
       gsap.to(bottomRef.current, {
         opacity: 0,
         y: -60,
@@ -108,18 +85,18 @@ export default function HeroSection() {
         position: "relative",
       }}
     >
-      {/* Logo — fixed, persists after hero scroll */}
+      {/* Logo — fixed top-left, starts 4x size and scales down */}
       <div
         ref={logoRef}
         style={{
           position: "fixed",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: "clamp(180px, 35vw, 500px)",
+          top: 16,
+          left: "var(--section-px)",
           zIndex: 105,
           pointerEvents: "none",
+          transformOrigin: "top left",
         }}
+        className="w-10 sm:w-[88px]"
       >
         <Image
           src="/logo.jpeg"
@@ -131,7 +108,7 @@ export default function HeroSection() {
             width: "100%",
             height: "auto",
             mixBlendMode: "lighten",
-            borderRadius: "12px",
+            borderRadius: "8px",
           }}
         />
       </div>
