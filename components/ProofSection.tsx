@@ -6,90 +6,78 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const CARDS = [
+const PROJECTS = [
   {
     number: "01",
     project: "Icon Training",
-    blurb:
-      "A full-stack fitness platform built from scratch for a first-time founder — mobile app, trainer dashboard, and payment integration.",
     tag: "Fitness Tech",
+    blurb:
+      "Placeholder — copy coming soon. A complete fitness platform built for a first-time founder, from mobile app to trainer dashboard.",
+    accentColor: "#59b0ff",
+    gradient:
+      "linear-gradient(160deg, rgba(89,176,255,0.1) 0%, rgba(89,176,255,0.03) 100%)",
   },
   {
     number: "02",
     project: "Basenote Solutions",
-    blurb:
-      "B2B SaaS MVP shipped in 8 weeks. Customer portal, analytics dashboard, and integrations with existing enterprise tools.",
     tag: "B2B SaaS",
+    blurb:
+      "Placeholder — copy coming soon. An end-to-end B2B SaaS MVP: customer portal, analytics dashboard, and enterprise integrations.",
+    accentColor: "#c084fc",
+    gradient:
+      "linear-gradient(160deg, rgba(192,132,252,0.1) 0%, rgba(192,132,252,0.03) 100%)",
   },
   {
     number: "03",
-    project: "Coming Soon",
+    project: "Freedom Airlines",
+    tag: "Travel & Aviation",
     blurb:
-      "Another exciting start-up project in the works. Reach out to learn more or get on the list.",
-    tag: "TBD",
+      "Placeholder — copy coming soon. Reach out if you'd like to learn more about this exciting new venture.",
+    accentColor: "#34d399",
+    gradient:
+      "linear-gradient(160deg, rgba(52,211,153,0.1) 0%, rgba(52,211,153,0.03) 100%)",
   },
 ];
 
+const CARD_TOP_BASE = 88;
+const STACK_OFFSET = 24;
+
 export default function ProofSection() {
   const rootRef = useRef<HTMLElement>(null);
-  const card2Ref = useRef<HTMLDivElement>(null);
-  const card3Ref = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.set(card2Ref.current, { y: 60 });
-      gsap.set(card3Ref.current, { y: 120 });
+      cardRefs.current.forEach((card, i) => {
+        if (!card || i === PROJECTS.length - 1) return;
+        const next = cardRefs.current[i + 1];
+        if (!next) return;
 
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: rootRef.current,
-          start: "top top",
-          end: "+=1200",
-          scrub: 1,
-          pin: true,
-        },
+        // Scale down each card as the next one slides in
+        gsap.to(card, {
+          scale: 0.96 - i * 0.01,
+          ease: "none",
+          scrollTrigger: {
+            trigger: next,
+            start: "top 88%",
+            end: `top ${CARD_TOP_BASE + (i + 1) * STACK_OFFSET + 8}px`,
+            scrub: 1,
+          },
+        });
       });
-
-      tl.to(card2Ref.current, { y: 20, duration: 1 }, 0);
-      tl.to(card3Ref.current, { y: 40, duration: 1.5 }, 0);
     }, rootRef);
 
     return () => ctx.revert();
   }, []);
 
-  const cardBase: React.CSSProperties = {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    background: "var(--surface-alt)",
-    border: "1px solid var(--border)",
-    borderRadius: "16px",
-    padding: "2.5rem",
-    boxShadow:
-      "0px 4px 32px rgba(0,0,0,0.5), 0px 2px 8px rgba(0,0,0,0.3)",
-    willChange: "transform",
-  };
-
   return (
-    <section
-      id="work"
-      ref={rootRef}
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "6rem 2rem",
-      }}
-    >
+    <section id="work" ref={rootRef} style={{ padding: "8rem 0 6rem" }}>
+      {/* Header */}
       <div
         style={{
-          maxWidth: "700px",
-          width: "100%",
           textAlign: "center",
-          marginBottom: "4rem",
+          marginBottom: "5rem",
+          padding: "0 2rem",
         }}
       >
         <p
@@ -115,88 +103,142 @@ export default function ProofSection() {
         </h2>
       </div>
 
+      {/* Sticky stacking cards */}
       <div
         style={{
-          position: "relative",
-          width: "min(680px, 90vw)",
-          height: "300px",
+          maxWidth: "860px",
+          margin: "0 auto",
+          padding: "0 2rem",
         }}
       >
-        {/* Card 3 — back */}
-        <div ref={card3Ref} style={{ ...cardBase, zIndex: 1 }}>
-          <CardContent card={CARDS[2]} />
-        </div>
+        {PROJECTS.map((project, i) => (
+          <div
+            key={project.number}
+            ref={(el) => {
+              cardRefs.current[i] = el;
+            }}
+            style={{
+              position: "sticky",
+              top: `${CARD_TOP_BASE + i * STACK_OFFSET}px`,
+              marginBottom:
+                i < PROJECTS.length - 1 ? "max(180px, 35vh)" : 0,
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+              borderRadius: "24px",
+              overflow: "hidden",
+              boxShadow:
+                "0 8px 48px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.05) inset",
+              willChange: "transform",
+              transformOrigin: "top center",
+            }}
+          >
+            <div className="proof-card-grid">
+              {/* Left: accent panel */}
+              <div
+                style={{
+                  background: project.gradient,
+                  borderRight: `1px solid ${project.accentColor}18`,
+                  padding: "3rem 2.5rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  minHeight: "320px",
+                  position: "relative",
+                  overflow: "hidden",
+                }}
+              >
+                <span
+                  style={{
+                    color: project.accentColor,
+                    fontSize: "0.7rem",
+                    fontWeight: 700,
+                    letterSpacing: "0.2em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {project.number}
+                </span>
+                <div>
+                  {/* Ghost number */}
+                  <div
+                    style={{
+                      fontSize: "clamp(5rem, 10vw, 8rem)",
+                      fontFamily: "var(--font-instrument-serif)",
+                      fontWeight: 400,
+                      color: project.accentColor,
+                      opacity: 0.12,
+                      lineHeight: 1,
+                      userSelect: "none",
+                      marginBottom: "1.25rem",
+                    }}
+                  >
+                    {project.number}
+                  </div>
+                  <div
+                    style={{
+                      width: "32px",
+                      height: "2px",
+                      background: project.accentColor,
+                      opacity: 0.5,
+                    }}
+                  />
+                </div>
+              </div>
 
-        {/* Card 2 — middle */}
-        <div ref={card2Ref} style={{ ...cardBase, zIndex: 2 }}>
-          <CardContent card={CARDS[1]} />
-        </div>
-
-        {/* Card 1 — front */}
-        <div style={{ ...cardBase, zIndex: 3 }}>
-          <CardContent card={CARDS[0]} />
-        </div>
+              {/* Right: content */}
+              <div
+                style={{
+                  padding: "3rem 2.5rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  gap: "1.25rem",
+                }}
+              >
+                <span
+                  style={{
+                    background: `${project.accentColor}18`,
+                    color: project.accentColor,
+                    fontSize: "0.7rem",
+                    fontWeight: 700,
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    padding: "0.35rem 0.9rem",
+                    borderRadius: "9999px",
+                    border: `1px solid ${project.accentColor}28`,
+                    alignSelf: "flex-start",
+                  }}
+                >
+                  {project.tag}
+                </span>
+                <h3
+                  style={{
+                    fontSize: "clamp(1.625rem, 3vw, 2.25rem)",
+                    fontFamily: "var(--font-instrument-serif)",
+                    fontWeight: 400,
+                    color: "var(--text)",
+                    lineHeight: 1.15,
+                    margin: 0,
+                  }}
+                >
+                  {project.project}
+                </h3>
+                <p
+                  style={{
+                    color: "var(--text-muted)",
+                    fontSize: "0.9375rem",
+                    lineHeight: 1.7,
+                    margin: 0,
+                    maxWidth: "420px",
+                  }}
+                >
+                  {project.blurb}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </section>
-  );
-}
-
-function CardContent({ card }: { card: (typeof CARDS)[0] }) {
-  return (
-    <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          marginBottom: "1rem",
-        }}
-      >
-        <span
-          style={{
-            color: "var(--text-muted)",
-            fontSize: "0.75rem",
-            fontWeight: 600,
-            letterSpacing: "0.08em",
-          }}
-        >
-          {card.number}
-        </span>
-        <span
-          style={{
-            background: "var(--accent-dim)",
-            color: "var(--accent)",
-            fontSize: "0.75rem",
-            fontWeight: 500,
-            padding: "0.25rem 0.75rem",
-            borderRadius: "9999px",
-            border: "1px solid rgba(89, 176, 255, 0.2)",
-          }}
-        >
-          {card.tag}
-        </span>
-      </div>
-
-      <h3
-        style={{
-          fontSize: "1.5rem",
-          fontWeight: 700,
-          marginBottom: "0.75rem",
-          color: "var(--text)",
-        }}
-      >
-        {card.project}
-      </h3>
-
-      <p
-        style={{
-          color: "var(--text-muted)",
-          fontSize: "0.9375rem",
-          lineHeight: 1.6,
-        }}
-      >
-        {card.blurb}
-      </p>
-    </div>
   );
 }
