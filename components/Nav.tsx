@@ -115,7 +115,7 @@ export default function Nav() {
   return (
     <>
       {/* Desktop nav — centered pill */}
-      <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] whitespace-nowrap hidden sm:block">
+      <nav className="fixed top-[max(1rem,env(safe-area-inset-top,1rem))] left-1/2 -translate-x-1/2 z-[100] whitespace-nowrap hidden sm:block">
         <div className="flex items-center gap-1 bg-black/40 backdrop-blur-xl border border-white/[0.08] rounded-full py-2.5 pl-6 pr-3">
           <a
             ref={textRef}
@@ -168,7 +168,7 @@ export default function Nav() {
       </nav>
 
       {/* Mobile nav — compact burger, right-aligned */}
-      <nav className="fixed top-4 right-4 z-[100] sm:hidden flex flex-col items-end">
+      <nav className="fixed top-[max(1rem,env(safe-area-inset-top,1rem))] right-[max(1.5rem,env(safe-area-inset-right,1.5rem))] z-[100] sm:hidden flex flex-col items-end">
         <button
           onClick={() => setMobileOpen((prev) => !prev)}
           className="flex items-center justify-center w-10 h-10 rounded-full bg-black/40 backdrop-blur-xl border border-white/[0.08]"

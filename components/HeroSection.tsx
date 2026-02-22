@@ -17,6 +17,8 @@ export default function HeroSection() {
     const root = rootRef.current;
     if (!root) return;
 
+    ScrollTrigger.normalizeScroll(true);
+
     const ctx = gsap.context(() => {
       // Phase 1: Logo shrinks down from 4x to 1x
       gsap.fromTo(
@@ -90,7 +92,7 @@ export default function HeroSection() {
         ref={logoRef}
         style={{
           position: "fixed",
-          top: 16,
+          top: "max(16px, env(safe-area-inset-top, 16px))",
           left: "var(--section-px)",
           zIndex: 105,
           pointerEvents: "none",
