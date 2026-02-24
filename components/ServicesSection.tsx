@@ -1,10 +1,7 @@
 "use client";
 
 import { useRef, useLayoutEffect } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
+import { gsap, prefersReducedMotion } from "@/lib/motion";
 
 const WORDS =
   "Your technical co-founder, combining both business strategy and software engineering to turn your idea into a successful business.".split(
@@ -16,6 +13,17 @@ export default function ServicesSection() {
   const wordsRef = useRef<(HTMLSpanElement | null)[]>([]);
 
   useLayoutEffect(() => {
+    if (prefersReducedMotion()) {
+      // Show all words at full opacity when motion is reduced
+      wordsRef.current.forEach((word) => {
+        if (word) {
+          word.style.opacity = "1";
+          word.style.color = "var(--text)";
+        }
+      });
+      return;
+    }
+
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         scrollTrigger: {

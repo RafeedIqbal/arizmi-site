@@ -1,10 +1,7 @@
 "use client";
 
 import { useRef, useLayoutEffect } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
+import { gsap, prefersReducedMotion } from "@/lib/motion";
 
 const PROJECTS = [
   {
@@ -45,7 +42,7 @@ export default function ProofSection() {
 
   useLayoutEffect(() => {
     const cards = cardRefs.current.filter(Boolean) as HTMLDivElement[];
-    if (cards.length < 2) return;
+    if (cards.length < 2 || prefersReducedMotion()) return;
 
     const ctx = gsap.context(() => {
       // Cards after the first start off-screen below the viewport

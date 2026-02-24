@@ -2,10 +2,7 @@
 
 import { useRef, useLayoutEffect } from "react";
 import Image from "next/image";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
+import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/motion";
 
 export default function HeroSection() {
   const rootRef = useRef<HTMLElement>(null);
@@ -15,9 +12,7 @@ export default function HeroSection() {
 
   useLayoutEffect(() => {
     const root = rootRef.current;
-    if (!root) return;
-
-
+    if (!root || prefersReducedMotion()) return;
 
     const ctx = gsap.context(() => {
       // Phase 1: Logo shrinks down from 4x to 1x

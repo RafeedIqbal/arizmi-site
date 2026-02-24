@@ -1,10 +1,7 @@
 "use client";
 
 import { useRef, useLayoutEffect } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
+import { gsap, prefersReducedMotion } from "@/lib/motion";
 
 const STEPS = [
   {
@@ -30,6 +27,8 @@ export default function HowItWorksSection() {
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useLayoutEffect(() => {
+    if (prefersReducedMotion()) return;
+
     const ctx = gsap.context(() => {
       gsap.set(lineRef.current, { scaleY: 0, transformOrigin: "top center" });
 

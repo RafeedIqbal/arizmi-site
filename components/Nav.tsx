@@ -1,10 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
+import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/motion";
 
 const links = [
   { label: "Services", href: "#services" },
@@ -50,12 +47,13 @@ export default function Nav() {
   // Animate the "Arizmi" text based on heroScrolled state
   useEffect(() => {
     if (!textRef.current) return;
+    const duration = prefersReducedMotion() ? 0 : 0.3;
     if (heroScrolled) {
       gsap.to(textRef.current, {
         opacity: 0,
         width: 0,
         marginRight: 0,
-        duration: 0.3,
+        duration,
         ease: "power2.inOut",
       });
     } else {
@@ -63,7 +61,7 @@ export default function Nav() {
         opacity: 1,
         width: "auto",
         marginRight: 12,
-        duration: 0.3,
+        duration,
         ease: "power2.inOut",
       });
     }
@@ -101,15 +99,22 @@ export default function Nav() {
     return () => mq.removeEventListener("change", handler);
   }, []);
 
-  // Close mobile menu when clicking outside
+  // Close mobile menu when clicking outside or pressing Escape
   useEffect(() => {
     if (!mobileOpen) return;
-    const handler = (e: MouseEvent) => {
+    const handleClick = (e: MouseEvent) => {
       const nav = (e.target as HTMLElement).closest("nav");
       if (!nav) setMobileOpen(false);
     };
-    document.addEventListener("click", handler);
-    return () => document.removeEventListener("click", handler);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileOpen(false);
+    };
+    document.addEventListener("click", handleClick);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("click", handleClick);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, [mobileOpen]);
 
   return (
@@ -173,6 +178,8 @@ export default function Nav() {
           onClick={() => setMobileOpen((prev) => !prev)}
           className="flex items-center justify-center w-10 h-10 rounded-full bg-black/40 backdrop-blur-xl border border-white/[0.08]"
           aria-label="Toggle menu"
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-nav-menu"
         >
           <div className="flex flex-col items-center justify-center gap-[5px] w-[18px]">
             <span
@@ -188,6 +195,8 @@ export default function Nav() {
 
         {/* Mobile dropdown */}
         <div
+          id="mobile-nav-menu"
+          role="menu"
           className={`
             absolute top-full right-0 mt-2 origin-top-right min-w-[180px]
             transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]

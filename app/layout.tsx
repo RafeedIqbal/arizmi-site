@@ -1,22 +1,50 @@
 import type { Metadata } from "next";
-import { Inter, Instrument_Serif } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const inter = Inter({
+const inter = localFont({
+  src: "../public/fonts/Inter-Variable.woff2",
   variable: "--font-inter",
-  subsets: ["latin"],
+  display: "swap",
+  weight: "100 900",
 });
 
-const instrumentSerif = Instrument_Serif({
+const instrumentSerif = localFont({
+  src: "../public/fonts/InstrumentSerif-Regular.woff2",
   variable: "--font-instrument-serif",
-  subsets: ["latin"],
+  display: "swap",
   weight: "400",
 });
+
+const siteUrl = "https://arizmi.com";
 
 export const metadata: Metadata = {
   title: "Arizmi — Start-Up Apps & Websites",
   description:
     "Your technical co-founder, combining business strategy and software engineering to turn your idea into a successful business.",
+  metadataBase: new URL(siteUrl),
+  openGraph: {
+    title: "Arizmi — Start-Up Apps & Websites",
+    description:
+      "Your technical co-founder, combining business strategy and software engineering to turn your idea into a successful business.",
+    url: siteUrl,
+    siteName: "Arizmi",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Arizmi — Start-Up Apps & Websites",
+    description:
+      "Your technical co-founder, combining business strategy and software engineering to turn your idea into a successful business.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  alternates: {
+    canonical: siteUrl,
+  },
 };
 
 export default function RootLayout({

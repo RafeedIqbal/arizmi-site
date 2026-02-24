@@ -125,6 +125,10 @@ export default function WhyChooseUsSection() {
               data-index={i}
               onMouseEnter={() => handleReveal(i)}
               onTouchStart={() => handleReveal(i)}
+              onFocus={() => handleReveal(i)}
+              tabIndex={0}
+              role="group"
+              aria-label={feature.title}
               style={{
                 background: "var(--surface)",
                 backgroundImage: revealed[i]

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 
 interface Props {
@@ -29,24 +29,63 @@ const labelStyle: React.CSSProperties = {
 };
 
 export default function ContactModal({ onClose }: Props) {
-  const [mounted, setMounted] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", message: "" });
-  const closeRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+
+  const trapFocus = useCallback((e: KeyboardEvent) => {
+    if (e.key !== "Tab" || !dialogRef.current) return;
+
+    const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusable.length === 0) return;
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (e.shiftKey) {
+      if (document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      }
+    } else {
+      if (document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  }, []);
 
   useEffect(() => {
-    setMounted(true);
-    const handleEsc = (e: KeyboardEvent) => {
+    // Save previous focus for restore
+    previousFocusRef.current = document.activeElement as HTMLElement;
+
+    // Lock body scroll
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    // Focus first focusable element in dialog
+    const timer = setTimeout(() => {
+      const firstInput = dialogRef.current?.querySelector<HTMLElement>("input, textarea, button");
+      firstInput?.focus();
+    }, 50);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
+      trapFocus(e);
     };
-    window.addEventListener("keydown", handleEsc);
 
-    // Focus trap: focus the close button on open
-    setTimeout(() => closeRef.current?.focus(), 50);
+    window.addEventListener("keydown", handleKeyDown);
 
-    return () => window.removeEventListener("keydown", handleEsc);
-  }, [onClose]);
-
-  if (!mounted) return null;
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = originalOverflow;
+      clearTimeout(timer);
+      // Restore focus
+      previousFocusRef.current?.focus();
+    };
+  }, [onClose, trapFocus]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +98,7 @@ export default function ContactModal({ onClose }: Props) {
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Contact form"
+      aria-labelledby="contact-dialog-title"
       onClick={onClose}
       style={{
         position: "fixed",
@@ -75,6 +114,7 @@ export default function ContactModal({ onClose }: Props) {
       }}
     >
       <div
+        ref={dialogRef}
         onClick={(e) => e.stopPropagation()}
         style={{
           background: "var(--surface-alt)",
@@ -96,6 +136,7 @@ export default function ContactModal({ onClose }: Props) {
           }}
         >
           <h2
+            id="contact-dialog-title"
             style={{
               fontSize: "1.5rem",
               fontWeight: 700,
@@ -105,7 +146,6 @@ export default function ContactModal({ onClose }: Props) {
             Get in touch
           </h2>
           <button
-            ref={closeRef}
             onClick={onClose}
             aria-label="Close dialog"
             style={{

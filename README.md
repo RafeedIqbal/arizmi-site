@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Arizmi
+
+Marketing site for Arizmi — a technical co-founder service that builds start-up apps and websites.
+
+## Tech Stack
+
+- **Framework:** Next.js 15 (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS v4 + CSS custom properties
+- **Animation:** GSAP + ScrollTrigger
+- **Testing:** Playwright (E2E)
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command | Description |
+|---|---|
+| `npm run dev` | Start development server |
+| `npm run build` | Production build |
+| `npm run start` | Start production server |
+| `npm run lint` | Run ESLint |
+| `npm run typecheck` | Run TypeScript type checking |
+| `npm run test:e2e` | Run Playwright E2E tests |
+| `npm run ci` | Full CI pipeline: lint + typecheck + build + e2e |
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+app/
+  layout.tsx       Root layout (fonts, metadata)
+  page.tsx         Home page
+  globals.css      Design tokens + Tailwind config
+  robots.ts        Robots.txt generation
+  sitemap.ts       Sitemap generation
+components/
+  Nav.tsx           Floating pill navbar
+  HeroSection.tsx   Full-viewport hero with scroll animation
+  ServicesSection.tsx  Word-by-word text highlight
+  ProofSection.tsx    Overlapping card stack
+  HowItWorksSection.tsx  Vertical timeline
+  WhyChooseUsSection.tsx  Feature grid with reveal
+  ContactSection.tsx  CTA section
+  ContactModal.tsx    Contact form modal
+lib/
+  motion.ts        Shared GSAP/ScrollTrigger setup
+public/
+  fonts/           Self-hosted Inter + Instrument Serif
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Deploy to Vercel or any platform supporting Next.js:
 
-## Deploy on Vercel
+```bash
+npm run build
+npm run start
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Fonts are self-hosted — no external network fetches required during build.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Release Checklist
+
+1. `npm run ci` passes
+2. Lighthouse: Performance >= 85, Accessibility >= 95, Best Practices >= 95, SEO >= 95
+3. Manual check on mobile and desktop
+4. Verify security headers via response headers
