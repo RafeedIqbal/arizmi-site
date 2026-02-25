@@ -22,14 +22,8 @@ Repository: `Arizmi-Site`
      - `npm ls` reports invalid peer ranges for Next ESLint plugins (expecting ESLint <=9).
    - Impact: CI cannot reliably enforce static quality checks.
 
-2. E2E test suite is template-only and does not validate this site.
-   - Evidence:
-     - [`/Volumes/External Drive/Github/Arizmi-Site/tests/example.spec.ts:4`](/Volumes/External Drive/Github/Arizmi-Site/tests/example.spec.ts:4) and `:11` test `playwright.dev` instead of local app.
-     - [`/Volumes/External Drive/Github/Arizmi-Site/playwright.config.ts:32`](/Volumes/External Drive/Github/Arizmi-Site/playwright.config.ts:32) `baseURL` is commented.
-     - [`/Volumes/External Drive/Github/Arizmi-Site/playwright.config.ts:77`](/Volumes/External Drive/Github/Arizmi-Site/playwright.config.ts:77) `webServer` is commented.
-   - Impact: false confidence; shipping regressions likely.
 
-3. Build reproducibility depends on external font fetch during build.
+2. Build reproducibility depends on external font fetch during build.
    - Evidence:
      - [`/Volumes/External Drive/Github/Arizmi-Site/app/layout.tsx:2`](/Volumes/External Drive/Github/Arizmi-Site/app/layout.tsx:2) uses `next/font/google`.
      - `npm run build` fails in restricted network due Google Fonts fetch.
@@ -76,19 +70,15 @@ Repository: `Arizmi-Site`
 
 ## Remediation Plan (Phased)
 
-## Phase 1: Stabilize Build and CI (Day 0-1)
+## Phase 1: Stabilize Build and CI
 1. Fix lint compatibility.
    - Pin ESLint to Next-supported major (`^9`) and reinstall lockfile.
    - Verify `npm run lint` is green.
-2. Replace template E2E tests.
-   - Create smoke tests against local app routes/sections.
-   - Enable `baseURL` and `webServer` in Playwright config.
-   - Limit default CI matrix to a reliable baseline browser first (`chromium`), expand after stability.
-3. Add deterministic CI scripts.
-   - Add `typecheck`, `test:e2e`, and `ci` scripts in `package.json`.
+2. Add deterministic CI scripts.
+   - Add `typecheck`, and `ci` scripts in `package.json`.
    - CI gate: lint + typecheck + build + e2e smoke.
 
-## Phase 2: Accessibility and UX Hardening (Day 1-2)
+## Phase 2: Accessibility and UX Hardening
 1. Remove global scrollbar suppression.
 2. Implement proper dialog a11y:
    - Focus trap loop, focus restore, body scroll lock, `aria-labelledby`.
@@ -98,14 +88,14 @@ Repository: `Arizmi-Site`
 5. Add reduced-motion support:
    - Respect `prefers-reduced-motion` for GSAP timelines and smooth-scroll behavior.
 
-## Phase 3: Security and SEO Baseline (Day 2-3)
+## Phase 3: Security and SEO Baseline
 1. Add security headers in `next.config.ts`:
    - `Content-Security-Policy` (report-only first), `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `X-Frame-Options`.
 2. Expand metadata:
    - Canonical URL, Open Graph, Twitter card, robots directives.
 3. Add `app/robots.ts` and `app/sitemap.ts`.
 
-## Phase 4: Performance Optimization (Day 3-4)
+## Phase 4: Performance Optimization
 1. Motion performance pass:
    - Avoid animating layout-affecting properties where possible.
    - Consolidate GSAP setup utility and avoid repeated plugin registration patterns.
@@ -117,7 +107,7 @@ Repository: `Arizmi-Site`
    - Lighthouse mobile targets (Performance >=85, Accessibility >=95, Best Practices >=95, SEO >=95).
    - Web Vitals thresholds for LCP/CLS/INP.
 
-## Phase 5: Documentation and Operations (Day 4)
+## Phase 5: Documentation and Operations
 1. Replace boilerplate README with:
    - real setup, scripts, deployment steps, and test strategy.
 2. Add release checklist:
