@@ -719,7 +719,7 @@ export default function HowItWorksSection() {
                       color: "var(--text)",
                     }}
                   >
-                    {step.number} — {step.title}
+                    {step.title}
                   </h3>
                   <p
                     style={{
