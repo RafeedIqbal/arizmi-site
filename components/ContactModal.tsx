@@ -148,6 +148,7 @@ export default function ContactModal({ onClose }: Props) {
           <button
             onClick={onClose}
             aria-label="Close dialog"
+            className="btn-outline"
             style={{
               background: "none",
               border: "1px solid var(--border)",
@@ -216,6 +217,7 @@ export default function ContactModal({ onClose }: Props) {
 
           <button
             type="submit"
+            className="btn-primary"
             style={{
               width: "100%",
               background: "var(--accent)",

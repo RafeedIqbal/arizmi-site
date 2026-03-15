@@ -160,7 +160,7 @@ export default function Nav() {
             onClick={(e) => scrollTo(e, "#contact")}
             className={`
               text-sm no-underline rounded-full px-5 py-1.5 ml-1.5
-              transition-all duration-200 border
+              transition-all duration-200 border hover:scale-105
               ${active === "contact"
                 ? "bg-[var(--accent)] text-[var(--bg)] border-[var(--accent)]"
                 : "text-[var(--accent)] border-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--bg)]"
@@ -230,7 +230,7 @@ export default function Nav() {
               onClick={(e) => scrollTo(e, "#contact")}
               className={`
                 text-sm no-underline rounded-xl px-4 py-2.5 mt-1 whitespace-nowrap
-                transition-all duration-200 border text-center
+                transition-all duration-200 border text-center hover:scale-105
                 ${active === "contact"
                   ? "bg-[var(--accent)] text-[var(--bg)] border-[var(--accent)]"
                   : "text-[var(--accent)] border-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--bg)]"

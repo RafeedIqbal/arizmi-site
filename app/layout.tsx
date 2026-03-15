@@ -38,6 +38,13 @@ export const metadata: Metadata = {
     description:
       "Your technical co-founder, combining business strategy and software engineering to turn your idea into a successful business.",
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/apple-icon.png",
+  },
   robots: {
     index: true,
     follow: true,

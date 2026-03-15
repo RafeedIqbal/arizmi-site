@@ -62,6 +62,7 @@ export default function ContactSection() {
           >
             <a
               href="#contact"
+              className="btn-primary"
               onClick={(e) => {
                 e.preventDefault();
                 // TODO: replace with Calendly URL when ready
@@ -81,6 +82,7 @@ export default function ContactSection() {
             </a>
 
             <button
+              className="btn-outline"
               onClick={() => setModalOpen(true)}
               style={{
                 background: "transparent",
@@ -92,7 +94,6 @@ export default function ContactSection() {
                 fontSize: "1rem",
                 cursor: "pointer",
                 fontFamily: "inherit",
-                transition: "border-color 0.2s, color 0.2s",
               }}
             >
               Contact

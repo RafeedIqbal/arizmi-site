@@ -1,12 +1,12 @@
 "use client";
 
 import { useRef, useLayoutEffect } from "react";
-import Image from "next/image";
 import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/motion";
 
 export default function HeroSection() {
   const rootRef = useRef<HTMLElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
+  const logoTextRef = useRef<HTMLImageElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -31,29 +31,43 @@ export default function HeroSection() {
         }
       );
 
-      // Hero image fades out with parallax
+      // Logo text fades in during tail end of shrink
+      gsap.fromTo(
+        logoTextRef.current,
+        { opacity: 0, y: 8 },
+        {
+          opacity: 1,
+          y: 0,
+          ease: "none",
+          scrollTrigger: {
+            trigger: root,
+            start: "30% top",
+            end: "40% top",
+            scrub: 0.5,
+          },
+        }
+      );
+
+      // Hero image fades out as next section overlaps
       gsap.to(imageRef.current, {
         opacity: 0,
-        y: -100,
-        scale: 0.96,
         ease: "none",
         scrollTrigger: {
           trigger: root,
-          start: "40% top",
-          end: "95% top",
+          start: "50% top",
+          end: "85% top",
           scrub: 0.5,
         },
       });
 
-      // Bottom bar fades out with parallax
+      // Bottom bar fades out as next section overlaps
       gsap.to(bottomRef.current, {
         opacity: 0,
-        y: -60,
         ease: "none",
         scrollTrigger: {
           trigger: root,
-          start: "40% top",
-          end: "90% top",
+          start: "50% top",
+          end: "80% top",
           scrub: 0.5,
         },
       });
@@ -80,6 +94,7 @@ export default function HeroSection() {
       style={{
         height: "clamp(150vh, 180vh, 200vh)",
         position: "relative",
+        zIndex: 0,
       }}
     >
       {/* Logo — fixed top-left, starts 4x size and scales down */}
@@ -95,17 +110,26 @@ export default function HeroSection() {
         }}
         className="w-10 sm:w-[88px]"
       >
-        <Image
-          src="/logo.jpeg"
+        <img
+          src="/logo.svg"
           alt="Arizmi"
           width={500}
           height={500}
-          priority
           style={{
             width: "100%",
             height: "auto",
-            mixBlendMode: "lighten",
-            borderRadius: "8px",
+          }}
+        />
+        <img
+          ref={logoTextRef}
+          src="/logo_text.svg"
+          alt="Arizmi"
+          className="hidden sm:block"
+          style={{
+            opacity: 0,
+            width: "100%",
+            height: "auto",
+            marginTop: "4px",
           }}
         />
       </div>
@@ -147,9 +171,9 @@ export default function HeroSection() {
           ref={bottomRef}
           style={{
             position: "absolute",
-            bottom: "clamp(1.5rem, 3vw, 3rem)",
-            left: "var(--section-px)",
-            right: "var(--section-px)",
+            bottom: "clamp(3.5rem, 8vw, 8rem)",
+            left: "calc(var(--section-px) + clamp(1rem, 4vw, 4rem))",
+            right: "calc(var(--section-px) + clamp(1rem, 4vw, 4rem))",
             display: "flex",
             alignItems: "flex-end",
             justifyContent: "space-between",
@@ -176,6 +200,7 @@ export default function HeroSection() {
 
           <a
             href="#contact"
+            className="btn-primary"
             style={{
               background: "var(--accent)",
               color: "#000",
