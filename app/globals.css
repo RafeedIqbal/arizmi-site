@@ -85,3 +85,24 @@ body {
     gap: 0 2.5rem;
   }
 }
+
+/* HowItWorks card visual animations */
+@keyframes hiw-shimmer {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+@keyframes hiw-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes hiw-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.12); opacity: 1; }
+}
+
+@keyframes hiw-bar-bounce {
+  0%, 100% { transform: scaleY(0.85); }
+  50% { transform: scaleY(1); }
+}

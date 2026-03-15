@@ -21,6 +21,509 @@ const STEPS = [
   },
 ];
 
+/* ── Shared visual container style ── */
+const VIS: React.CSSProperties = {
+  background: "rgba(89,176,255,0.03)",
+  borderRadius: "12px",
+  padding: "1rem 1.25rem",
+  marginBottom: "1.25rem",
+  border: "1px solid rgba(89,176,255,0.06)",
+  overflow: "hidden",
+  position: "relative",
+  minHeight: "130px",
+};
+
+/* ── Card 1: Understand — discovery / conversation UI ── */
+function UnderstandVis() {
+  return (
+    <div style={VIS}>
+      {/* Search bar */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          background: "rgba(255,255,255,0.05)",
+          borderRadius: "8px",
+          padding: "8px 12px",
+          marginBottom: "12px",
+        }}
+      >
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="var(--accent)"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
+        </svg>
+        <div
+          style={{
+            flex: 1,
+            height: "4px",
+            borderRadius: "2px",
+            background: "rgba(89,176,255,0.2)",
+            animation: "hiw-shimmer 3s ease infinite",
+          }}
+        />
+        <div
+          style={{
+            width: "4px",
+            height: "4px",
+            borderRadius: "50%",
+            background: "var(--accent)",
+            animation: "hiw-pulse 2s ease infinite",
+          }}
+        />
+      </div>
+
+      {/* Chat bubble — left */}
+      <div
+        style={{
+          display: "flex",
+          gap: "8px",
+          marginBottom: "8px",
+          animation: "hiw-float 4s ease infinite",
+        }}
+      >
+        <div
+          style={{
+            width: "20px",
+            height: "20px",
+            borderRadius: "50%",
+            background: "rgba(89,176,255,0.15)",
+            flexShrink: 0,
+          }}
+        />
+        <div
+          style={{
+            background: "rgba(89,176,255,0.08)",
+            borderRadius: "10px 10px 10px 2px",
+            padding: "8px 12px",
+            maxWidth: "65%",
+          }}
+        >
+          <div
+            style={{
+              height: "3px",
+              borderRadius: "2px",
+              background: "rgba(89,176,255,0.2)",
+              width: "80%",
+              marginBottom: "5px",
+            }}
+          />
+          <div
+            style={{
+              height: "3px",
+              borderRadius: "2px",
+              background: "rgba(89,176,255,0.12)",
+              width: "55%",
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Chat bubble — right */}
+      <div
+        style={{
+          display: "flex",
+          gap: "8px",
+          justifyContent: "flex-end",
+          animation: "hiw-float 4s ease infinite 0.6s",
+        }}
+      >
+        <div
+          style={{
+            background: "rgba(255,255,255,0.05)",
+            borderRadius: "10px 10px 2px 10px",
+            padding: "8px 12px",
+            maxWidth: "50%",
+          }}
+        >
+          <div
+            style={{
+              height: "3px",
+              borderRadius: "2px",
+              background: "rgba(255,255,255,0.1)",
+              width: "90%",
+              marginBottom: "5px",
+            }}
+          />
+          <div
+            style={{
+              height: "3px",
+              borderRadius: "2px",
+              background: "rgba(255,255,255,0.06)",
+              width: "60%",
+            }}
+          />
+        </div>
+        <div
+          style={{
+            width: "20px",
+            height: "20px",
+            borderRadius: "50%",
+            background: "rgba(255,255,255,0.08)",
+            flexShrink: 0,
+          }}
+        />
+      </div>
+
+      {/* Lightbulb icon */}
+      <div
+        style={{
+          position: "absolute",
+          top: "12px",
+          right: "12px",
+          animation: "hiw-pulse 3s ease infinite",
+        }}
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="var(--accent)"
+          strokeWidth="2"
+          strokeLinecap="round"
+          style={{ opacity: 0.5 }}
+        >
+          <path d="M9 18h6M10 22h4M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14" />
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+/* ── Card 2: Plan & Build — code editor / wireframe UI ── */
+function PlanBuildVis() {
+  return (
+    <div style={VIS}>
+      {/* Editor toolbar */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "6px",
+          marginBottom: "12px",
+        }}
+      >
+        <div
+          style={{
+            width: "8px",
+            height: "8px",
+            borderRadius: "50%",
+            background: "rgba(255,95,86,0.5)",
+          }}
+        />
+        <div
+          style={{
+            width: "8px",
+            height: "8px",
+            borderRadius: "50%",
+            background: "rgba(255,189,46,0.5)",
+          }}
+        />
+        <div
+          style={{
+            width: "8px",
+            height: "8px",
+            borderRadius: "50%",
+            background: "rgba(39,201,63,0.5)",
+          }}
+        />
+        <div
+          style={{
+            marginLeft: "8px",
+            height: "3px",
+            borderRadius: "2px",
+            background: "rgba(255,255,255,0.08)",
+            width: "50px",
+          }}
+        />
+      </div>
+
+      {/* Code lines */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "6px",
+          marginBottom: "14px",
+          paddingLeft: "12px",
+        }}
+      >
+        <div style={{ display: "flex", gap: "6px" }}>
+          <div
+            style={{
+              height: "3px",
+              borderRadius: "2px",
+              background: "rgba(89,176,255,0.25)",
+              width: "35%",
+              animation: "hiw-shimmer 3s ease infinite",
+            }}
+          />
+          <div
+            style={{
+              height: "3px",
+              borderRadius: "2px",
+              background: "rgba(255,255,255,0.08)",
+              width: "25%",
+            }}
+          />
+        </div>
+        <div style={{ display: "flex", gap: "6px", paddingLeft: "12px" }}>
+          <div
+            style={{
+              height: "3px",
+              borderRadius: "2px",
+              background: "rgba(89,176,255,0.15)",
+              width: "45%",
+              animation: "hiw-shimmer 3s ease infinite 0.3s",
+            }}
+          />
+        </div>
+        <div style={{ display: "flex", gap: "6px", paddingLeft: "12px" }}>
+          <div
+            style={{
+              height: "3px",
+              borderRadius: "2px",
+              background: "rgba(255,255,255,0.06)",
+              width: "55%",
+              animation: "hiw-shimmer 3s ease infinite 0.6s",
+            }}
+          />
+          <div
+            style={{
+              height: "3px",
+              borderRadius: "2px",
+              background: "rgba(89,176,255,0.12)",
+              width: "15%",
+            }}
+          />
+        </div>
+        <div style={{ display: "flex", gap: "6px" }}>
+          <div
+            style={{
+              height: "3px",
+              borderRadius: "2px",
+              background: "rgba(89,176,255,0.2)",
+              width: "30%",
+              animation: "hiw-shimmer 3s ease infinite 0.9s",
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Wireframe component blocks */}
+      <div style={{ display: "flex", gap: "8px" }}>
+        {[0, 0.25, 0.5].map((delay, i) => (
+          <div
+            key={i}
+            style={{
+              flex: 1,
+              height: "28px",
+              borderRadius: "6px",
+              background: "rgba(89,176,255,0.06)",
+              border: "1px solid rgba(89,176,255,0.08)",
+              animation: `hiw-float 4s ease infinite ${delay}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Gear icon */}
+      <div
+        style={{
+          position: "absolute",
+          top: "12px",
+          right: "12px",
+          animation: "hiw-pulse 3s ease infinite 1s",
+        }}
+      >
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="var(--accent)"
+          strokeWidth="2"
+          strokeLinecap="round"
+          style={{ opacity: 0.4 }}
+        >
+          <circle cx="12" cy="12" r="3" />
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+/* ── Card 3: Launch & Grow — analytics dashboard UI ── */
+function LaunchGrowVis() {
+  const bars = [35, 50, 45, 70, 60, 85, 75, 95];
+  return (
+    <div style={VIS}>
+      {/* Metric header row */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          marginBottom: "12px",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+          <svg
+            width="10"
+            height="10"
+            viewBox="0 0 24 24"
+            fill="var(--accent)"
+            style={{ opacity: 0.6 }}
+          >
+            <path d="M18 15l-6-6-6 6" />
+          </svg>
+          <span
+            style={{
+              fontSize: "0.6rem",
+              color: "var(--accent)",
+              opacity: 0.7,
+              letterSpacing: "0.04em",
+            }}
+          >
+            Growth
+          </span>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "4px",
+            marginLeft: "auto",
+          }}
+        >
+          <div
+            style={{
+              width: "6px",
+              height: "6px",
+              borderRadius: "50%",
+              background: "rgba(39,201,63,0.5)",
+              animation: "hiw-pulse 2s ease infinite",
+            }}
+          />
+          <span
+            style={{
+              fontSize: "0.6rem",
+              color: "rgba(255,255,255,0.3)",
+            }}
+          >
+            Live
+          </span>
+        </div>
+      </div>
+
+      {/* Bar chart */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-end",
+          gap: "6px",
+          height: "55px",
+          marginBottom: "12px",
+          paddingBottom: "1px",
+          borderBottom: "1px solid rgba(255,255,255,0.06)",
+        }}
+      >
+        {bars.map((h, i) => (
+          <div
+            key={i}
+            style={{
+              flex: 1,
+              height: `${h}%`,
+              borderRadius: "3px 3px 0 0",
+              background: `rgba(89,176,255,${0.15 + (h / 100) * 0.25})`,
+              transformOrigin: "bottom",
+              animation: `hiw-bar-bounce 3s ease infinite ${i * 0.15}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Progress bar */}
+      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="var(--accent)"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          style={{ opacity: 0.5 }}
+        >
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+          <polyline points="22 4 12 14.01 9 11.01" />
+        </svg>
+        <div
+          style={{
+            flex: 1,
+            height: "4px",
+            borderRadius: "2px",
+            background: "rgba(255,255,255,0.06)",
+            overflow: "hidden",
+            position: "relative",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              height: "100%",
+              width: "75%",
+              borderRadius: "2px",
+              background:
+                "linear-gradient(90deg, rgba(89,176,255,0.3), rgba(89,176,255,0.5))",
+              animation: "hiw-shimmer 3s ease infinite",
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Rocket icon */}
+      <div
+        style={{
+          position: "absolute",
+          top: "12px",
+          right: "12px",
+          animation: "hiw-float 3s ease infinite",
+        }}
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="var(--accent)"
+          strokeWidth="2"
+          strokeLinecap="round"
+          style={{ opacity: 0.4 }}
+        >
+          <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+          <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+          <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+          <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+const VISUALS = [UnderstandVis, PlanBuildVis, LaunchGrowVis];
+
 export default function HowItWorksSection() {
   const rootRef = useRef<HTMLElement>(null);
   const lineRef = useRef<HTMLDivElement>(null);
@@ -189,43 +692,47 @@ export default function HowItWorksSection() {
               gap: "2.5rem",
             }}
           >
-            {STEPS.map((step, i) => (
-              <div
-                key={step.number}
-                ref={(el) => {
-                  cardRefs.current[i] = el;
-                }}
-                style={{
-                  background: "var(--surface-alt)",
-                  border: "1px solid var(--accent-dim)",
-                  borderRadius: "16px",
-                  padding: "clamp(1.5rem, 2vw, 2rem) clamp(1.25rem, 2.5vw, 2.5rem)",
-                  boxShadow:
-                    "0 1px 3px rgba(0,0,0,0.4), 0 4px 16px rgba(89,176,255,0.05)",
-                  willChange: "transform, opacity",
-                }}
-              >
-                <h3
+            {STEPS.map((step, i) => {
+              const Visual = VISUALS[i];
+              return (
+                <div
+                  key={step.number}
+                  ref={(el) => {
+                    cardRefs.current[i] = el;
+                  }}
                   style={{
-                    fontSize: "clamp(1.1rem, 1.5vw, 1.25rem)",
-                    fontWeight: 700,
-                    marginBottom: "0.625rem",
-                    color: "var(--text)",
+                    background: "var(--surface-alt)",
+                    border: "1px solid var(--accent-dim)",
+                    borderRadius: "16px",
+                    padding: "clamp(1.5rem, 2vw, 2rem) clamp(1.25rem, 2.5vw, 2.5rem)",
+                    boxShadow:
+                      "0 1px 3px rgba(0,0,0,0.4), 0 4px 16px rgba(89,176,255,0.05)",
+                    willChange: "transform, opacity",
                   }}
                 >
-                  {step.number} — {step.title}
-                </h3>
-                <p
-                  style={{
-                    color: "var(--text-muted)",
-                    fontSize: "0.9375rem",
-                    lineHeight: 1.65,
-                  }}
-                >
-                  {step.body}
-                </p>
-              </div>
-            ))}
+                  <Visual />
+                  <h3
+                    style={{
+                      fontSize: "clamp(1.1rem, 1.5vw, 1.25rem)",
+                      fontWeight: 700,
+                      marginBottom: "0.625rem",
+                      color: "var(--text)",
+                    }}
+                  >
+                    {step.number} — {step.title}
+                  </h3>
+                  <p
+                    style={{
+                      color: "var(--text-muted)",
+                      fontSize: "0.9375rem",
+                      lineHeight: 1.65,
+                    }}
+                  >
+                    {step.body}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
