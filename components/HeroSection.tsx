@@ -1,12 +1,13 @@
 "use client";
 
 import { useRef, useLayoutEffect } from "react";
-import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/motion";
+import Image from "next/image";
+import { gsap, prefersReducedMotion } from "@/lib/motion";
 
 export default function HeroSection() {
   const rootRef = useRef<HTMLElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
-  const logoTextRef = useRef<HTMLImageElement>(null);
+  const logoTextRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -15,73 +16,38 @@ export default function HeroSection() {
     if (!root || prefersReducedMotion()) return;
 
     const ctx = gsap.context(() => {
-      // Pre-pin timeline (0 → 50vh scroll): logo shrink + text fade + parallax
-      const prePinTl = gsap.timeline({
+      gsap.set(logoRef.current, { scale: 4, transformOrigin: "top left" });
+      gsap.set(logoTextRef.current, { opacity: 0, y: 8 });
+
+      const heroTl = gsap.timeline({
         scrollTrigger: {
           trigger: root,
           start: "top top",
-          end: "50% top",
+          end: () => `+=${Math.round(window.innerHeight * 0.4)}`,
+          invalidateOnRefresh: true,
           scrub: 0.5,
         },
       });
-      prePinTl.fromTo(
+      heroTl.to(
         logoRef.current,
-        { scale: 4 },
-        { scale: 1, ease: "none", duration: 0.8 },
+        { scale: 1, ease: "none", duration: 1 },
         0
       );
-      prePinTl.fromTo(
+      heroTl.to(
         logoTextRef.current,
-        { opacity: 0, y: 8 },
-        { opacity: 1, y: 0, ease: "none", duration: 0.2 },
+        { opacity: 1, y: 0, ease: "none", duration: 0.35 },
         0.6
       );
-      // Parallax: image drifts up slowly — feels further away
-      prePinTl.to(
+      heroTl.to(
         imageRef.current,
         { yPercent: -6, ease: "none", duration: 1 },
         0
       );
-      // Parallax: bottom bar drifts up faster — feels closer
-      prePinTl.to(
+      heroTl.to(
         bottomRef.current,
         { yPercent: -14, ease: "none", duration: 1 },
         0
       );
-
-      // Pin timeline (pin at 50%, 50vh duration): smooth fade out with drift
-      const pinTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: root,
-          start: "50% top",
-          end: "+=50vh",
-          pin: true,
-          pinSpacing: false,
-          anticipatePin: 1,
-          scrub: 0.5,
-        },
-      });
-      pinTl.to(
-        imageRef.current,
-        { opacity: 0, scale: 0.97, yPercent: -12, ease: "power1.inOut", duration: 0.7 },
-        0
-      );
-      pinTl.to(
-        bottomRef.current,
-        { opacity: 0, y: -30, ease: "power1.inOut", duration: 0.6 },
-        0.05
-      );
-
-      // Toggle hero-scrolled class for Nav
-      ScrollTrigger.create({
-        trigger: root,
-        start: "top top",
-        end: "bottom top",
-        onLeave: () =>
-          document.documentElement.classList.add("hero-scrolled"),
-        onEnterBack: () =>
-          document.documentElement.classList.remove("hero-scrolled"),
-      });
     }, rootRef);
 
     return () => ctx.revert();
@@ -92,27 +58,26 @@ export default function HeroSection() {
       id="hero"
       ref={rootRef}
       style={{
-        height: "100vh",
+        height: "160vh",
         position: "relative",
         zIndex: 0,
       }}
     >
-      {/* Logo — fixed top-left, starts 4x size and scales down */}
       <div
         ref={logoRef}
+        data-testid="hero-logo"
         style={{
           position: "fixed",
           top: "max(16px, env(safe-area-inset-top, 16px))",
           left: "var(--section-px)",
           zIndex: 105,
           pointerEvents: "none",
-          transformOrigin: "top left",
         }}
         className="w-10 sm:w-[88px]"
       >
-        <img
+        <Image
           src="/logo.svg"
-          alt="Arizmi"
+          alt="Arizmi logo"
           width={500}
           height={500}
           style={{
@@ -120,31 +85,42 @@ export default function HeroSection() {
             height: "auto",
           }}
         />
-        <img
+        <div
           ref={logoTextRef}
-          src="/logo_text.svg"
-          alt="Arizmi"
+          data-testid="hero-wordmark"
           className="hidden sm:block"
           style={{
-            opacity: 0,
             width: "100%",
-            height: "auto",
             marginTop: "4px",
           }}
-        />
+        >
+          <Image
+            src="/logo_text.svg"
+            alt=""
+            aria-hidden="true"
+            width={23471}
+            height={3962}
+            style={{
+              width: "100%",
+              height: "auto",
+            }}
+          />
+        </div>
       </div>
 
-      {/* Sticky content — stays in view, then scrolls away under next section */}
       <div
         style={{
-          position: "relative",
-          height: "100%",
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "100vh",
           overflow: "hidden",
         }}
       >
-        {/* Hero image — full viewport height with horizontal padding */}
         <div
           ref={imageRef}
+          data-testid="hero-image"
           style={{
             position: "absolute",
             top: "1.5rem",
@@ -155,18 +131,18 @@ export default function HeroSection() {
             overflow: "hidden",
           }}
         >
-          <img
+          <Image
             src="/hero_image.png"
-            alt="Hero"
+            alt="Arizmi Labs hero artwork"
+            fill
+            priority
+            sizes="(max-width: 640px) calc(100vw - 2.5rem), calc(100vw - 4rem)"
             style={{
-              width: "100%",
-              height: "100%",
               objectFit: "cover",
             }}
           />
         </div>
 
-        {/* Bottom bar — H1 left, CTA right */}
         <div
           ref={bottomRef}
           style={{

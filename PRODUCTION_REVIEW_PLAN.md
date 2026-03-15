@@ -62,10 +62,7 @@ Repository: `Arizmi-Site`
 1. README remains create-next-app boilerplate and mismatches actual project setup.
    - Evidence: [`/Volumes/External Drive/Github/Arizmi-Site/README.md:1`](/Volumes/External Drive/Github/Arizmi-Site/README.md:1), [`21`](/Volumes/External Drive/Github/Arizmi-Site/README.md:21), [`34`](/Volumes/External Drive/Github/Arizmi-Site/README.md:34).
 
-2. Playwright config includes unused import.
-   - Evidence: [`/Volumes/External Drive/Github/Arizmi-Site/playwright.config.ts:2`](/Volumes/External Drive/Github/Arizmi-Site/playwright.config.ts:2) imports `path` but does not use it.
-
-3. Codebase uses large inline-style surface area, which slows maintainability and style reuse.
+2. Codebase uses large inline-style surface area, which slows maintainability and style reuse.
    - Evidence: extensive inline style objects across all section components.
 
 ## Remediation Plan (Phased)
@@ -124,5 +121,5 @@ Repository: `Arizmi-Site`
 - `npm run lint` passes.
 - `npx tsc --noEmit` passes.
 - `npm run build` passes in CI environment.
-- `npm run test:e2e` validates local app behavior (not external websites).
+- Manual smoke testing validates local app behavior (not external websites).
 - Lighthouse and accessibility goals meet agreed budgets.

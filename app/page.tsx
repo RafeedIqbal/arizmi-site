@@ -13,13 +13,14 @@ export default function Home() {
       <main>
         <HeroSection />
         <div
+          data-testid="page-content-shell"
           style={{
             position: "relative",
             zIndex: 1,
             background: "var(--bg)",
             borderRadius: "24px 24px 0 0",
             boxShadow: "0 -20px 60px rgba(0, 0, 0, 0.6)",
-            marginTop: "-4rem",
+            marginTop: "calc(-1 * clamp(6rem, 12vw, 12rem))",
           }}
         >
           <ServicesSection />

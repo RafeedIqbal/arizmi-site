@@ -8,7 +8,7 @@ Marketing site for Arizmi — a technical co-founder service that builds start-u
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS v4 + CSS custom properties
 - **Animation:** GSAP + ScrollTrigger
-- **Testing:** Playwright (E2E)
+- **Testing:** Manual smoke testing
 
 ## Getting Started
 
@@ -28,8 +28,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | `npm run start` | Start production server |
 | `npm run lint` | Run ESLint |
 | `npm run typecheck` | Run TypeScript type checking |
-| `npm run test:e2e` | Run Playwright E2E tests |
-| `npm run ci` | Full CI pipeline: lint + typecheck + build + e2e |
+| `npm run ci` | Full CI pipeline: lint + typecheck + build |
 
 ## Project Structure
 
