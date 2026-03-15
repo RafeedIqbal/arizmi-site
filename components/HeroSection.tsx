@@ -15,62 +15,62 @@ export default function HeroSection() {
     if (!root || prefersReducedMotion()) return;
 
     const ctx = gsap.context(() => {
-      // Phase 1: Logo shrinks down from 4x to 1x
-      gsap.fromTo(
+      // Pre-pin timeline (0 → 50vh scroll): logo shrink + text fade + parallax
+      const prePinTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: root,
+          start: "top top",
+          end: "50% top",
+          scrub: 0.5,
+        },
+      });
+      prePinTl.fromTo(
         logoRef.current,
         { scale: 4 },
-        {
-          scale: 1,
-          ease: "none",
-          scrollTrigger: {
-            trigger: root,
-            start: "top top",
-            end: "40% top",
-            scrub: 0.5,
-          },
-        }
+        { scale: 1, ease: "none", duration: 0.8 },
+        0
       );
-
-      // Logo text fades in during tail end of shrink
-      gsap.fromTo(
+      prePinTl.fromTo(
         logoTextRef.current,
         { opacity: 0, y: 8 },
-        {
-          opacity: 1,
-          y: 0,
-          ease: "none",
-          scrollTrigger: {
-            trigger: root,
-            start: "30% top",
-            end: "40% top",
-            scrub: 0.5,
-          },
-        }
+        { opacity: 1, y: 0, ease: "none", duration: 0.2 },
+        0.6
+      );
+      // Parallax: image drifts up slowly — feels further away
+      prePinTl.to(
+        imageRef.current,
+        { yPercent: -6, ease: "none", duration: 1 },
+        0
+      );
+      // Parallax: bottom bar drifts up faster — feels closer
+      prePinTl.to(
+        bottomRef.current,
+        { yPercent: -14, ease: "none", duration: 1 },
+        0
       );
 
-      // Hero image fades out as next section overlaps
-      gsap.to(imageRef.current, {
-        opacity: 0,
-        ease: "none",
+      // Pin timeline (pin at 50%, 50vh duration): smooth fade out with drift
+      const pinTl = gsap.timeline({
         scrollTrigger: {
           trigger: root,
           start: "50% top",
-          end: "85% top",
+          end: "+=50vh",
+          pin: true,
+          pinSpacing: false,
+          anticipatePin: 1,
           scrub: 0.5,
         },
       });
-
-      // Bottom bar fades out as next section overlaps
-      gsap.to(bottomRef.current, {
-        opacity: 0,
-        ease: "none",
-        scrollTrigger: {
-          trigger: root,
-          start: "50% top",
-          end: "80% top",
-          scrub: 0.5,
-        },
-      });
+      pinTl.to(
+        imageRef.current,
+        { opacity: 0, scale: 0.97, yPercent: -12, ease: "power1.inOut", duration: 0.7 },
+        0
+      );
+      pinTl.to(
+        bottomRef.current,
+        { opacity: 0, y: -30, ease: "power1.inOut", duration: 0.6 },
+        0.05
+      );
 
       // Toggle hero-scrolled class for Nav
       ScrollTrigger.create({
@@ -92,7 +92,7 @@ export default function HeroSection() {
       id="hero"
       ref={rootRef}
       style={{
-        height: "clamp(150vh, 180vh, 200vh)",
+        height: "100vh",
         position: "relative",
         zIndex: 0,
       }}
@@ -137,9 +137,8 @@ export default function HeroSection() {
       {/* Sticky content — stays in view, then scrolls away under next section */}
       <div
         style={{
-          position: "sticky",
-          top: 0,
-          height: "100vh",
+          position: "relative",
+          height: "100%",
           overflow: "hidden",
         }}
       >
@@ -152,18 +151,19 @@ export default function HeroSection() {
             bottom: "clamp(5rem, 8vw, 7rem)",
             left: "var(--section-px)",
             right: "var(--section-px)",
-            border: "2px dashed rgba(255, 255, 255, 0.12)",
-            background: "rgba(255, 255, 255, 0.03)",
             borderRadius: "16px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "var(--text-muted)",
-            fontSize: "0.875rem",
-            letterSpacing: "0.06em",
+            overflow: "hidden",
           }}
         >
-          Hero Image (TBD)
+          <img
+            src="/hero_image.png"
+            alt="Hero"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
+          />
         </div>
 
         {/* Bottom bar — H1 left, CTA right */}
