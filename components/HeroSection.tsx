@@ -54,15 +54,7 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <section
-      id="hero"
-      ref={rootRef}
-      style={{
-        height: "160vh",
-        position: "relative",
-        zIndex: 0,
-      }}
-    >
+    <>
       <div
         ref={logoRef}
         data-testid="hero-logo"
@@ -108,6 +100,15 @@ export default function HeroSection() {
         </div>
       </div>
 
+      <section
+        id="hero"
+        ref={rootRef}
+        style={{
+          height: "160vh",
+          position: "relative",
+          zIndex: 0,
+        }}
+      >
       <div
         style={{
           position: "fixed",
@@ -194,6 +195,7 @@ export default function HeroSection() {
           </a>
         </div>
       </div>
-    </section>
+      </section>
+    </>
   );
 }

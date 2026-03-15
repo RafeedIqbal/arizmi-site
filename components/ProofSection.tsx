@@ -13,6 +13,7 @@ const PROJECTS = [
     accentColor: "#59b0ff",
     gradient:
       "linear-gradient(160deg, rgba(89,176,255,0.1) 0%, rgba(89,176,255,0.03) 100%)",
+    image: "/IconTraining.svg",
   },
   {
     number: "02",
@@ -23,6 +24,7 @@ const PROJECTS = [
     accentColor: "#c084fc",
     gradient:
       "linear-gradient(160deg, rgba(192,132,252,0.1) 0%, rgba(192,132,252,0.03) 100%)",
+    image: "/BasenoteSolutions.svg",
   },
   {
     number: "03",
@@ -33,6 +35,7 @@ const PROJECTS = [
     accentColor: "#34d399",
     gradient:
       "linear-gradient(160deg, rgba(52,211,153,0.1) 0%, rgba(52,211,153,0.03) 100%)",
+    image: "/FreedomAirlines.webp",
   },
 ];
 
@@ -180,28 +183,26 @@ export default function ProofSection() {
                 >
                   {project.number}
                 </span>
-                <div>
-                  {/* Ghost number */}
-                  <div
+                <div
+                  style={{
+                    width: "clamp(120px, 18vw, 200px)",
+                    height: "clamp(120px, 18vw, 200px)",
+                    borderRadius: "clamp(16px, 2vw, 24px)",
+                    overflow: "hidden",
+                    background: `${project.accentColor}10`,
+                    border: `1px solid ${project.accentColor}25`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <img
+                    src={project.image}
+                    alt={project.project}
                     style={{
-                      fontSize: "clamp(4rem, 8vw, 8rem)",
-                      fontFamily: "var(--font-instrument-serif)",
-                      fontWeight: 400,
-                      color: project.accentColor,
-                      opacity: 0.12,
-                      lineHeight: 1,
-                      userSelect: "none",
-                      marginBottom: "1.25rem",
-                    }}
-                  >
-                    {project.number}
-                  </div>
-                  <div
-                    style={{
-                      width: "32px",
-                      height: "2px",
-                      background: project.accentColor,
-                      opacity: 0.5,
+                      width: "70%",
+                      height: "70%",
+                      objectFit: "contain",
                     }}
                   />
                 </div>

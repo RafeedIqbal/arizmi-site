@@ -25,6 +25,7 @@ export default function HowItWorksSection() {
   const rootRef = useRef<HTMLElement>(null);
   const lineRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const badgeRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useLayoutEffect(() => {
     if (prefersReducedMotion()) return;
@@ -60,6 +61,27 @@ export default function HowItWorksSection() {
             },
           }
         );
+      });
+
+      badgeRefs.current.forEach((badge) => {
+        if (!badge) return;
+        gsap.set(badge, {
+          borderColor: "rgba(255,255,255,0.12)",
+          color: "rgba(255,255,255,0.3)",
+          background: "var(--bg)",
+        });
+        gsap.to(badge, {
+          borderColor: "rgba(89,176,255,0.35)",
+          color: "#59b0ff",
+          background: "linear-gradient(rgba(89,176,255,0.15), rgba(89,176,255,0.15)), var(--bg)",
+          duration: 0.3,
+          ease: "power1.out",
+          scrollTrigger: {
+            trigger: badge,
+            start: "top 70%",
+            toggleActions: "play none none reverse",
+          },
+        });
       });
     }, rootRef);
 
@@ -132,6 +154,9 @@ export default function HowItWorksSection() {
             {STEPS.map((step, i) => (
               <div
                 key={step.number}
+                ref={(el) => {
+                  badgeRefs.current[i] = el;
+                }}
                 style={{
                   position: "absolute",
                   top: `${i * 33.33 + 5}%`,
@@ -140,12 +165,12 @@ export default function HowItWorksSection() {
                   width: "32px",
                   height: "32px",
                   borderRadius: "50%",
-                  background: "linear-gradient(var(--accent-dim), var(--accent-dim)), var(--bg)",
-                  border: "1px solid rgba(89, 176, 255, 0.35)",
+                  background: "var(--bg)",
+                  border: "1px solid rgba(255,255,255,0.12)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: "var(--accent)",
+                  color: "rgba(255,255,255,0.3)",
                   fontSize: "0.75rem",
                   fontWeight: 700,
                   zIndex: 2,
