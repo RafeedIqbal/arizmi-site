@@ -8,13 +8,12 @@ export const vertexShader = /* glsl */ `
   uniform float uLeakPointSize;
   uniform float uBreathingAmplitude;
   uniform float uLeakSpeed;
-  uniform float uLeakTravelDistance;
   uniform float uLeakTurbulence;
   uniform float uCursorBrightness;
   uniform float uSphereRadius;
-  uniform float uLeakConeAngle;
-  uniform float uPlumeLift;
-  uniform float uPlumeCursorPull;
+  uniform float uPlumeArcHeight;
+  uniform float uPlumePathSpread;
+  uniform float uPlumeArrivalShrink;
   uniform float uMagneticStrength;
 
   attribute float aRandom;
@@ -40,51 +39,80 @@ export const vertexShader = /* glsl */ `
     vec3 color;
 
     if (isLeak > 0.5) {
-      // Compact plume that hugs the upper hemisphere.
+      // --- Magnetic arc: particles fly from emission origin to cursor ---
       float lifecycle = fract((uTime * uLeakSpeed + aPhase) / aLeakFactor);
-      vec3 pointerDir = normalize(uPointer);
-      vec3 leakDir = normalize(rotatedLeakOrigin);
-      vec3 plumeDir = normalize(mix(leakDir, sphereUp, uPlumeLift));
 
-      vec3 guideAxis = abs(plumeDir.y) > 0.9 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
-      vec3 perp1 = normalize(cross(plumeDir, guideAxis));
-      vec3 perp2 = normalize(cross(plumeDir, perp1));
+      // P0: emission point on sphere surface
+      vec3 P0 = rotatedLeakOrigin * (uSphereRadius + 0.015);
 
-      float coneR = uLeakConeAngle * mix(0.18, 1.0, sqrt(aConeOffset.y));
-      float coneAngle = aConeOffset.x * 6.28318;
-      vec3 coneDir = normalize(
-        plumeDir + perp1 * (sin(coneAngle) * coneR) + perp2 * (cos(coneAngle) * coneR)
-      );
-      float cursorPull = smoothstep(0.08, 0.95, lifecycle) * uPlumeCursorPull;
-      vec3 guidedDir = normalize(mix(coneDir, pointerDir, cursorPull));
+      // P2: cursor target projected onto sphere surface
+      vec3 cursorTarget = normalize(uPointer) * uSphereRadius;
 
-      float driftScale = 0.16 + lifecycle * 0.68;
-      float drift1 = sin(uTime * 0.7 + aPhase * 6.28 + lifecycle * 4.5) * uLeakTurbulence * driftScale;
-      float drift2 = cos(uTime * 1.0 + aRandom * 6.28 + lifecycle * 3.5) * uLeakTurbulence * driftScale * 0.8;
-      float liftJitter = sin(uTime * 1.15 + aConeOffset.y * 6.28 + lifecycle * 5.0) * uLeakTurbulence * lifecycle * 0.4;
-      float driftFade = 1.0 - cursorPull * 0.7;
+      // Control point P1: lifted midpoint with per-particle spread
+      vec3 midpoint = (P0 + cursorTarget) * 0.5;
+      float chordLen = max(length(cursorTarget - P0), 0.001);
+      vec3 liftDir = normalize(midpoint);
 
-      float dist = lifecycle * uLeakTravelDistance;
-      finalPos = rotatedLeakOrigin * (uSphereRadius + 0.015)
-        + guidedDir * dist
-        + perp1 * drift1 * driftFade
-        + perp2 * drift2 * driftFade
-        + sphereUp * liftJitter * (1.0 - cursorPull * 0.35);
+      // Tangent frame at midpoint for lateral path variation
+      vec3 chord = normalize(cursorTarget - P0 + vec3(0.0001));
+      vec3 lateralA = normalize(cross(chord, liftDir));
+      vec3 lateralB = normalize(cross(chord, lateralA));
 
-      float fadeIn = smoothstep(0.0, 0.1, lifecycle);
-      float fadeOut = 1.0 - smoothstep(0.78, 1.0, lifecycle);
-      float coreGlow = 1.0 - smoothstep(0.1, 0.4, lifecycle);
-      alpha = fadeIn * fadeOut * (0.3 + coreGlow * 0.14);
+      // Per-particle path variation from aConeOffset
+      float spreadAngle = (aConeOffset.x - 0.5) * 6.28318;
+      float spreadMag = aConeOffset.y * uPlumePathSpread * chordLen;
+      vec3 lateralOffset = (lateralA * sin(spreadAngle) + lateralB * cos(spreadAngle)) * spreadMag;
 
-      float sizeFade = mix(1.08, 0.94, lifecycle);
+      float arcHeight = uPlumeArcHeight * chordLen;
+      vec3 P1 = midpoint + liftDir * arcHeight + lateralOffset;
+
+      // Quadratic Bezier: B(t) = (1-t)^2 * P0 + 2(1-t)t * P1 + t^2 * P2
+      float t = lifecycle;
+      float omt = 1.0 - t;
+      vec3 bezierPos = omt * omt * P0 + 2.0 * omt * t * P1 + t * t * cursorTarget;
+
+      // Turbulence perpendicular to path, decaying near arrival
+      vec3 tangent = normalize(-2.0 * omt * P0 + 2.0 * (1.0 - 2.0 * t) * P1 + 2.0 * t * cursorTarget);
+      vec3 upRef = abs(tangent.y) > 0.99 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
+      vec3 driftBasisA = normalize(cross(tangent, upRef));
+      vec3 driftBasisB = normalize(cross(tangent, driftBasisA));
+
+      float turbulenceFade = 1.0 - smoothstep(0.5, 0.95, lifecycle);
+      float driftScale = turbulenceFade * (0.2 + lifecycle * 0.5);
+
+      float drift1 = sin(uTime * 0.7 + aPhase * 6.28 + lifecycle * 4.5)
+                    * uLeakTurbulence * driftScale;
+      float drift2 = cos(uTime * 1.0 + aRandom * 6.28 + lifecycle * 3.5)
+                    * uLeakTurbulence * driftScale * 0.8;
+      float drift3 = sin(uTime * 1.15 + aConeOffset.y * 6.28 + lifecycle * 5.0)
+                    * uLeakTurbulence * driftScale * 0.4;
+
+      finalPos = bezierPos
+               + driftBasisA * drift1
+               + driftBasisB * drift2
+               + liftDir * drift3;
+
+      // Alpha: fade in at birth, fade out on arrival
+      float fadeIn = smoothstep(0.0, 0.08, lifecycle);
+      float fadeOut = 1.0 - smoothstep(0.75, 1.0, lifecycle);
+      float coreGlow = 1.0 - smoothstep(0.05, 0.3, lifecycle);
+      alpha = fadeIn * fadeOut * (0.35 + coreGlow * 0.15);
+
+      // Point size: shrink near arrival for absorption effect
+      float arrivalShrink = 1.0 - smoothstep(uPlumeArrivalShrink, 1.0, lifecycle);
+      float sizeFade = mix(1.08, 0.6, lifecycle) * arrivalShrink;
       gl_PointSize = uLeakPointSize * uPixelRatio * sizeFade * (0.92 + aRandom * 0.12);
 
+      // Color: blue gradient with convergence glow
       vec3 blueStart = vec3(0.62, 0.88, 1.0);
-      vec3 blueMid = vec3(0.39, 0.69, 0.96);
-      vec3 blueEnd = vec3(0.12, 0.23, 0.34);
+      vec3 blueMid   = vec3(0.39, 0.69, 0.96);
+      vec3 blueEnd   = vec3(0.12, 0.23, 0.34);
       color = mix(blueStart, blueMid, smoothstep(0.08, 0.42, lifecycle));
       color = mix(color, blueEnd, smoothstep(0.42, 1.0, lifecycle));
       color += coreGlow * vec3(0.12, 0.17, 0.2);
+
+      float convergenceGlow = smoothstep(0.5, 0.9, lifecycle) * (1.0 - smoothstep(0.9, 1.0, lifecycle));
+      color += convergenceGlow * vec3(0.08, 0.12, 0.18);
     } else {
       float breathe = sin(uTime * 0.45 + aPhase * 6.28) * uBreathingAmplitude;
       finalPos = rotatedPos * (uSphereRadius + breathe * (0.7 + aRandom * 0.3));

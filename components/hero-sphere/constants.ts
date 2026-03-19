@@ -19,11 +19,10 @@ export const LEAK_COLOR_END = "#102031"; // dark blue fade-out
 export const AUTO_ROTATE_SPEED = 0.028; // radians per second
 export const BREATHING_AMPLITUDE = 0.006;
 export const LEAK_SPEED = 0.21;
-export const LEAK_TRAVEL_DISTANCE = 1.25;
 export const LEAK_TURBULENCE = 0.045;
-export const LEAK_CONE_ANGLE = 0.09; // radians — half-angle of the emission cone
-export const PLUME_LIFT = 0.72;
-export const PLUME_CURSOR_PULL = 0.55;
+export const PLUME_ARC_HEIGHT = 0.55; // arc curvature above sphere surface
+export const PLUME_PATH_SPREAD = 0.35; // per-particle lateral path variation
+export const PLUME_ARRIVAL_SHRINK = 0.7; // lifecycle point where size shrink begins
 
 // Interaction
 export const CURSOR_BRIGHTNESS_BOOST = 0.24;

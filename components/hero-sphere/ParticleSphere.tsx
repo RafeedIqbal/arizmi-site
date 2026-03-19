@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo, useCallback } from "react";
+import { useRef, useMemo, useCallback, useEffect } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { vertexShader, fragmentShader } from "./shaders";
@@ -14,11 +14,10 @@ import {
   AUTO_ROTATE_SPEED,
   BREATHING_AMPLITUDE,
   LEAK_SPEED,
-  LEAK_TRAVEL_DISTANCE,
   LEAK_TURBULENCE,
-  LEAK_CONE_ANGLE,
-  PLUME_LIFT,
-  PLUME_CURSOR_PULL,
+  PLUME_ARC_HEIGHT,
+  PLUME_PATH_SPREAD,
+  PLUME_ARRIVAL_SHRINK,
   CURSOR_BRIGHTNESS_BOOST,
   CURSOR_MAGNETIC_STRENGTH,
   DRAG_SENSITIVITY,
@@ -128,13 +127,12 @@ export default function ParticleSphere({ reducedMotion }: { reducedMotion: boole
       uLeakPointSize: { value: LEAK_POINT_SIZE },
       uBreathingAmplitude: { value: BREATHING_AMPLITUDE },
       uLeakSpeed: { value: LEAK_SPEED },
-      uLeakTravelDistance: { value: LEAK_TRAVEL_DISTANCE },
       uLeakTurbulence: { value: LEAK_TURBULENCE },
       uCursorBrightness: { value: CURSOR_BRIGHTNESS_BOOST },
       uSphereRadius: { value: SPHERE_RADIUS },
-      uLeakConeAngle: { value: LEAK_CONE_ANGLE },
-      uPlumeLift: { value: PLUME_LIFT },
-      uPlumeCursorPull: { value: PLUME_CURSOR_PULL },
+      uPlumeArcHeight: { value: PLUME_ARC_HEIGHT },
+      uPlumePathSpread: { value: PLUME_PATH_SPREAD },
+      uPlumeArrivalShrink: { value: PLUME_ARRIVAL_SHRINK },
       uMagneticStrength: { value: CURSOR_MAGNETIC_STRENGTH },
     }),
     [gl]
@@ -182,6 +180,19 @@ export default function ParticleSphere({ reducedMotion }: { reducedMotion: boole
     mat.uniforms.uPointer.value.copy(pointerNDC.current);
   });
 
+  // Track cursor globally so particles follow pointer across the entire page
+  useEffect(() => {
+    const canvas = gl.domElement;
+    const handlePointerMove = (e: PointerEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      const ny = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      pointerNDC.current.set(nx, ny, 1).normalize();
+    };
+    window.addEventListener("pointermove", handlePointerMove);
+    return () => window.removeEventListener("pointermove", handlePointerMove);
+  }, [gl]);
+
   // Pointer handlers
   const onPointerDown = useCallback((e: THREE.Event) => {
     const event = e as unknown as { pointerId: number; point: THREE.Vector3; nativeEvent: PointerEvent };
@@ -205,10 +216,10 @@ export default function ParticleSphere({ reducedMotion }: { reducedMotion: boole
     (e: THREE.Event) => {
       const event = e as unknown as { nativeEvent: PointerEvent };
       const ds = dragState.current;
-      const clientX = event.nativeEvent.clientX;
-      const clientY = event.nativeEvent.clientY;
 
       if (ds.isDragging) {
+        const clientX = event.nativeEvent.clientX;
+        const clientY = event.nativeEvent.clientY;
         const dx = (clientX - ds.prevPointer.x) * DRAG_SENSITIVITY;
         const dy = (clientY - ds.prevPointer.y) * DRAG_SENSITIVITY;
 
@@ -220,13 +231,8 @@ export default function ParticleSphere({ reducedMotion }: { reducedMotion: boole
         ds.velocity.set(dx, dy);
         ds.prevPointer.set(clientX, clientY);
       }
-
-      // Update cursor position for brightness effect (NDC)
-      const nx = (clientX / size.width) * 2 - 1;
-      const ny = -(clientY / size.height) * 2 + 1;
-      pointerNDC.current.set(nx, ny, 1).normalize();
     },
-    [size]
+    []
   );
 
   return (
