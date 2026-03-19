@@ -31,8 +31,8 @@ export const DRAG_SENSITIVITY = 0.0048;
 export const MOMENTUM_DECAY = 0.88;
 
 // Sizes
-export const SHELL_POINT_SIZE = 3.2;
-export const LEAK_POINT_SIZE = 4.6;
+export const SHELL_POINT_SIZE = 5.0;
+export const LEAK_POINT_SIZE = 6.8;
 
 // Camera
 export const CAMERA_POSITION = [0, 0, 4.75] as const;

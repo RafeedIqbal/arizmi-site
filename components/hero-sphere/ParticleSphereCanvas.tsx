@@ -74,6 +74,7 @@ export default function ParticleSphereCanvas() {
           width: "100%",
           height: "100%",
           background: "transparent",
+          touchAction: "none",
         }}
         onCreated={onCreated}
         onError={() => setHasError(true)}

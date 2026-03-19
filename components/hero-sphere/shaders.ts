@@ -129,7 +129,7 @@ export const vertexShader = /* glsl */ `
 
       float boost = facing * facing * uCursorBrightness;
 
-      alpha = 0.34 + aRandom * 0.2 + shellBias * 0.2 + boost * 0.55;
+      alpha = 0.55 + aRandom * 0.25 + shellBias * 0.25 + boost * 0.55;
       color = vec3(0.93, 0.95, 0.99);
       color += shellBias * vec3(0.03, 0.05, 0.09);
       color += boost * vec3(0.05, 0.09, 0.14);
@@ -142,7 +142,7 @@ export const vertexShader = /* glsl */ `
 
     // Attenuate size by distance
     gl_PointSize *= (1.0 / -mvPosition.z);
-    gl_PointSize = max(gl_PointSize, mix(2.2, 1.7, isLeak));
+    gl_PointSize = max(gl_PointSize, mix(3.0, 2.2, isLeak));
 
     vColor = color;
     vAlpha = alpha;

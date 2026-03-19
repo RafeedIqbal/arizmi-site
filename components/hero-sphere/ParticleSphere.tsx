@@ -193,7 +193,7 @@ export default function ParticleSphere({ reducedMotion }: { reducedMotion: boole
     return () => window.removeEventListener("pointermove", handlePointerMove);
   }, [gl]);
 
-  // Pointer handlers
+  // Pointer handlers (desktop via R3F events)
   const onPointerDown = useCallback((e: THREE.Event) => {
     const event = e as unknown as { pointerId: number; point: THREE.Vector3; nativeEvent: PointerEvent };
     const ds = dragState.current;
@@ -235,6 +235,60 @@ export default function ParticleSphere({ reducedMotion }: { reducedMotion: boole
     []
   );
 
+  // Touch handlers directly on canvas for reliable mobile drag
+  useEffect(() => {
+    const canvas = gl.domElement;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return;
+      const touch = e.touches[0];
+      const ds = dragState.current;
+      ds.isDragging = true;
+      ds.prevPointer.set(touch.clientX, touch.clientY);
+      ds.velocity.set(0, 0);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return;
+      const ds = dragState.current;
+      if (!ds.isDragging) return;
+
+      const touch = e.touches[0];
+      const dx = (touch.clientX - ds.prevPointer.x) * DRAG_SENSITIVITY;
+      const dy = (touch.clientY - ds.prevPointer.y) * DRAG_SENSITIVITY;
+
+      const qx = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), dx);
+      const qy = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), dy);
+      const combined = qx.multiply(qy);
+
+      ds.rotation.premultiply(combined);
+      ds.velocity.set(dx, dy);
+      ds.prevPointer.set(touch.clientX, touch.clientY);
+
+      // Also update pointer position for plume targeting
+      const rect = canvas.getBoundingClientRect();
+      const nx = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
+      const ny = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
+      pointerNDC.current.set(nx, ny, 1).normalize();
+    };
+
+    const handleTouchEnd = () => {
+      dragState.current.isDragging = false;
+    };
+
+    canvas.addEventListener("touchstart", handleTouchStart, { passive: true });
+    canvas.addEventListener("touchmove", handleTouchMove, { passive: true });
+    canvas.addEventListener("touchend", handleTouchEnd);
+    canvas.addEventListener("touchcancel", handleTouchEnd);
+
+    return () => {
+      canvas.removeEventListener("touchstart", handleTouchStart);
+      canvas.removeEventListener("touchmove", handleTouchMove);
+      canvas.removeEventListener("touchend", handleTouchEnd);
+      canvas.removeEventListener("touchcancel", handleTouchEnd);
+    };
+  }, [gl]);
+
   return (
     <group>
       {/* Invisible mesh for pointer events */}
@@ -245,7 +299,7 @@ export default function ParticleSphere({ reducedMotion }: { reducedMotion: boole
         onPointerMove={onPointerMove}
         onPointerLeave={onPointerUp}
       >
-        <sphereGeometry args={[SPHERE_RADIUS * 1.2, 16, 16]} />
+        <sphereGeometry args={[SPHERE_RADIUS * 1.5, 16, 16]} />
         <meshBasicMaterial visible={false} />
       </mesh>
 
