@@ -52,6 +52,8 @@ export default function ParticleSphere({ reducedMotion }: { reducedMotion: boole
   const materialRef = useRef<THREE.ShaderMaterial>(null);
   const meshRef = useRef<THREE.Mesh>(null);
   const { size, gl, camera } = useThree();
+  const isMobile = size.width < 768;
+  const groupScale = isMobile ? 0.75 : 1;
 
   // Drag state
   const dragState = useRef({
@@ -304,7 +306,7 @@ export default function ParticleSphere({ reducedMotion }: { reducedMotion: boole
   }, [gl, camera]);
 
   return (
-    <group>
+    <group scale={groupScale}>
       {/* Invisible mesh for pointer events */}
       <mesh
         ref={meshRef}
