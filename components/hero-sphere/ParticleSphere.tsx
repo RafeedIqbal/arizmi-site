@@ -51,7 +51,7 @@ function fibonacciSphere(count: number): Float32Array {
 export default function ParticleSphere({ reducedMotion }: { reducedMotion: boolean }) {
   const materialRef = useRef<THREE.ShaderMaterial>(null);
   const meshRef = useRef<THREE.Mesh>(null);
-  const { size, gl } = useThree();
+  const { size, gl, camera } = useThree();
 
   // Drag state
   const dragState = useRef({
@@ -235,13 +235,27 @@ export default function ParticleSphere({ reducedMotion }: { reducedMotion: boole
     []
   );
 
-  // Touch handlers directly on canvas for reliable mobile drag
+  // Touch handlers: raycast to only capture drags that start on the sphere
   useEffect(() => {
     const canvas = gl.domElement;
+    const raycaster = new THREE.Raycaster();
+    const touchNDC = new THREE.Vector2();
 
     const handleTouchStart = (e: TouchEvent) => {
-      if (e.touches.length !== 1) return;
+      if (e.touches.length !== 1 || !meshRef.current) return;
       const touch = e.touches[0];
+
+      // Raycast to check if the finger landed on the sphere hitbox
+      const rect = canvas.getBoundingClientRect();
+      touchNDC.set(
+        ((touch.clientX - rect.left) / rect.width) * 2 - 1,
+        -((touch.clientY - rect.top) / rect.height) * 2 + 1
+      );
+      raycaster.setFromCamera(touchNDC, camera);
+      if (raycaster.intersectObject(meshRef.current).length === 0) return;
+
+      // Touch hit the sphere — claim this gesture
+      e.preventDefault();
       const ds = dragState.current;
       ds.isDragging = true;
       ds.prevPointer.set(touch.clientX, touch.clientY);
@@ -249,10 +263,10 @@ export default function ParticleSphere({ reducedMotion }: { reducedMotion: boole
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches.length !== 1) return;
       const ds = dragState.current;
-      if (!ds.isDragging) return;
+      if (!ds.isDragging || e.touches.length !== 1) return;
 
+      e.preventDefault(); // prevent scroll while dragging sphere
       const touch = e.touches[0];
       const dx = (touch.clientX - ds.prevPointer.x) * DRAG_SENSITIVITY;
       const dy = (touch.clientY - ds.prevPointer.y) * DRAG_SENSITIVITY;
@@ -265,7 +279,7 @@ export default function ParticleSphere({ reducedMotion }: { reducedMotion: boole
       ds.velocity.set(dx, dy);
       ds.prevPointer.set(touch.clientX, touch.clientY);
 
-      // Also update pointer position for plume targeting
+      // Update pointer position for plume targeting
       const rect = canvas.getBoundingClientRect();
       const nx = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
       const ny = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
@@ -276,8 +290,8 @@ export default function ParticleSphere({ reducedMotion }: { reducedMotion: boole
       dragState.current.isDragging = false;
     };
 
-    canvas.addEventListener("touchstart", handleTouchStart, { passive: true });
-    canvas.addEventListener("touchmove", handleTouchMove, { passive: true });
+    canvas.addEventListener("touchstart", handleTouchStart, { passive: false });
+    canvas.addEventListener("touchmove", handleTouchMove, { passive: false });
     canvas.addEventListener("touchend", handleTouchEnd);
     canvas.addEventListener("touchcancel", handleTouchEnd);
 
@@ -287,7 +301,7 @@ export default function ParticleSphere({ reducedMotion }: { reducedMotion: boole
       canvas.removeEventListener("touchend", handleTouchEnd);
       canvas.removeEventListener("touchcancel", handleTouchEnd);
     };
-  }, [gl]);
+  }, [gl, camera]);
 
   return (
     <group>
@@ -299,7 +313,7 @@ export default function ParticleSphere({ reducedMotion }: { reducedMotion: boole
         onPointerMove={onPointerMove}
         onPointerLeave={onPointerUp}
       >
-        <sphereGeometry args={[SPHERE_RADIUS * 1.5, 16, 16]} />
+        <sphereGeometry args={[SPHERE_RADIUS * 1.2, 16, 16]} />
         <meshBasicMaterial visible={false} />
       </mesh>
 
