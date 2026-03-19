@@ -10,12 +10,15 @@ import {
   TOTAL_COUNT,
   SPHERE_RADIUS,
   LEAK_ORIGIN,
+  LEAK_ORIGIN_SPREAD,
   AUTO_ROTATE_SPEED,
   BREATHING_AMPLITUDE,
   LEAK_SPEED,
   LEAK_TRAVEL_DISTANCE,
   LEAK_TURBULENCE,
   LEAK_CONE_ANGLE,
+  PLUME_LIFT,
+  PLUME_CURSOR_PULL,
   CURSOR_BRIGHTNESS_BOOST,
   CURSOR_MAGNETIC_STRENGTH,
   DRAG_SENSITIVITY,
@@ -26,7 +29,7 @@ import {
 
 // Deterministic hash: maps an integer to a stable float in [0, 1)
 function hash(n: number): number {
-  let x = Math.sin(n * 127.1 + 311.7) * 43758.5453123;
+  const x = Math.sin(n * 127.1 + 311.7) * 43758.5453123;
   return x - Math.floor(x);
 }
 
@@ -49,7 +52,7 @@ function fibonacciSphere(count: number): Float32Array {
 export default function ParticleSphere({ reducedMotion }: { reducedMotion: boolean }) {
   const materialRef = useRef<THREE.ShaderMaterial>(null);
   const meshRef = useRef<THREE.Mesh>(null);
-  const { size } = useThree();
+  const { size, gl } = useThree();
 
   // Drag state
   const dragState = useRef({
@@ -69,18 +72,17 @@ export default function ParticleSphere({ reducedMotion }: { reducedMotion: boole
     // Shell positions: Fibonacci on unit sphere
     const shellPos = fibonacciSphere(SHELL_COUNT);
 
-    // Leak positions: clustered near leak origin (deterministic spread)
+    // Leak positions: tightly clustered near the upper emission origin
     const leakOriginNorm = new THREE.Vector3(...LEAK_ORIGIN).normalize();
     const leakPos = new Float32Array(LEAK_COUNT * 3);
 
     for (let i = 0; i < LEAK_COUNT; i++) {
-      const spread = 0.08;
       const h1 = hash(i * 3 + 70001);
       const h2 = hash(i * 3 + 70002);
       const h3 = hash(i * 3 + 70003);
-      const x = leakOriginNorm.x + (h1 - 0.5) * spread;
-      const y = leakOriginNorm.y + (h2 - 0.5) * spread;
-      const z = leakOriginNorm.z + (h3 - 0.5) * spread;
+      const x = leakOriginNorm.x + (h1 - 0.5) * LEAK_ORIGIN_SPREAD;
+      const y = leakOriginNorm.y + (h2 - 0.5) * LEAK_ORIGIN_SPREAD;
+      const z = leakOriginNorm.z + (h3 - 0.5) * LEAK_ORIGIN_SPREAD;
       const len = Math.sqrt(x * x + y * y + z * z);
       leakPos[i * 3] = x / len;
       leakPos[i * 3 + 1] = y / len;
@@ -101,7 +103,7 @@ export default function ParticleSphere({ reducedMotion }: { reducedMotion: boole
     for (let i = 0; i < TOTAL_COUNT; i++) {
       aRandom[i] = hash(i);
       aPhase[i] = hash(i + 10000);
-      aLeakFactor[i] = i >= SHELL_COUNT ? 0.5 + hash(i + 20000) * 1.5 : 0;
+      aLeakFactor[i] = i >= SHELL_COUNT ? 1.05 + hash(i + 20000) * 0.55 : 0;
       aConeOffset[i * 2] = hash(i + 30000);
       aConeOffset[i * 2 + 1] = hash(i + 40000);
     }
@@ -121,7 +123,7 @@ export default function ParticleSphere({ reducedMotion }: { reducedMotion: boole
       uPointer: { value: new THREE.Vector3(0, 0, 1) },
       uDragRotation: { value: new THREE.Matrix4() },
       uLeakOrigin: { value: new THREE.Vector3(...LEAK_ORIGIN).normalize() },
-      uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
+      uPixelRatio: { value: Math.min(gl.getPixelRatio(), 2) },
       uShellPointSize: { value: SHELL_POINT_SIZE },
       uLeakPointSize: { value: LEAK_POINT_SIZE },
       uBreathingAmplitude: { value: BREATHING_AMPLITUDE },
@@ -131,9 +133,11 @@ export default function ParticleSphere({ reducedMotion }: { reducedMotion: boole
       uCursorBrightness: { value: CURSOR_BRIGHTNESS_BOOST },
       uSphereRadius: { value: SPHERE_RADIUS },
       uLeakConeAngle: { value: LEAK_CONE_ANGLE },
+      uPlumeLift: { value: PLUME_LIFT },
+      uPlumeCursorPull: { value: PLUME_CURSOR_PULL },
       uMagneticStrength: { value: CURSOR_MAGNETIC_STRENGTH },
     }),
-    []
+    [gl]
   );
 
   useFrame((_, delta) => {
@@ -141,6 +145,7 @@ export default function ParticleSphere({ reducedMotion }: { reducedMotion: boole
 
     const mat = materialRef.current;
     const ds = dragState.current;
+    mat.uniforms.uPixelRatio.value = Math.min(gl.getPixelRatio(), 2);
 
     // Update time (freeze at 0 for reduced motion)
     if (!reducedMotion) {

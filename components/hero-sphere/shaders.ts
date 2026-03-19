@@ -13,6 +13,8 @@ export const vertexShader = /* glsl */ `
   uniform float uCursorBrightness;
   uniform float uSphereRadius;
   uniform float uLeakConeAngle;
+  uniform float uPlumeLift;
+  uniform float uPlumeCursorPull;
   uniform float uMagneticStrength;
 
   attribute float aRandom;
@@ -22,6 +24,7 @@ export const vertexShader = /* glsl */ `
 
   varying vec3 vColor;
   varying float vAlpha;
+  varying float vKind;
 
   void main() {
     vec3 pos = position;
@@ -30,74 +33,80 @@ export const vertexShader = /* glsl */ `
     // Apply drag rotation to the base position and leak origin
     vec3 rotatedPos = (uDragRotation * vec4(pos, 1.0)).xyz;
     vec3 rotatedLeakOrigin = (uDragRotation * vec4(uLeakOrigin, 1.0)).xyz;
+    vec3 sphereUp = normalize((uDragRotation * vec4(0.0, 1.0, 0.0, 0.0)).xyz);
 
     vec3 finalPos;
     float alpha = 1.0;
     vec3 color;
 
     if (isLeak > 0.5) {
-      // --- Leak particle (smoke cone) ---
+      // Compact plume that hugs the upper hemisphere.
       float lifecycle = fract((uTime * uLeakSpeed + aPhase) / aLeakFactor);
-
-      // Base direction: outward from leak origin
+      vec3 pointerDir = normalize(uPointer);
       vec3 leakDir = normalize(rotatedLeakOrigin);
+      vec3 plumeDir = normalize(mix(leakDir, sphereUp, uPlumeLift));
 
-      // Build a local frame around leakDir for cone spread
-      vec3 perp1 = normalize(cross(leakDir, vec3(0.0, 1.0, 0.001)));
-      vec3 perp2 = cross(leakDir, perp1);
+      vec3 guideAxis = abs(plumeDir.y) > 0.9 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
+      vec3 perp1 = normalize(cross(plumeDir, guideAxis));
+      vec3 perp2 = normalize(cross(plumeDir, perp1));
 
-      // Cone spread: offset the direction within a cone
-      float coneR = uLeakConeAngle * sqrt(aRandom); // sqrt for uniform disk distribution
+      float coneR = uLeakConeAngle * mix(0.18, 1.0, sqrt(aConeOffset.y));
       float coneAngle = aConeOffset.x * 6.28318;
       vec3 coneDir = normalize(
-        leakDir + perp1 * (sin(coneAngle) * coneR) + perp2 * (cos(coneAngle) * coneR)
+        plumeDir + perp1 * (sin(coneAngle) * coneR) + perp2 * (cos(coneAngle) * coneR)
       );
+      float cursorPull = smoothstep(0.08, 0.95, lifecycle) * uPlumeCursorPull;
+      vec3 guidedDir = normalize(mix(coneDir, pointerDir, cursorPull));
 
-      // Smoke turbulence: increases with distance
-      float turbScale = lifecycle * lifecycle; // stronger further out
-      float turb1 = sin(uTime * 1.3 + aPhase * 6.28 + lifecycle * 4.0) * uLeakTurbulence * turbScale;
-      float turb2 = cos(uTime * 0.9 + aPhase * 6.28 + lifecycle * 3.0 + 2.0) * uLeakTurbulence * turbScale;
-      float turb3 = sin(uTime * 1.7 + aRandom * 6.28 + lifecycle * 5.0) * uLeakTurbulence * turbScale * 0.5;
+      float driftScale = 0.16 + lifecycle * 0.68;
+      float drift1 = sin(uTime * 0.7 + aPhase * 6.28 + lifecycle * 4.5) * uLeakTurbulence * driftScale;
+      float drift2 = cos(uTime * 1.0 + aRandom * 6.28 + lifecycle * 3.5) * uLeakTurbulence * driftScale * 0.8;
+      float liftJitter = sin(uTime * 1.15 + aConeOffset.y * 6.28 + lifecycle * 5.0) * uLeakTurbulence * lifecycle * 0.4;
+      float driftFade = 1.0 - cursorPull * 0.7;
 
-      // Position along the cone with deceleration (smoke slows down)
-      float dist = lifecycle * uLeakTravelDistance * (1.0 - lifecycle * 0.4);
-      finalPos = rotatedLeakOrigin * uSphereRadius
-        + coneDir * dist
-        + perp1 * turb1
-        + perp2 * turb2
-        + leakDir * turb3;
+      float dist = lifecycle * uLeakTravelDistance;
+      finalPos = rotatedLeakOrigin * (uSphereRadius + 0.015)
+        + guidedDir * dist
+        + perp1 * drift1 * driftFade
+        + perp2 * drift2 * driftFade
+        + sphereUp * liftJitter * (1.0 - cursorPull * 0.35);
 
-      // Smoke fade: quick rise, slow fade
       float fadeIn = smoothstep(0.0, 0.1, lifecycle);
-      float fadeOut = 1.0 - smoothstep(0.3, 1.0, lifecycle);
-      alpha = fadeIn * fadeOut * (0.4 + aRandom * 0.3);
+      float fadeOut = 1.0 - smoothstep(0.78, 1.0, lifecycle);
+      float coreGlow = 1.0 - smoothstep(0.1, 0.4, lifecycle);
+      alpha = fadeIn * fadeOut * (0.3 + coreGlow * 0.14);
 
-      // Size: grows as smoke disperses, then fades
-      float sizeMod = smoothstep(0.0, 0.3, lifecycle) * (1.0 - lifecycle * 0.3);
-      gl_PointSize = uLeakPointSize * uPixelRatio * (0.4 + sizeMod * 1.2) * (0.6 + aRandom * 0.4);
+      float sizeFade = mix(1.08, 0.94, lifecycle);
+      gl_PointSize = uLeakPointSize * uPixelRatio * sizeFade * (0.92 + aRandom * 0.12);
 
-      // Color: accent blue → darker blue as it fades
-      vec3 blueStart = vec3(0.35, 0.69, 1.0);  // #59b0ff
-      vec3 blueEnd = vec3(0.10, 0.23, 0.36);    // #1a3a5c
-      color = mix(blueStart, blueEnd, lifecycle);
+      vec3 blueStart = vec3(0.62, 0.88, 1.0);
+      vec3 blueMid = vec3(0.39, 0.69, 0.96);
+      vec3 blueEnd = vec3(0.12, 0.23, 0.34);
+      color = mix(blueStart, blueMid, smoothstep(0.08, 0.42, lifecycle));
+      color = mix(color, blueEnd, smoothstep(0.42, 1.0, lifecycle));
+      color += coreGlow * vec3(0.12, 0.17, 0.2);
     } else {
-      // --- Shell particle ---
-      float breathe = sin(uTime * 1.2 + aPhase * 6.28) * uBreathingAmplitude;
-      finalPos = rotatedPos * (uSphereRadius + breathe);
+      float breathe = sin(uTime * 0.45 + aPhase * 6.28) * uBreathingAmplitude;
+      finalPos = rotatedPos * (uSphereRadius + breathe * (0.7 + aRandom * 0.3));
 
-      // Magnetic pull: displace shell particles toward cursor
+      float lowerBias = smoothstep(-0.85, 0.2, -rotatedPos.y);
+      float frontBias = smoothstep(-0.2, 0.85, rotatedPos.z);
+      float shellBias = lowerBias * 0.65 + frontBias * 0.35;
+
+      vec3 pointerDir = normalize(uPointer);
       vec3 particleNormal = normalize(rotatedPos);
-      float facing = max(dot(particleNormal, normalize(uPointer)), 0.0);
+      float facing = max(dot(particleNormal, pointerDir), 0.0);
       float magneticPull = facing * facing * facing * uMagneticStrength;
-      finalPos += normalize(uPointer) * magneticPull * 0.15;
+      finalPos += pointerDir * magneticPull * 0.08;
 
-      // Cursor brightness boost
       float boost = facing * facing * uCursorBrightness;
 
-      alpha = 0.5 + aRandom * 0.3 + boost;
-      color = vec3(0.94, 0.94, 0.94) + vec3(boost * 0.3);
+      alpha = 0.34 + aRandom * 0.2 + shellBias * 0.2 + boost * 0.55;
+      color = vec3(0.93, 0.95, 0.99);
+      color += shellBias * vec3(0.03, 0.05, 0.09);
+      color += boost * vec3(0.05, 0.09, 0.14);
 
-      gl_PointSize = uShellPointSize * uPixelRatio * (0.6 + aRandom * 0.4);
+      gl_PointSize = uShellPointSize * uPixelRatio * (0.72 + aRandom * 0.22 + shellBias * 0.08);
     }
 
     vec4 mvPosition = modelViewMatrix * vec4(finalPos, 1.0);
@@ -105,24 +114,29 @@ export const vertexShader = /* glsl */ `
 
     // Attenuate size by distance
     gl_PointSize *= (1.0 / -mvPosition.z);
+    gl_PointSize = max(gl_PointSize, mix(2.2, 1.7, isLeak));
 
     vColor = color;
     vAlpha = alpha;
+    vKind = isLeak;
   }
 `;
 
 export const fragmentShader = /* glsl */ `
   varying vec3 vColor;
   varying float vAlpha;
+  varying float vKind;
 
   void main() {
     float dist = distance(gl_PointCoord, vec2(0.5));
     if (dist > 0.5) discard;
 
-    // Softer falloff for smokier look
-    float softEdge = 1.0 - smoothstep(0.15, 0.5, dist);
-    softEdge *= softEdge; // extra soft
+    float shellFalloff = pow(1.0 - smoothstep(0.12, 0.5, dist), 1.9);
+    float plumeGlow = pow(1.0 - smoothstep(0.04, 0.5, dist), 1.2);
+    float plumeCore = 1.0 - smoothstep(0.0, 0.19, dist);
+    float plumeFalloff = max(plumeGlow * 0.96, plumeCore * 0.42);
+    float pointAlpha = mix(shellFalloff, plumeFalloff, vKind);
 
-    gl_FragColor = vec4(vColor, vAlpha * softEdge);
+    gl_FragColor = vec4(vColor, vAlpha * pointAlpha);
   }
 `;

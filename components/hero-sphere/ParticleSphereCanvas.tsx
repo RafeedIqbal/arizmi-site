@@ -2,7 +2,6 @@
 
 import { Suspense, useState, useEffect, useCallback } from "react";
 import { Canvas, type RootState } from "@react-three/fiber";
-import { AdaptiveDpr } from "@react-three/drei";
 import ParticleSphere from "./ParticleSphere";
 import { CAMERA_POSITION, CAMERA_FOV } from "./constants";
 
@@ -20,12 +19,20 @@ function Fallback() {
 
 export default function ParticleSphereCanvas() {
   const [hasError, setHasError] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(() =>
+    typeof window !== "undefined"
+      ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      : false
+  );
 
   useEffect(() => {
-    setReducedMotion(
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    );
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const handleChange = (event: MediaQueryListEvent) => {
+      setReducedMotion(event.matches);
+    };
+
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
   const onCreated = useCallback((state: RootState) => {
@@ -51,6 +58,7 @@ export default function ParticleSphereCanvas() {
   return (
     <Suspense fallback={<Fallback />}>
       <Canvas
+        dpr={[1, 2]}
         gl={{
           alpha: true,
           antialias: false,
@@ -70,7 +78,6 @@ export default function ParticleSphereCanvas() {
         onCreated={onCreated}
         onError={() => setHasError(true)}
       >
-        <AdaptiveDpr pixelated />
         <ParticleSphere reducedMotion={reducedMotion} />
       </Canvas>
     </Suspense>
