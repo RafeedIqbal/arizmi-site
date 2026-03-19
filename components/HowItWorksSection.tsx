@@ -104,7 +104,7 @@ function UnderstandVis() {
             background: "rgba(89,176,255,0.08)",
             borderRadius: "10px 10px 10px 2px",
             padding: "8px 12px",
-            maxWidth: "65%",
+            width: "75%",
           }}
         >
           <div
@@ -141,7 +141,7 @@ function UnderstandVis() {
             background: "rgba(255,255,255,0.05)",
             borderRadius: "10px 10px 2px 10px",
             padding: "8px 12px",
-            maxWidth: "50%",
+            width: "60%",
           }}
         >
           <div
