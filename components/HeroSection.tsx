@@ -16,9 +16,13 @@ export default function HeroSection() {
     const root = rootRef.current;
     if (!root || prefersReducedMotion()) return;
 
+    const isMobile = window.innerWidth < 640;
+
     const ctx = gsap.context(() => {
-      gsap.set(logoRef.current, { scale: 4, transformOrigin: "top left" });
-      gsap.set(logoTextRef.current, { opacity: 0, y: 8 });
+      if (!isMobile) {
+        gsap.set(logoRef.current, { scale: 4, transformOrigin: "top left" });
+        gsap.set(logoTextRef.current, { opacity: 0, y: 8 });
+      }
 
       const heroTl = gsap.timeline({
         scrollTrigger: {
@@ -29,16 +33,18 @@ export default function HeroSection() {
           scrub: 0.5,
         },
       });
-      heroTl.to(
-        logoRef.current,
-        { scale: 1, ease: "none", duration: 1 },
-        0
-      );
-      heroTl.to(
-        logoTextRef.current,
-        { opacity: 1, y: 0, ease: "none", duration: 0.35 },
-        0.6
-      );
+      if (!isMobile) {
+        heroTl.to(
+          logoRef.current,
+          { scale: 1, ease: "none", duration: 1 },
+          0
+        );
+        heroTl.to(
+          logoTextRef.current,
+          { opacity: 1, y: 0, ease: "none", duration: 0.35 },
+          0.6
+        );
+      }
       heroTl.to(
         imageRef.current,
         { yPercent: -6, ease: "none", duration: 1 },
@@ -127,8 +133,8 @@ export default function HeroSection() {
             position: "absolute",
             top: "1.5rem",
             bottom: "clamp(5rem, 8vw, 7rem)",
-            left: "var(--section-px)",
-            right: "var(--section-px)",
+            left: 0,
+            right: 0,
             borderRadius: "16px",
             overflow: "hidden",
             background: "var(--bg)",
@@ -141,7 +147,7 @@ export default function HeroSection() {
           ref={bottomRef}
           style={{
             position: "absolute",
-            bottom: "clamp(3.5rem, 8vw, 8rem)",
+            bottom: "clamp(6rem, 8vw, 8rem)",
             left: "calc(var(--section-px) + clamp(1rem, 4vw, 4rem))",
             right: "calc(var(--section-px) + clamp(1rem, 4vw, 4rem))",
             display: "flex",
