@@ -149,8 +149,6 @@ export default function TextGlowHero() {
     >
       <div className="text-glow-hero__track" style={textStyle}>
         <div className="text-glow-hero__stage" aria-hidden="true">
-          <span className="text-glow-hero__wash" />
-          <span className="text-glow-hero__halo" />
           {TRAIL_LAYERS.map((layer) => (
             <span
               key={layer.id}
