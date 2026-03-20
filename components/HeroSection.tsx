@@ -3,6 +3,7 @@
 import { useRef, useLayoutEffect } from "react";
 import Image from "next/image";
 import { gsap, prefersReducedMotion } from "@/lib/motion";
+import TextGlowHero from "./TextGlowHero";
 
 export default function HeroSection() {
   const rootRef = useRef<HTMLElement>(null);
@@ -130,15 +131,10 @@ export default function HeroSection() {
             right: "var(--section-px)",
             borderRadius: "16px",
             overflow: "hidden",
+            background: "var(--bg)",
           }}
         >
-          <Image
-            src="/hero_image.png"
-            alt="Arizmi Labs hero artwork"
-            fill
-            style={{ objectFit: "cover" }}
-            priority
-          />
+          <TextGlowHero />
         </div>
 
         <div
