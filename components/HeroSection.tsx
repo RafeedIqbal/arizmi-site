@@ -1,19 +1,8 @@
 "use client";
 
 import { useRef, useLayoutEffect } from "react";
-import dynamic from "next/dynamic";
 import Image from "next/image";
 import { gsap, prefersReducedMotion } from "@/lib/motion";
-
-const ParticleSphereCanvas = dynamic(
-  () => import("@/components/hero-sphere/ParticleSphereCanvas"),
-  {
-    ssr: false,
-    loading: () => (
-      <div style={{ width: "100%", height: "100%", background: "var(--bg)" }} />
-    ),
-  }
-);
 
 export default function HeroSection() {
   const rootRef = useRef<HTMLElement>(null);
@@ -143,7 +132,13 @@ export default function HeroSection() {
             overflow: "hidden",
           }}
         >
-          <ParticleSphereCanvas />
+          <Image
+            src="/hero_image.png"
+            alt="Arizmi Labs hero artwork"
+            fill
+            style={{ objectFit: "cover" }}
+            priority
+          />
         </div>
 
         <div
