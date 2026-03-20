@@ -20,10 +20,10 @@ const TRAIL_LAYERS = Array.from({ length: LAYER_COUNT }, (_, index) => {
   return {
     id: `trail-${index}`,
     style: {
-      "--trail-blur": `${(1 + depth * 10).toFixed(1)}px`,
-      "--trail-opacity": `${(0.34 - depth * 0.2).toFixed(3)}`,
-      "--trail-shift-x": `${(0.1 + depth * 0.8).toFixed(3)}em`,
-      "--trail-shift-y": `${(0.06 + depth * 0.45).toFixed(3)}em`,
+      "--trail-blur": `${(2 + depth * 22).toFixed(1)}px`,
+      "--trail-opacity": `${(0.44 - depth * 0.24).toFixed(3)}`,
+      "--trail-shift-x": `${(0.2 + depth * 1.55).toFixed(3)}em`,
+      "--trail-shift-y": `${(0.12 + depth * 0.9).toFixed(3)}em`,
       "--trail-stretch": `${(0.08 + depth * 0.46).toFixed(3)}`,
       "--trail-scale": `${(1 - depth * 0.08).toFixed(3)}`,
     } as GlowLayerStyle,
@@ -149,6 +149,8 @@ export default function TextGlowHero() {
     >
       <div className="text-glow-hero__track" style={textStyle}>
         <div className="text-glow-hero__stage" aria-hidden="true">
+          <span className="text-glow-hero__wash" />
+          <span className="text-glow-hero__halo" />
           {TRAIL_LAYERS.map((layer) => (
             <span
               key={layer.id}
