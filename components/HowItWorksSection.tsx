@@ -481,9 +481,9 @@ export default function HowItWorksSection() {
         if (!card) return;
         gsap.fromTo(
           card,
-          { x: 40, opacity: 0 },
+          { xPercent: 8, opacity: 0 },
           {
-            x: 0,
+            xPercent: 0,
             opacity: 1,
             ease: "power2.out",
             scrollTrigger: {

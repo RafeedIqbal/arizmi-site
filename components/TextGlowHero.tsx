@@ -40,6 +40,7 @@ export default function TextGlowHero() {
   const frameRef = useRef<number | null>(null);
   const pendingRef = useRef({ x: 0, y: 0, strength: 0 });
   const reducedMotionRef = useRef(false);
+  const draggingRef = useRef(false);
 
   function writeGlow(x: number, y: number, strength: number) {
     const el = containerRef.current;
@@ -103,24 +104,43 @@ export default function TextGlowHero() {
     };
   }, []);
 
-  function handlePointerEnter(event: React.PointerEvent<HTMLDivElement>) {
-    if (reducedMotionRef.current || event.pointerType === "touch") return;
-    updateBounds();
-    handlePointerMove(event);
-  }
-
-  function handlePointerMove(event: React.PointerEvent<HTMLDivElement>) {
-    if (reducedMotionRef.current || event.pointerType === "touch") return;
-
+  function glowFromEvent(clientX: number, clientY: number) {
     if (!boundsRef.current) updateBounds();
     const bounds = boundsRef.current;
     if (!bounds) return;
 
-    const x = clamp(((event.clientX - bounds.left) / bounds.width - 0.5) * 2, -1, 1);
-    const y = clamp(((event.clientY - bounds.top) / bounds.height - 0.5) * 2, -1, 1);
+    const x = clamp(((clientX - bounds.left) / bounds.width - 0.5) * 2, -1, 1);
+    const y = clamp(((clientY - bounds.top) / bounds.height - 0.5) * 2, -1, 1);
     const strength = clamp(0.38 + Math.hypot(x, y) * 0.5, 0.38, 1);
 
     scheduleGlow(x, y, strength);
+  }
+
+  function handlePointerEnter(event: React.PointerEvent<HTMLDivElement>) {
+    if (reducedMotionRef.current || event.pointerType === "touch") return;
+    updateBounds();
+    glowFromEvent(event.clientX, event.clientY);
+  }
+
+  function handlePointerMove(event: React.PointerEvent<HTMLDivElement>) {
+    if (reducedMotionRef.current) return;
+    if (event.pointerType === "touch" && !draggingRef.current) return;
+
+    glowFromEvent(event.clientX, event.clientY);
+  }
+
+  function handlePointerDown(event: React.PointerEvent<HTMLDivElement>) {
+    if (reducedMotionRef.current || event.pointerType !== "touch") return;
+    draggingRef.current = true;
+    updateBounds();
+    glowFromEvent(event.clientX, event.clientY);
+  }
+
+  function handlePointerUp(event: React.PointerEvent<HTMLDivElement>) {
+    if (event.pointerType === "touch") {
+      draggingRef.current = false;
+      resetGlow();
+    }
   }
 
   function resetGlow() {
@@ -142,7 +162,9 @@ export default function TextGlowHero() {
       ref={containerRef}
       className="text-glow-hero"
       onPointerEnter={handlePointerEnter}
+      onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
       onPointerLeave={resetGlow}
       onPointerCancel={resetGlow}
       style={{ touchAction: "pan-y" }}
