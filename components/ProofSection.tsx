@@ -9,33 +9,36 @@ const PROJECTS = [
     project: "Icon Training",
     tag: "Fitness Tech",
     blurb:
-      "Placeholder — copy coming soon. A complete fitness platform built for a first-time founder, from mobile app to trainer dashboard.",
+      "Built an AI-powered fitness coaching app from the ground up — adaptive training engine, real-time chat, progress tracking, and a full mobile experience ready for launch.",
     accentColor: "#59b0ff",
     gradient:
       "linear-gradient(160deg, rgba(89,176,255,0.1) 0%, rgba(89,176,255,0.03) 100%)",
     image: "/IconTraining.svg",
+    url: "https://www.icontraining.app/",
   },
   {
     number: "02",
     project: "Basenote Solutions",
     tag: "B2B SaaS",
     blurb:
-      "Placeholder — copy coming soon. An end-to-end B2B SaaS MVP: customer portal, analytics dashboard, and enterprise integrations.",
+      "Designing and developing the complete digital infrastructure for fragrance brands — e-commerce platform, CRM, launch pages, and a bespoke perfumery AI that suggests custom blends.",
     accentColor: "#c084fc",
     gradient:
       "linear-gradient(160deg, rgba(192,132,252,0.1) 0%, rgba(192,132,252,0.03) 100%)",
     image: "/BasenoteSolutions.svg",
+    url: "https://www.basenotesolutions.com/",
   },
   {
     number: "03",
     project: "Freedom Airlines",
     tag: "Travel & Aviation",
     blurb:
-      "Placeholder — copy coming soon. Reach out if you'd like to learn more about this exciting new venture.",
+      "Created the web presence for a regional airline launching domestic routes across Bangladesh — investor portal, route information, and a pre-launch registration system.",
     accentColor: "#34d399",
     gradient:
       "linear-gradient(160deg, rgba(52,211,153,0.1) 0%, rgba(52,211,153,0.03) 100%)",
     image: "/FreedomAirlines.webp",
+    url: "https://freedomairlinesbd.com/",
   },
 ];
 
@@ -183,7 +186,10 @@ export default function ProofSection() {
                 >
                   {project.number}
                 </span>
-                <div
+                <a
+                  href={project.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   style={{
                     width: "clamp(120px, 18vw, 200px)",
                     height: "clamp(120px, 18vw, 200px)",
@@ -205,7 +211,7 @@ export default function ProofSection() {
                       objectFit: "contain",
                     }}
                   />
-                </div>
+                </a>
               </div>
 
               {/* Right: content */}
@@ -245,7 +251,14 @@ export default function ProofSection() {
                     margin: 0,
                   }}
                 >
-                  {project.project}
+                  <a
+                    href={project.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: "inherit", textDecoration: "none" }}
+                  >
+                    {project.project}
+                  </a>
                 </h3>
                 <p
                   style={{

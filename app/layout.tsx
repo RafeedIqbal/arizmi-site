@@ -16,7 +16,7 @@ const instrumentSerif = localFont({
   weight: "400",
 });
 
-const siteUrl = "https://arizmi.com";
+const siteUrl = "https://arizmlabs.com";
 
 export const metadata: Metadata = {
   title: "Arizmi — Start-Up Apps & Websites",
@@ -31,12 +31,21 @@ export const metadata: Metadata = {
     siteName: "Arizmi",
     type: "website",
     locale: "en_US",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Arizmi — Start-Up Apps & Websites",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Arizmi — Start-Up Apps & Websites",
     description:
       "Your technical co-founder, combining business strategy and software engineering to turn your idea into a successful business.",
+    images: ["/og-image.png"],
   },
   icons: {
     icon: [
