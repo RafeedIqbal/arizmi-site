@@ -78,6 +78,7 @@ export default function RootLayout({
         className={`${inter.variable} ${instrumentSerif.variable} antialiased`}
       >
         {children}
+        <Analytics />
         <Toaster
           position="bottom-center"
           toastOptions={{
