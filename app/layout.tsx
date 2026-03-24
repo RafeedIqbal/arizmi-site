@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const inter = localFont({
@@ -74,6 +75,16 @@ export default function RootLayout({
         className={`${inter.variable} ${instrumentSerif.variable} antialiased`}
       >
         {children}
+        <Toaster
+          position="bottom-center"
+          toastOptions={{
+            style: {
+              background: "var(--surface-alt)",
+              border: "1px solid var(--border)",
+              color: "var(--text)",
+            },
+          }}
+        />
       </body>
     </html>
   );

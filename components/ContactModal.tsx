@@ -2,6 +2,10 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
+import { toast } from "sonner";
+import { FormGuardFields } from "@/lib/formGuard";
+import { submitContactForm } from "@/app/actions/contact";
+import SuccessMessage from "./SuccessMessage";
 
 interface Props {
   onClose: () => void;
@@ -30,6 +34,8 @@ const labelStyle: React.CSSProperties = {
 
 export default function ContactModal({ onClose }: Props) {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
@@ -58,14 +64,11 @@ export default function ContactModal({ onClose }: Props) {
   }, []);
 
   useEffect(() => {
-    // Save previous focus for restore
     previousFocusRef.current = document.activeElement as HTMLElement;
 
-    // Lock body scroll
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
-    // Focus first focusable element in dialog
     const timer = setTimeout(() => {
       const firstInput = dialogRef.current?.querySelector<HTMLElement>("input, textarea, button");
       firstInput?.focus();
@@ -82,16 +85,24 @@ export default function ContactModal({ onClose }: Props) {
       window.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = originalOverflow;
       clearTimeout(timer);
-      // Restore focus
       previousFocusRef.current?.focus();
     };
   }, [onClose, trapFocus]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // TODO: wire up email service
-    console.log("Contact form submission:", form);
-    onClose();
+    setSending(true);
+
+    const fd = new FormData(e.currentTarget);
+    const result = await submitContactForm(fd);
+
+    setSending(false);
+
+    if (result.success) {
+      setSent(true);
+    } else {
+      toast.error(result.error);
+    }
   };
 
   return createPortal(
@@ -143,7 +154,7 @@ export default function ContactModal({ onClose }: Props) {
               color: "var(--text)",
             }}
           >
-            Get in touch
+            {sent ? "Thank you" : "Get in touch"}
           </h2>
           <button
             onClick={onClose}
@@ -169,71 +180,83 @@ export default function ContactModal({ onClose }: Props) {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: "1.25rem" }}>
-            <label htmlFor="contact-name" style={labelStyle}>
-              Name
-            </label>
-            <input
-              id="contact-name"
-              type="text"
-              required
-              placeholder="Your name"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              style={inputStyle}
-            />
-          </div>
+        {sent ? (
+          <SuccessMessage onClose={onClose} />
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <FormGuardFields />
 
-          <div style={{ marginBottom: "1.25rem" }}>
-            <label htmlFor="contact-email" style={labelStyle}>
-              Email
-            </label>
-            <input
-              id="contact-email"
-              type="email"
-              required
-              placeholder="you@example.com"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              style={inputStyle}
-            />
-          </div>
+            <div style={{ marginBottom: "1.25rem" }}>
+              <label htmlFor="contact-name" style={labelStyle}>
+                Name
+              </label>
+              <input
+                id="contact-name"
+                name="name"
+                type="text"
+                required
+                placeholder="Your name"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                style={inputStyle}
+              />
+            </div>
 
-          <div style={{ marginBottom: "2rem" }}>
-            <label htmlFor="contact-message" style={labelStyle}>
-              Message
-            </label>
-            <textarea
-              id="contact-message"
-              required
-              placeholder="Tell us about your idea..."
-              rows={5}
-              value={form.message}
-              onChange={(e) => setForm({ ...form, message: e.target.value })}
-              style={{ ...inputStyle, resize: "vertical" }}
-            />
-          </div>
+            <div style={{ marginBottom: "1.25rem" }}>
+              <label htmlFor="contact-email" style={labelStyle}>
+                Email
+              </label>
+              <input
+                id="contact-email"
+                name="email"
+                type="email"
+                required
+                placeholder="you@example.com"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                style={inputStyle}
+              />
+            </div>
 
-          <button
-            type="submit"
-            className="btn-primary"
-            style={{
-              width: "100%",
-              background: "var(--accent)",
-              color: "#000",
-              border: "none",
-              borderRadius: "9999px",
-              padding: "0.875rem",
-              fontSize: "1rem",
-              fontWeight: 600,
-              cursor: "pointer",
-              fontFamily: "inherit",
-            }}
-          >
-            Send Message
-          </button>
-        </form>
+            <div style={{ marginBottom: "2rem" }}>
+              <label htmlFor="contact-message" style={labelStyle}>
+                Message
+              </label>
+              <textarea
+                id="contact-message"
+                name="message"
+                required
+                placeholder="Tell us about your idea..."
+                rows={5}
+                value={form.message}
+                onChange={(e) => setForm({ ...form, message: e.target.value })}
+                style={{ ...inputStyle, resize: "vertical" }}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={sending}
+              className="btn-primary"
+              style={{
+                width: "100%",
+                background: sending ? "var(--text-muted)" : "var(--accent)",
+                color: "#000",
+                border: "none",
+                borderRadius: "9999px",
+                padding: "0.875rem",
+                fontSize: "1rem",
+                fontWeight: 600,
+                cursor: sending ? "not-allowed" : "pointer",
+                fontFamily: "inherit",
+                opacity: sending ? 0.6 : 1,
+                transition: "opacity 0.2s ease",
+              }}
+            >
+              {sending ? "Sending..." : "Send Message"}
+            </button>
+          </form>
+        )}
       </div>
     </div>,
     document.body

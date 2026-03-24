@@ -61,12 +61,10 @@ export default function ContactSection() {
             }}
           >
             <a
-              href="#contact"
+              href={process.env.NEXT_PUBLIC_CALENDLY_LINK ?? "#contact"}
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn-primary"
-              onClick={(e) => {
-                e.preventDefault();
-                // TODO: replace with Calendly URL when ready
-              }}
               style={{
                 background: "var(--accent)",
                 color: "#000",
