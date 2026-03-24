@@ -1,0 +1,38 @@
+# Arizmi
+
+> Your technical co-founder, combining both business strategy and software engineering to turn your idea into a successful business.
+
+Arizmi builds start-up apps and websites for non-technical founders. We act as a technical co-founder — shaping product strategy, building the software, and staying involved after launch.
+
+## Services
+
+- Full-stack app and website development for start-ups
+- Product strategy and business model advisory
+- Mobile and web application engineering
+- Post-launch support and growth partnership
+
+## Process
+
+1. **Understand** — We learn your idea, business model, and goals.
+2. **Plan & Build** — We shape the product strategy and build the right solution.
+3. **Launch & Grow** — We launch with you and support the next stage.
+
+## Why Choose Us
+
+- Technical co-founder mindset — we care about outcomes, not tickets
+- Strategy + development — we help shape the business, not just build features
+- Founder-friendly approach — clear communication, no technical jargon
+- Lean and fast — ship early, learn quickly
+- Long-term partner — we stay involved after launch
+- Built for non-technical founders — we translate ideas into real products
+
+## Portfolio
+
+- [Icon Training](https://www.icontraining.app/) — AI-powered fitness coaching app with adaptive training engine, real-time chat, and progress tracking
+- [Basenote Solutions](https://www.basenotesolutions.com/) — Digital infrastructure for fragrance brands including e-commerce, CRM, and a bespoke perfumery AI
+- [Freedom Airlines](https://freedomairlinesbd.com/) — Web presence for a regional airline launching domestic routes across Bangladesh
+
+## Contact
+
+- Website: https://www.arizmilabs.com
+- Contact form available at https://www.arizmilabs.com/#contact
