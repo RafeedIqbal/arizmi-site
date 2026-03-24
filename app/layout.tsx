@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Toaster } from "sonner";
+import { Analytics } from "@vercel/analytics/next"
 import "./globals.css";
 
 const inter = localFont({
