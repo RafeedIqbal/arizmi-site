@@ -16,7 +16,7 @@ const instrumentSerif = localFont({
   weight: "400",
 });
 
-const siteUrl = "https://arizmlabs.com";
+const siteUrl = "https://www.arizmilabs.com";
 
 export const metadata: Metadata = {
   title: "Arizmi — Start-Up Apps & Websites",

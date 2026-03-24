@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://arizmi.com/sitemap.xml",
+    sitemap: "https://www.arizmilabs.com/sitemap.xml",
   };
 }
