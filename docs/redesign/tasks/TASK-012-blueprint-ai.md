@@ -23,7 +23,6 @@ Build server-only, provider-agnostic structured generation for the first diagnos
 - Implement diagnosis generation and regeneration after added detail.
 - Implement full-plan generation behind a server boundary, but do not expose it before lead-gate authorization.
 - Validate every model response before display/persistence; return user-safe recovery states.
-- Add test fixtures for valid, invalid, truncated, refused, timed-out, and injected-looking inputs. If no test runner exists, introduce the smallest justified unit-test setup or isolate deterministic validators for `node` execution.
 - Log identifiers/timing/error categories without raw sensitive answers.
 
 # Out of scope
@@ -40,6 +39,5 @@ Build server-only, provider-agnostic structured generation for the first diagnos
 
 # Validation
 
-- Run `npm run ci` and the validator/adapter tests.
-- Verify missing credentials, timeout, malformed output, duplicate request, large input, and retry behavior.
-
+- Run `npm run ci`.
+- Manual smoke testing is performed by the owner at the end of the release; do not add or run tests in this task.

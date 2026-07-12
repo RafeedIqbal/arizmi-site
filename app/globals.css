@@ -249,6 +249,131 @@ body {
   }
 }
 
+/*
+ * Surface-scoped tokens for the shared primitives (TASK-004). Primitives
+ * read only --ui-* variables, so marking any dark container with
+ * data-surface="card" restyles every primitive inside it with
+ * contrast-safe values; data-surface="canvas" resets inside a card region.
+ * Hover pairs are chosen to keep WCAG-passing text in the hover state too.
+ */
+:root,
+[data-surface="canvas"] {
+  --ui-ink: var(--ink);
+  --ui-ink-muted: var(--ink-muted);
+  --ui-border: var(--border-soft);
+  --ui-border-strong: var(--border-strong);
+  --ui-accent: var(--teal-ink);
+  --ui-solid-bg: var(--surface-card);
+  --ui-solid-ink: var(--ink-on-card);
+  --ui-solid-hover-bg: #2a2f2f;
+  --ui-solid-hover-ink: var(--ink-on-card);
+}
+
+[data-surface="card"] {
+  --ui-ink: var(--ink-on-card);
+  --ui-ink-muted: var(--ink-on-card-muted);
+  --ui-border: var(--border-on-card);
+  --ui-border-strong: var(--border-on-card-strong);
+  --ui-accent: var(--teal-light);
+  --ui-solid-bg: var(--canvas);
+  --ui-solid-ink: var(--ink);
+  --ui-solid-hover-bg: var(--teal-light);
+  --ui-solid-hover-ink: var(--arizmi-card-black);
+}
+
+/*
+ * Dialog/drawer primitive (components/ui/Dialog.tsx): the same native
+ * <dialog> approach as .site-menu, in a centered and an edge-drawer layout.
+ */
+.ui-dialog {
+  border: none;
+  padding: 0;
+  background: var(--surface-card);
+  color: var(--ink-on-card);
+  box-shadow: var(--shadow-lifted);
+  overflow-y: auto;
+  opacity: 1;
+  transition: opacity 0.24s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ui-dialog::backdrop {
+  background: color-mix(in srgb, var(--arizmi-card-black) 55%, transparent);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+
+.ui-dialog--center {
+  margin: auto;
+  width: min(32rem, calc(100vw - 2 * var(--section-px)));
+  max-height: min(85vh, 85dvh);
+  border-radius: var(--radius-lg);
+  transform: translateY(0);
+}
+
+.ui-dialog--drawer {
+  margin: 0 0 0 auto;
+  width: min(28rem, 100vw);
+  max-width: none;
+  height: 100vh;
+  height: 100dvh;
+  max-height: none;
+  border-radius: 0;
+  transform: translateX(0);
+}
+
+@starting-style {
+  .ui-dialog--center[open] {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+
+  .ui-dialog--drawer[open] {
+    opacity: 0;
+    transform: translateX(1.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-dialog {
+    transition: opacity 0.12s linear;
+  }
+
+  @starting-style {
+    .ui-dialog--center[open],
+    .ui-dialog--drawer[open] {
+      opacity: 0;
+      transform: none;
+    }
+  }
+}
+
+/*
+ * Disclosure primitive (components/ui/Disclosure.tsx). The 0fr→1fr grid
+ * transition animates height without JS measurement; without animation
+ * (reduced motion, no transition support) the panel simply snaps open, so
+ * content and ARIA state never depend on the animation.
+ */
+.ui-disclosure__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ui-disclosure__panel[data-open] {
+  grid-template-rows: 1fr;
+}
+
+.ui-disclosure__content {
+  min-height: 0;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-disclosure__panel {
+    transition: none;
+  }
+}
+
 ::selection {
   background: var(--teal-light);
   color: var(--surface-card);

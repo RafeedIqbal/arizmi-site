@@ -16,7 +16,7 @@ Provide the small reusable primitives needed by the menu, archive, disclosures, 
 - Create a disclosure/accordion primitive using button semantics and stable IDs.
 - Create reusable previous/next controls and a roving-focus or selection helper only if the actual consumers require it.
 - Add a React-safe reduced-motion hook that updates when the media query changes; keep the existing GSAP utility compatible.
-- Establish tested utilities for click-versus-drag thresholds and bounded index math if used by the archive.
+- Establish utilities for click-versus-drag thresholds and bounded index math if used by the archive.
 
 # Out of scope
 
@@ -33,5 +33,4 @@ Provide the small reusable primitives needed by the menu, archive, disclosures, 
 # Validation
 
 - Run `npm run ci`.
-- Add focused automated tests only if a test harness is introduced deliberately; otherwise create a small development usage surface and manually verify keyboard/focus behavior before removing it.
-
+- Manual smoke testing is performed by the owner at the end of the release; do not add or run tests in this task.

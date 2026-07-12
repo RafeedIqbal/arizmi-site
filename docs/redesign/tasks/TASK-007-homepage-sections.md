@@ -33,5 +33,4 @@ Implement the BluePrint promo, expandable build categories, and closing booking 
 # Validation
 
 - Run `npm run ci`.
-- Smoke-test all homepage CTAs, disclosure states, mobile wrapping, 200% zoom, and reduced motion.
-
+- Manual smoke testing is performed by the owner at the end of the release; do not add or run tests in this task.

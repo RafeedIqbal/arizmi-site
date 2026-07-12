@@ -29,5 +29,4 @@ Add the four compact archive entries, finish the page composition, and make the 
 # Validation
 
 - Run `npm run ci`.
-- Smoke-test all 12 entries and six filters with keyboard, pointer, touch viewport, copied URL, refresh, and back/forward.
-
+- Manual smoke testing is performed by the owner at the end of the release; do not add or run tests in this task.

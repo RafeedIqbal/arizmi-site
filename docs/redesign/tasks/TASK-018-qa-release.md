@@ -9,16 +9,17 @@ status: final_gate
 
 Verify the integrated redesign as a release candidate and fix only integration/quality issues discovered during the pass; route substantial feature defects back to their owning task.
 
+All manual smoke testing for the release happens here and is performed by the owner. Individual implementation tasks do not write or run tests.
+
 # Automated validation
 
 - Run `npm run ci` from a clean working tree state that includes all intended files.
-- Add/run unit or integration tests introduced by BluePrint and content-schema tasks.
 - Check production start, not just build output.
 - Crawl the five routes for broken internal links, duplicate IDs, missing images, console errors, and unhandled server errors.
 
-# Manual viewport/input matrix
+# Manual viewport/input matrix (owner smoke tests)
 
-Test at minimum:
+The owner smoke-tests at minimum:
 
 - 320 × 568 mobile
 - 390 × 844 mobile
@@ -56,7 +57,7 @@ For interactive areas, test mouse, precision trackpad, touch, keyboard-only, scr
 
 # Acceptance criteria
 
-- `npm run ci` and all added tests pass.
+- `npm run ci` passes.
 - No critical/serious accessibility issue, broken route, fake link, fabricated fact, lost form state, duplicate lead, or secret exposure remains.
 - Known non-blocking issues are recorded with owner, severity, route, reproduction, and follow-up task.
 - Before/after screenshots are captured for the eventual PR handoff.

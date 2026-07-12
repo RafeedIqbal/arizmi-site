@@ -11,6 +11,7 @@ import {
   SECONDARY_NAV,
   type NavItem,
 } from "@/lib/content/navigation";
+import { lockBodyScroll } from "@/lib/scrollLock";
 import { ROUTES } from "@/lib/site";
 
 const ROUTE_ITEMS = PRIMARY_NAV.filter(
@@ -50,11 +51,7 @@ export default function SiteMenu({
   // Body scroll is locked only while the menu is open.
   useEffect(() => {
     if (!open) return;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previous;
-    };
+    return lockBodyScroll();
   }, [open]);
 
   // Route changes (link activation, back/forward) close the menu.

@@ -41,6 +41,5 @@ Complete the BluePrint conversion experience: concise on-screen preview, diagnos
 
 # Validation
 
-- Run `npm run ci` plus email/document tests.
-- Test all three classifications, email/PDF rendering, duplicate click, mail failure, retry, long content, missing booking config, and redacted logs.
-
+- Run `npm run ci`.
+- Manual smoke testing is performed by the owner at the end of the release; do not add or run tests in this task.

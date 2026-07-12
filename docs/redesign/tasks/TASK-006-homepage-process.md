@@ -32,5 +32,4 @@ Build the four-step homepage process narrative with progressive scroll activatio
 # Validation
 
 - Run `npm run ci`.
-- Test mobile portrait/landscape, short laptop viewport, browser resize, back navigation, and reduced motion.
-
+- Manual smoke testing is performed by the owner at the end of the release; do not add or run tests in this task.

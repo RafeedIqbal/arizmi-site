@@ -40,5 +40,4 @@ Replace the floating pill navigation with the logomark/menu system and add a res
 # Validation
 
 - Run `npm run ci`.
-- Test mouse, keyboard-only, touch-size viewport, Escape, back/forward navigation, and reduced motion on at least `/` and `/about`.
-
+- Manual smoke testing is performed by the owner at the end of the release; do not add or run tests in this task.

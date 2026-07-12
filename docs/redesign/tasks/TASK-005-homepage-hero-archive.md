@@ -45,7 +45,4 @@ Replace the current particle/text-glow hero with the full-viewport product-archi
 # Validation
 
 - Run `npm run ci`.
-- Manually test 320 × 568, 768 × 1024, 1440 × 900, and a wide desktop.
-- Test mouse wheel, precision trackpad, drag, touch drag, keyboard, Escape, zoom 200%, and reduced motion.
-- Inspect for layout shift, dropped frames, hydration errors, and horizontal overflow.
-
+- Manual smoke testing is performed by the owner at the end of the release; do not add or run tests in this task.

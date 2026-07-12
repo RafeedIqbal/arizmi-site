@@ -2,6 +2,8 @@
 
 Each task is intentionally bounded for one AI implementation thread. A task is complete only when its acceptance criteria and validation steps pass; completing a dependency does not authorize starting its dependants in the same change.
 
+Testing policy: implementation threads do not write or run tests (unit, integration, or browser). Per-task validation is `npm run ci` only. The owner performs all manual smoke testing at the end of the release in `TASK-018`.
+
 ## Dependency graph
 
 ```text
@@ -57,6 +59,5 @@ Every implementation thread should report:
 - behavior delivered
 - decisions or placeholders used
 - commands run and results
-- manual viewport/input checks performed
 - remaining risks or follow-up task IDs
 

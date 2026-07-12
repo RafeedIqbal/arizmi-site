@@ -49,7 +49,7 @@ See [`tasks/README.md`](./tasks/README.md) for the dependency graph and status c
 - Keep animation usable with keyboard and touch, and provide a coherent `prefers-reduced-motion` state.
 - Keep AI keys, SMTP credentials, database credentials, and prompt internals server-side.
 - Do not ship invented About statistics, project URLs, legal URLs, case-study media, or team cards. Use an explicit, visually intentional placeholder only where the spec permits it.
-- Run `npm run ci` for every implementation task. Also perform the manual checks named by the task.
+- Run `npm run ci` for every implementation task. Do not write or run tests: all manual smoke testing is done once, by the owner, at the end of the release (`TASK-018`).
 
 ## Definition of done for the redesign
 
@@ -60,5 +60,5 @@ See [`tasks/README.md`](./tasks/README.md) for the dependency graph and status c
 - BluePrint AI validates every step, generates structured server-side output, stores the lead, records consent separately, sends the promised outputs, and handles failures without losing answers.
 - Metadata, sitemap, robots, social previews, and canonical URLs reflect the new routes.
 - No unresolved placeholder is presented as a verified fact.
-- `npm run ci` passes and the smoke-test matrix in `TASK-018` is complete.
+- `npm run ci` passes and the owner has completed the end-of-release smoke tests (`TASK-018`).
 

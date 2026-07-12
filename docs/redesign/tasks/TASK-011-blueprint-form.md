@@ -39,5 +39,4 @@ Implement the client-visible BluePrint route through guided intake with robust t
 # Validation
 
 - Run `npm run ci`.
-- Complete, backtrack, edit, and resubmit at 320 px and desktop; test empty/long values, keyboard-only, refresh behavior, reduced motion, and 200% zoom.
-
+- Manual smoke testing is performed by the owner at the end of the release; do not add or run tests in this task.

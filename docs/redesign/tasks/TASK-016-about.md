@@ -39,5 +39,4 @@ Build the About route's story, principles, team details, ticker, and closing CTA
 # Validation
 
 - Run `npm run ci`.
-- Test every team member, Escape/focus restoration, mobile cards, 200% zoom, reduced motion, and CTA fallback.
-
+- Manual smoke testing is performed by the owner at the end of the release; do not add or run tests in this task.

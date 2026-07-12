@@ -33,5 +33,4 @@ Build the Services route with exact source copy, accessible service disclosures,
 # Validation
 
 - Run `npm run ci`.
-- Open every service using keyboard and pointer; test direct route load, mobile, zoom, and reduced motion.
-
+- Manual smoke testing is performed by the owner at the end of the release; do not add or run tests in this task.

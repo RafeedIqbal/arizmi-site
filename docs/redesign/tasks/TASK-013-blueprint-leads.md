@@ -40,6 +40,5 @@ Add the post-diagnosis lead gate and persist one validated lead record per succe
 
 # Validation
 
-- Run `npm run ci` and repository/schema tests.
-- Test missing/invalid fields, unchecked consent, checked consent, double submit, refresh, storage timeout, rate limit, and malicious-looking text.
-
+- Run `npm run ci`.
+- Manual smoke testing is performed by the owner at the end of the release; do not add or run tests in this task.

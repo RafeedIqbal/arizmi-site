@@ -35,5 +35,4 @@ Present the eight featured builds as a premium browseable sequence with a minima
 # Validation
 
 - Run `npm run ci`.
-- Test every filter with open/closed state, keyboard, touch, Escape, 320 px, 200% zoom, and reduced motion.
-
+- Manual smoke testing is performed by the owner at the end of the release; do not add or run tests in this task.
