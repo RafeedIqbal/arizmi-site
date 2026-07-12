@@ -1,6 +1,6 @@
 # Runtime asset aliases
 
-Created by `TASK-001`. The supplied originals in [`public/New_Assets`](../../public/New_Assets/) are the
+Created by `TASK-001`. The supplied originals in [`public/New_Assets`](../public/New_Assets/) are the
 provenance copies and remain unchanged; components must reference only the URL-safe runtime aliases
 under `public/assets/arizmi/`.
 

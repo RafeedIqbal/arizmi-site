@@ -1,7 +1,7 @@
 import { ROUTES, type AppRoute } from "@/lib/site";
 
 /**
- * Shared CTA vocabulary from docs/redesign/specs/global.md. Use these labels
+ * Shared CTA vocabulary from docs/specs/global.md. Use these labels
  * verbatim; do not fork copy per page.
  */
 export const CTA_LABELS = {

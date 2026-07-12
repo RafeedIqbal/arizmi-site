@@ -1,7 +1,7 @@
 import { ROUTES, type AppRoute } from "@/lib/site";
 
 /**
- * Global navigation content from docs/redesign/specs/global.md.
+ * Global navigation content from docs/specs/global.md.
  * TASK-003 consumes this for the full-screen menu; the interim PageShell
  * header renders only the route items.
  */

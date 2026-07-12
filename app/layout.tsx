@@ -53,7 +53,7 @@ const instrumentSerif = localFont({
 
 const siteUrl = SITE_URL;
 
-// Approved homepage copy (docs/redesign/specs/homepage.md hero + global menu
+// Approved homepage copy (docs/specs/homepage.md hero + global menu
 // supporting line). The share image comes from app/opengraph-image.tsx, so no
 // static og:image path is declared here.
 const HOME_TITLE = `Arizmi Labs — ${NAV_SUPPORTING_LINE}`;

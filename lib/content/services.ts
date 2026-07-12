@@ -2,7 +2,7 @@
  * Single typed source for service content, shared by /services (full
  * disclosure content) and the homepage "What Arizmi builds" section
  * (homepageSummary). Copy is transcribed exactly from
- * docs/redesign/specs/services.md and docs/redesign/specs/homepage.md.
+ * docs/specs/services.md and docs/specs/homepage.md.
  */
 export interface Service {
   readonly id: string;

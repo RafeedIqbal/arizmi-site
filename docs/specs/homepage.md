@@ -47,9 +47,9 @@ The initial state shows card backs only:
 
 | State | Color | Production asset |
 | --- | --- | --- |
-| Live build | Arizmi mid teal | [`arizmi_card_back_live_teal.png`](../../../public/New_Assets/arizmi_card_back_live_teal.png) |
-| BluePrint | Tech blue | [`arizmi_card_back_blueprint_tech_blue.png`](../../../public/New_Assets/arizmi_card_back_blueprint_tech_blue.png) |
-| Concept | Deep violet | [`arizmi_card_back_concept_deep_violet.png`](../../../public/New_Assets/arizmi_card_back_concept_deep_violet.png) |
+| Live build | Arizmi mid teal | [`arizmi_card_back_live_teal.png`](../../public/New_Assets/arizmi_card_back_live_teal.png) |
+| BluePrint | Tech blue | [`arizmi_card_back_blueprint_tech_blue.png`](../../public/New_Assets/arizmi_card_back_blueprint_tech_blue.png) |
+| Concept | Deep violet | [`arizmi_card_back_concept_deep_violet.png`](../../public/New_Assets/arizmi_card_back_concept_deep_violet.png) |
 
 ![Archive card system reference](../reference-images/hero-archive-card-system.png)
 

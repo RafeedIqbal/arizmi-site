@@ -6,7 +6,7 @@ import { CTA_LABELS, CTA_ROUTES } from "@/lib/content/cta";
  * "Start with BluePrint" (TASK-007). Rendered on a card-black surface so it
  * reads as a deliberate visual bridge from the process steps into the
  * product-scoping experience. Copy is transcribed exactly from
- * docs/redesign/specs/homepage.md section 3.
+ * docs/specs/homepage.md section 3.
  */
 export default function BlueprintPromo() {
   return (

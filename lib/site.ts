@@ -1,6 +1,6 @@
 /**
  * Canonical origin and route map for the five public routes defined in
- * docs/redesign/specs/global.md. Browser-safe: contains no environment reads.
+ * docs/specs/global.md. Browser-safe: contains no environment reads.
  *
  * Careers, contact, and privacy routes are intentionally absent until D-02,
  * D-14, and D-15 are resolved.

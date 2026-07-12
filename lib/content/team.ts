@@ -1,6 +1,6 @@
 /**
  * Typed team content for the About page ("The team in the lab"), transcribed
- * exactly from docs/redesign/specs/about.md.
+ * exactly from docs/specs/about.md.
  *
  * No image field yet: team card images are referenced by the brief but absent
  * from public/New_Assets (D-11). TASK-016 adds a clearly-marked placeholder

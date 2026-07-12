@@ -15,7 +15,7 @@ const INTRO =
  * without JavaScript or motion; an expandable "Best for" disclosure adds the
  * supplementary audience detail and operates by keyboard and touch (the
  * Bento Expand Grid behaviour). Copy is transcribed exactly from
- * docs/redesign/specs/homepage.md section 4.
+ * docs/specs/homepage.md section 4.
  */
 export default function BuildCategories() {
   return (

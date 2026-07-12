@@ -6,7 +6,7 @@ import ClosingCta from "@/components/home/ClosingCta";
 import { getBookingDestination } from "@/lib/server/config";
 
 /**
- * Homepage assembly (docs/redesign/specs/homepage.md section order):
+ * Homepage assembly (docs/specs/homepage.md section order):
  * hero → process → BluePrint promo → build categories → closing CTA. The
  * global nav and footer are rendered by app/layout.tsx. Each section owns a
  * labelled landmark so the page is navigable by heading and region.

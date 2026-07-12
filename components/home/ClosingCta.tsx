@@ -4,7 +4,7 @@ import { CTA_LABELS } from "@/lib/content/cta";
 
 /**
  * Homepage closing CTA (TASK-007). Copy transcribed exactly from
- * docs/redesign/specs/homepage.md section 5. The booking action routes through
+ * docs/specs/homepage.md section 5. The booking action routes through
  * the centralized, environment-backed BookingCta (D-01), which renders a
  * visibly disabled control — never a "#" link — until the URL is configured.
  */

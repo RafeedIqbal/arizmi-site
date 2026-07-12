@@ -2,7 +2,7 @@ import { ROUTES, type AppRoute } from "@/lib/site";
 
 /**
  * Single typed source for all 12 build entries, transcribed exactly from
- * docs/redesign/specs/builds.md. Consumed by the Builds page (featured cards
+ * docs/specs/builds.md. Consumed by the Builds page (featured cards
  * and compact archive), the homepage hero card fronts (D-09), filters
  * (TASK-008), and metadata.
  *

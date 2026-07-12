@@ -1,6 +1,6 @@
 /**
  * Homepage "How ideas become systems" steps (TASK-006), transcribed exactly
- * from docs/redesign/specs/homepage.md section 2. Server-safe data consumed by
+ * from docs/specs/homepage.md section 2. Server-safe data consumed by
  * components/home/ProcessSection.tsx. The `index` string ("01"–"04") is part
  * of the approved label and is rendered verbatim, not derived, so the numbering
  * can never drift from the source copy.

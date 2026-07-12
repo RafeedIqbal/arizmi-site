@@ -23,7 +23,7 @@ const ROUTE_ITEMS = PRIMARY_NAV.filter(
  * full-screen card-black menu. Built on the native <dialog> element so focus
  * containment, Escape handling, and focus restoration come from the platform
  * (D-18: no Rive & Limn reference URL was supplied, so the written spec in
- * docs/redesign/specs/global.md is authoritative).
+ * docs/specs/global.md is authoritative).
  */
 export default function SiteMenu({
   bookingUrl,

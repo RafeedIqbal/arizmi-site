@@ -4,7 +4,7 @@ import { FILTER_TABS, type BuildFilterId } from "@/lib/content/builds";
  * Builds filter controls (TASK-008). These filter one list rather than swap
  * panels, so they are a toolbar of toggle buttons with `aria-pressed`, not an
  * ARIA tablist — using `role="tab"` here would mislead assistive technology
- * about the behaviour (docs/redesign/specs/builds.md).
+ * about the behaviour (docs/specs/builds.md).
  */
 export default function BuildFilters({
   active,

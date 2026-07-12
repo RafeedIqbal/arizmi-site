@@ -11,7 +11,7 @@ import type { Build } from "@/lib/content/builds";
  * a heading or disclosure summary), never duplicated here.
  *
  * Only the exact approved contribution copy is ever shown; nothing derives or
- * embellishes protected detail (docs/redesign/specs/builds.md).
+ * embellishes protected detail (docs/specs/builds.md).
  */
 export default function BuildDetail({ build }: { build: Build }) {
   return (

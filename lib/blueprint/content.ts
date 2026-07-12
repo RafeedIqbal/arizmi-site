@@ -1,6 +1,6 @@
 /**
  * Single typed source for every BluePrint question, option, label, and message
- * (spec docs/redesign/specs/blueprint-ai.md). Copy is transcribed exactly from
+ * (spec docs/specs/blueprint-ai.md). Copy is transcribed exactly from
  * the brief — do not fork it across components. Browser-safe.
  */
 import {
