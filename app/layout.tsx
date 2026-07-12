@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/next"
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const manrope = localFont({
@@ -47,7 +48,7 @@ const instrumentSerif = localFont({
   weight: "400",
 });
 
-const siteUrl = "https://www.arizmilabs.com";
+const siteUrl = SITE_URL;
 
 export const metadata: Metadata = {
   title: "Arizmi — Start-Up Apps & Websites",

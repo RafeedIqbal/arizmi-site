@@ -1,0 +1,180 @@
+- generic [ref=e1]:
+  - link "Skip to content" [active] [ref=e234] [cursor=pointer]:
+    - /url: "#main"
+  - banner [ref=e235]:
+    - link [ref=e236] [cursor=pointer]:
+      - /url: /
+      - img "Arizmi Labs — home" [ref=e237]
+    - navigation "Site" [ref=e238]:
+      - list [ref=e239]:
+        - listitem [ref=e240]:
+          - link "Builds" [ref=e241] [cursor=pointer]:
+            - /url: /builds
+        - listitem [ref=e242]:
+          - link "Services" [ref=e243] [cursor=pointer]:
+            - /url: /services
+        - listitem [ref=e244]:
+          - link "BluePrint AI" [ref=e245] [cursor=pointer]:
+            - /url: /blueprint-ai
+        - listitem [ref=e246]:
+          - link "About" [ref=e247] [cursor=pointer]:
+            - /url: /about
+  - main [ref=e248]:
+    - generic [ref=e249]:
+      - heading "Product and software development for ideas that need more than a template." [level=1] [ref=e250]
+      - paragraph [ref=e251]: Arizmi Labs helps founders, operators and teams shape, design and build digital products, platforms, AI systems and operational tools, from early ideas to live products.
+      - generic [ref=e253]:
+        - text: Book your build call
+        - generic [ref=e254]: Booking opens soon
+    - region [ref=e255]:
+      - paragraph [ref=e256]: What we do
+      - heading "Services" [level=2] [ref=e257]
+      - list [ref=e258]:
+        - listitem [ref=e259]:
+          - article [ref=e260]:
+            - paragraph [ref=e261]: "01"
+            - heading "Websites and digital platforms" [level=3] [ref=e262]
+            - paragraph [ref=e263]: For businesses that need a site, platform or digital experience that does more than sit online.
+            - generic [ref=e264]:
+              - generic [ref=e265]:
+                - heading "Includes" [level=4] [ref=e266]
+                - list [ref=e267]:
+                  - listitem [ref=e268]: marketing websites
+                  - listitem [ref=e269]: landing pages
+                  - listitem [ref=e270]: content-managed websites
+                  - listitem [ref=e271]: product-led websites
+                  - listitem [ref=e272]: investor or partner portals
+                  - listitem [ref=e273]: digital platform foundations
+              - generic [ref=e274]:
+                - heading "Best for" [level=4] [ref=e275]
+                - list [ref=e276]:
+                  - listitem [ref=e277]: new ventures
+                  - listitem [ref=e278]: service businesses
+                  - listitem [ref=e279]: product launches
+                  - listitem [ref=e280]: brand refreshes
+                  - listitem [ref=e281]: businesses outgrowing basic website builders
+        - listitem [ref=e282]:
+          - article [ref=e283]:
+            - paragraph [ref=e284]: "02"
+            - heading "Web applications" [level=3] [ref=e285]
+            - paragraph [ref=e286]: For teams that need custom software accessed through the browser.
+            - generic [ref=e287]:
+              - generic [ref=e288]:
+                - heading "Includes" [level=4] [ref=e289]
+                - list [ref=e290]:
+                  - listitem [ref=e291]: SaaS platforms
+                  - listitem [ref=e292]: booking systems
+                  - listitem [ref=e293]: quote tools
+                  - listitem [ref=e294]: dashboards
+                  - listitem [ref=e295]: client portals
+                  - listitem [ref=e296]: admin systems
+                  - listitem [ref=e297]: marketplace-style platforms
+              - generic [ref=e298]:
+                - heading "Best for" [level=4] [ref=e299]
+                - list [ref=e300]:
+                  - listitem [ref=e301]: founders building MVPs
+                  - listitem [ref=e302]: businesses replacing spreadsheets
+                  - listitem [ref=e303]: teams with complex workflows
+                  - listitem [ref=e304]: products that need accounts, roles, data or logic
+        - listitem [ref=e305]:
+          - article [ref=e306]:
+            - paragraph [ref=e307]: "03"
+            - heading "Mobile applications" [level=3] [ref=e308]
+            - paragraph [ref=e309]: For products that need to live in users’ hands.
+            - generic [ref=e310]:
+              - generic [ref=e311]:
+                - heading "Includes" [level=4] [ref=e312]
+                - list [ref=e313]:
+                  - listitem [ref=e314]: iOS apps
+                  - listitem [ref=e315]: Android apps
+                  - listitem [ref=e316]: cross-platform apps
+                  - listitem [ref=e317]: member apps
+                  - listitem [ref=e318]: companion apps
+                  - listitem [ref=e319]: product MVPs
+              - generic [ref=e320]:
+                - heading "Best for" [level=4] [ref=e321]
+                - list [ref=e322]:
+                  - listitem [ref=e323]: retail establishments
+                  - listitem [ref=e324]: restaurants
+                  - listitem [ref=e325]: fitness, wellness and community products
+                  - listitem [ref=e326]: customer-facing platforms
+                  - listitem [ref=e327]: user habit and engagement products
+                  - listitem [ref=e328]: tools that need frequent interaction
+        - listitem [ref=e329]:
+          - article [ref=e330]:
+            - paragraph [ref=e331]: "04"
+            - heading "AI-enabled systems" [level=3] [ref=e332]
+            - paragraph [ref=e333]: For teams that want AI built into useful workflows, not added as a gimmick.
+            - generic [ref=e334]:
+              - generic [ref=e335]:
+                - heading "Includes" [level=4] [ref=e336]
+                - list [ref=e337]:
+                  - listitem [ref=e338]: AI assistants
+                  - listitem [ref=e339]: recommendation systems
+                  - listitem [ref=e340]: document generation
+                  - listitem [ref=e341]: AI workflow tools
+                  - listitem [ref=e342]: internal AI tools
+                  - listitem [ref=e343]: product scoping tools
+                  - listitem [ref=e344]: AI-powered dashboards
+              - generic [ref=e345]:
+                - heading "Best for" [level=4] [ref=e346]
+                - list [ref=e347]:
+                  - listitem [ref=e348]: teams with repetitive manual work
+                  - listitem [ref=e349]: products with content, data or decision logic
+                  - listitem [ref=e350]: businesses exploring AI features
+                  - listitem [ref=e351]: founders building AI-enabled products
+        - listitem [ref=e352]:
+          - article [ref=e353]:
+            - paragraph [ref=e354]: "05"
+            - heading "CRM and operational tools" [level=3] [ref=e355]
+            - paragraph [ref=e356]: For businesses that need systems built around the way they actually work.
+            - generic [ref=e357]:
+              - generic [ref=e358]:
+                - heading "Includes" [level=4] [ref=e359]
+                - list [ref=e360]:
+                  - listitem [ref=e361]: custom CRMs
+                  - listitem [ref=e362]: inventory tools
+                  - listitem [ref=e363]: internal workflows
+                  - listitem [ref=e364]: admin dashboards
+                  - listitem [ref=e365]: reporting systems
+                  - listitem [ref=e366]: team portals
+                  - listitem [ref=e367]: automation tools
+              - generic [ref=e368]:
+                - heading "Best for" [level=4] [ref=e369]
+                - list [ref=e370]:
+                  - listitem [ref=e371]: businesses outgrowing spreadsheets
+                  - listitem [ref=e372]: teams stuck between tools
+                  - listitem [ref=e373]: operations-heavy businesses
+                  - listitem [ref=e374]: companies with messy manual processes
+        - listitem [ref=e375]:
+          - article [ref=e376]:
+            - paragraph [ref=e377]: "06"
+            - heading "Long-term product support" [level=3] [ref=e378]
+            - paragraph [ref=e379]: For businesses that need a product partner beyond launch.
+            - generic [ref=e380]:
+              - generic [ref=e381]:
+                - heading "Includes" [level=4] [ref=e382]
+                - list [ref=e383]:
+                  - listitem [ref=e384]: iteration
+                  - listitem [ref=e385]: maintenance
+                  - listitem [ref=e386]: feature development
+                  - listitem [ref=e387]: analytics support
+                  - listitem [ref=e388]: roadmap planning
+                  - listitem [ref=e389]: performance improvements
+                  - listitem [ref=e390]: technical support
+              - generic [ref=e391]:
+                - heading "Best for" [level=4] [ref=e392]
+                - list [ref=e393]:
+                  - listitem [ref=e394]: launched products
+                  - listitem [ref=e395]: MVPs moving into version two
+                  - listitem [ref=e396]: teams without internal product resource
+                  - listitem [ref=e397]: businesses that need ongoing technical improvement
+    - region [ref=e398]:
+      - heading "Not sure what you need yet? Start with BluePrint AI" [level=2] [ref=e399]
+      - paragraph [ref=e400]: If the product is still unclear, Arizmi BluePrint AI helps turn the idea, workflow or opportunity into a Product Requirements Document (PRD)-style plan before development begins.
+      - paragraph [ref=e401]: It helps define the users, features, scope, complexity, risks and first version, so the right service route becomes easier to choose.
+      - paragraph [ref=e402]:
+        - link "Start your BluePrint" [ref=e403] [cursor=pointer]:
+          - /url: /blueprint-ai
+  - region "Notifications alt+T"
+  - alert [ref=e233]: Product and Software Development Services — Arizmi Labs

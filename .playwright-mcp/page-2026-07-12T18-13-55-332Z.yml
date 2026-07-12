@@ -1,0 +1,155 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e504]:
+    - generic [ref=e505]:
+      - link "Arizmi" [ref=e506] [cursor=pointer]:
+        - /url: "#hero"
+      - generic [ref=e507]:
+        - link "Services" [ref=e508] [cursor=pointer]:
+          - /url: "#services"
+        - link "Work" [ref=e509] [cursor=pointer]:
+          - /url: "#work"
+        - link "Process" [ref=e510] [cursor=pointer]:
+          - /url: "#process"
+        - link "Why Us" [ref=e511] [cursor=pointer]:
+          - /url: "#why"
+      - link "Get Started" [ref=e512] [cursor=pointer]:
+        - /url: "#contact"
+  - main [ref=e513]:
+    - generic:
+      - img "Arizmi logo"
+    - generic [ref=e515]:
+      - generic [ref=e518]:
+        - generic:
+          - generic: Arizmi Labs
+          - generic: Arizmi Labs
+          - generic: Arizmi Labs
+          - generic: Arizmi Labs
+          - generic: Arizmi Labs
+          - generic: Arizmi Labs
+          - generic: Arizmi Labs
+          - generic: Arizmi Labs
+          - generic: Arizmi Labs
+          - generic: Arizmi Labs
+          - generic: Arizmi Labs
+          - generic: Arizmi Labs
+        - generic [ref=e519]: Arizmi Labs
+      - generic [ref=e520]:
+        - heading "Start-Up apps and websites, built by fellow Start-Up founders" [level=1] [ref=e521]: Start-Up apps and websites,built by fellow Start-Up founders
+        - link "Get Started" [ref=e522] [cursor=pointer]:
+          - /url: "#contact"
+    - generic [ref=e523]:
+      - paragraph [ref=e526]:
+        - generic [ref=e527]: Your
+        - generic [ref=e528]: technical
+        - generic [ref=e529]: co-founder,
+        - generic [ref=e530]: combining
+        - generic [ref=e531]: both
+        - generic [ref=e532]: business
+        - generic [ref=e533]: strategy
+        - generic [ref=e534]: and
+        - generic [ref=e535]: software
+        - generic [ref=e536]: engineering
+        - generic [ref=e537]: to
+        - generic [ref=e538]: turn
+        - generic [ref=e539]: your
+        - generic [ref=e540]: idea
+        - generic [ref=e541]: into
+        - generic [ref=e542]: a
+        - generic [ref=e543]: successful
+        - generic [ref=e544]: business.
+      - generic [ref=e546]:
+        - generic [ref=e547]:
+          - paragraph [ref=e548]: Our Work
+          - heading "Projects that ship and grow" [level=2] [ref=e549]
+        - generic [ref=e550]:
+          - generic [ref=e552]:
+            - generic [ref=e553]:
+              - generic [ref=e554]: "01"
+              - link [ref=e555] [cursor=pointer]:
+                - /url: https://www.icontraining.app/
+                - img "Icon Training" [ref=e556]
+            - generic [ref=e557]:
+              - generic [ref=e558]: Fitness Tech
+              - heading [level=3] [ref=e559]:
+                - link "Icon Training" [ref=e560] [cursor=pointer]:
+                  - /url: https://www.icontraining.app/
+              - paragraph [ref=e561]: Built an AI-powered fitness coaching app from the ground up — adaptive training engine, real-time chat, progress tracking, and a full mobile experience ready for launch.
+          - generic [ref=e563]:
+            - generic [ref=e564]:
+              - generic [ref=e565]: "02"
+              - link [ref=e566] [cursor=pointer]:
+                - /url: https://www.basenotesolutions.com/
+                - img "Basenote Solutions" [ref=e567]
+            - generic [ref=e568]:
+              - generic [ref=e569]: B2B SaaS
+              - heading [level=3] [ref=e570]:
+                - link "Basenote Solutions" [ref=e571] [cursor=pointer]:
+                  - /url: https://www.basenotesolutions.com/
+              - paragraph [ref=e572]: Designing and developing the complete digital infrastructure for fragrance brands — e-commerce platform, CRM, launch pages, and a bespoke perfumery AI that suggests custom blends.
+          - generic [ref=e574]:
+            - generic [ref=e575]:
+              - generic [ref=e576]: "03"
+              - link [ref=e577] [cursor=pointer]:
+                - /url: https://freedomairlinesbd.com/
+                - img "Freedom Airlines" [ref=e578]
+            - generic [ref=e579]:
+              - generic [ref=e580]: Travel & Aviation
+              - heading [level=3] [ref=e581]:
+                - link "Freedom Airlines" [ref=e582] [cursor=pointer]:
+                  - /url: https://freedomairlinesbd.com/
+              - paragraph [ref=e583]: Created the web presence for a regional airline launching domestic routes across Bangladesh — investor portal, route information, and a pre-launch registration system.
+      - generic [ref=e585]:
+        - generic [ref=e586]:
+          - paragraph [ref=e587]: Process
+          - heading "How it works" [level=2] [ref=e588]
+        - generic [ref=e589]:
+          - generic [ref=e590]:
+            - generic [ref=e592]: "1"
+            - generic [ref=e593]: "2"
+            - generic [ref=e594]: "3"
+          - generic [ref=e595]:
+            - generic [ref=e596]:
+              - heading "Understand" [level=3] [ref=e614]
+              - paragraph [ref=e615]: We learn your idea, business model, and goals.
+            - generic [ref=e616]:
+              - heading "Plan & Build" [level=3] [ref=e638]
+              - paragraph [ref=e639]: We shape the product strategy and build the right solution.
+            - generic [ref=e640]:
+              - generic [ref=e642]:
+                - generic [ref=e643]: Growth
+                - generic [ref=e647]: Live
+              - heading "Launch & Grow" [level=3] [ref=e665]
+              - paragraph [ref=e666]: We launch with you and support the next stage.
+      - generic [ref=e668]:
+        - generic [ref=e669]:
+          - paragraph [ref=e670]: Why Us
+          - heading "Why choose us" [level=2] [ref=e671]
+        - generic [ref=e672]:
+          - group "Technical co-founder mindset" [ref=e673]:
+            - heading "Technical co-founder mindset" [level=3] [ref=e674]
+            - paragraph [ref=e675]: We care about outcomes, not tickets.
+          - group "Strategy + development" [ref=e676]:
+            - heading "Strategy + development" [level=3] [ref=e677]
+            - paragraph [ref=e678]: We help shape the business, not just build features.
+          - group "Founder-friendly approach" [ref=e679]:
+            - heading "Founder-friendly approach" [level=3] [ref=e680]
+            - paragraph [ref=e681]: Clear communication, no technical jargon.
+          - group "Lean and fast" [ref=e682]:
+            - heading "Lean and fast" [level=3] [ref=e683]
+            - paragraph [ref=e684]: Ship early, learn quickly.
+          - group "Long-term partner" [ref=e685]:
+            - heading "Long-term partner" [level=3] [ref=e686]
+            - paragraph [ref=e687]: We stay involved after launch.
+          - group "Built for non-technical founders" [ref=e688]:
+            - heading "Built for non-technical founders" [level=3] [ref=e689]
+            - paragraph [ref=e690]: We translate ideas into real products.
+      - generic [ref=e692]:
+        - paragraph [ref=e693]: Contact
+        - heading "Ready to build something?" [level=2] [ref=e694]
+        - paragraph [ref=e695]: Let's turn your idea into a real product. Book a free call or send us a message.
+        - generic [ref=e696]:
+          - link "Book a Free Call" [ref=e697] [cursor=pointer]:
+            - /url: https://calendly.com/mish-icontraining/30min
+          - button "Contact" [ref=e698] [cursor=pointer]
+  - region "Notifications alt+T"
+  - alert [ref=e233]: Arizmi — Start-Up Apps & Websites
