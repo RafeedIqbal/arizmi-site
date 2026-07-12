@@ -10,7 +10,9 @@ export default function Home() {
   return (
     <>
       <Nav />
-      <main>
+      {/* legacy-dark-page: temporary compat canvas for the superseded
+          dark theme; remove as sections migrate (TASK-005+) */}
+      <main className="legacy-dark-page">
         <HeroSection />
         <div
           data-testid="page-content-shell"

@@ -4,6 +4,35 @@ import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css";
 
+const manrope = localFont({
+  src: "../public/New_Assets/Fonts/Manrope/Manrope-VariableFont_wght.ttf",
+  variable: "--font-manrope",
+  display: "swap",
+  weight: "200 800",
+});
+
+const spaceMono = localFont({
+  src: [
+    {
+      path: "../public/New_Assets/Fonts/Space_Mono/SpaceMono-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../public/New_Assets/Fonts/Space_Mono/SpaceMono-Bold.ttf",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+  variable: "--font-space-mono",
+  display: "swap",
+});
+
+/*
+ * Legacy fonts for the superseded dark theme. Existing components still
+ * reference --font-inter / --font-instrument-serif; remove once every
+ * section has migrated to the redesign (TASK-005+).
+ */
 const inter = localFont({
   src: "../public/fonts/Inter-Variable.woff2",
   variable: "--font-inter",
@@ -75,7 +104,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${instrumentSerif.variable} antialiased`}
+        className={`${manrope.variable} ${spaceMono.variable} ${inter.variable} ${instrumentSerif.variable} antialiased`}
       >
         {children}
         <Analytics />

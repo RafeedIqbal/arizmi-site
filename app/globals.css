@@ -1,11 +1,141 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-manrope);
+  --font-mono: var(--font-space-mono);
+  /* Legacy (superseded theme) — remove after all sections migrate */
   --font-serif: var(--font-instrument-serif);
+
+  --color-canvas: var(--canvas);
+  --color-card: var(--surface-card);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-on-card: var(--ink-on-card);
+  --color-ink-on-card-muted: var(--ink-on-card-muted);
+  --color-teal-light: var(--teal-light);
+  --color-teal-mid: var(--teal-mid);
+  --color-teal-dark: var(--teal-dark);
+  --color-teal-ink: var(--teal-ink);
+  --color-blueprint: var(--blueprint);
+  --color-blueprint-ink: var(--blueprint-ink);
+  --color-concept: var(--concept);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-border-soft: var(--border-soft);
+  --color-border-strong: var(--border-strong);
+  --color-border-on-card: var(--border-on-card);
 }
 
 :root {
+  /*
+   * Arizmi brand primitives (SOURCE-OF-TRUTH.md "Brand foundation").
+   * Components should consume the semantic tokens below, never these
+   * raw values directly.
+   */
+  --arizmi-teal-light: #03b6a3;
+  --arizmi-teal-mid: #00afa7;
+  --arizmi-teal-dark: #019099;
+  --arizmi-tech-blue: #2f8ed8;
+  --arizmi-deep-violet: #6b4fd3;
+  --arizmi-card-black: #101313;
+  --arizmi-off-white: #f7f5ef;
+
+  /* Surfaces */
+  --canvas: var(--arizmi-off-white);
+  --surface-card: var(--arizmi-card-black);
+
+  /*
+   * Text. Contrast ratios measured against their intended surface:
+   * ink 17.13:1, ink-muted 6.90:1 on canvas; ink-on-card 17.13:1,
+   * ink-on-card-muted 8.11:1 on card black. All meet WCAG AA.
+   */
+  --ink: var(--arizmi-card-black);
+  --ink-muted: #4e5657;
+  --ink-on-card: var(--arizmi-off-white);
+  --ink-on-card-muted: #a3adab;
+
+  /*
+   * Teal states. teal-dark passes 3:1 on canvas (large text / UI only);
+   * teal-ink (5.38:1) is the body-text-safe teal for light surfaces;
+   * teal-light (7.31:1 on card black) is the accent for dark surfaces.
+   */
+  --teal-light: var(--arizmi-teal-light);
+  --teal-mid: var(--arizmi-teal-mid);
+  --teal-dark: var(--arizmi-teal-dark);
+  --teal-ink: #017076;
+  --gradient-teal: linear-gradient(
+    135deg,
+    var(--arizmi-teal-dark) 0%,
+    var(--arizmi-teal-light) 100%
+  );
+
+  /*
+   * Build-state accents. Brand values pass 3:1 on canvas (UI/large text);
+   * the -ink variants pass 4.5:1 on canvas for body text. Deep violet
+   * passes 5.23:1 on canvas as-is.
+   */
+  --blueprint: var(--arizmi-tech-blue);
+  --blueprint-ink: #1b679d;
+  --concept: var(--arizmi-deep-violet);
+  --concept-ink: var(--arizmi-deep-violet);
+
+  /* Focus — #019099 measures 3.53:1 on canvas and 4.85:1 on card black */
+  --focus-ring: var(--arizmi-teal-dark);
+
+  /* Feedback states — all ≥4.5:1 on canvas */
+  --success: #177245;
+  --warning: #8f5b00;
+  --error: #b3261e;
+
+  /*
+   * Borders. Soft variants are decorative hairlines; strong variants
+   * (#6e7674) pass 3:1 against both canvas and card black for
+   * interactive control boundaries.
+   */
+  --border-soft: #ddd9ce;
+  --border-strong: #6e7674;
+  --border-on-card: #2a2f2f;
+  --border-on-card-strong: #6e7674;
+
+  /* Spacing scale */
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6rem;
+
+  /* Responsive section padding */
+  --section-py: clamp(4rem, 8vw, 8rem);
+  --section-px: clamp(1.25rem, 4vw, 2rem);
+
+  /* Radii */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 2rem;
+  --radius-pill: 999px;
+
+  /* Shadows for the light canvas */
+  --shadow-soft: 0 1px 2px rgba(16, 19, 19, 0.06), 0 4px 16px rgba(16, 19, 19, 0.08);
+  --shadow-lifted: 0 2px 8px rgba(16, 19, 19, 0.08), 0 12px 40px rgba(16, 19, 19, 0.16);
+
+  /* Page widths */
+  --page-max: 90rem;
+  --page-content: 75rem;
+  --page-narrow: 44rem;
+
+  /*
+   * ------------------------------------------------------------------
+   * TEMPORARY compatibility aliases for the superseded dark theme.
+   * Existing components (Nav, Hero, Services, Proof, HowItWorks,
+   * WhyChooseUs, Contact) still consume these. Delete each once the
+   * matching redesign task replaces its consumers (TASK-003+).
+   * ------------------------------------------------------------------
+   */
   --bg: #06080d;
   --surface: #111318;
   --surface-alt: #1c1e24;
@@ -15,10 +145,16 @@
   --accent: #59b0ff;
   --accent-dim: rgba(89, 176, 255, 0.15);
   --shadow-card: 0px 4px 32px 0px rgba(0, 0, 0, 0.4);
+}
 
-  /* Responsive section padding */
-  --section-py: clamp(4rem, 8vw, 8rem);
-  --section-px: clamp(1.25rem, 4vw, 2rem);
+/*
+ * TEMPORARY: the legacy single-page sections paint no canvas of their own
+ * and inherit body text color, so the home page keeps the superseded dark
+ * base until its sections are rebuilt (TASK-005+). Applied in app/page.tsx.
+ */
+.legacy-dark-page {
+  background: var(--bg);
+  color: var(--text);
 }
 
 html {
@@ -32,14 +168,29 @@ html {
 }
 
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-inter), system-ui, sans-serif;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-manrope), system-ui, sans-serif;
   overflow-x: clip;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* Space Mono for indexes, statuses, categories, counters, system labels */
+.font-meta {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+}
+
+::selection {
+  background: var(--teal-light);
+  color: var(--surface-card);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 /* Button hover animations */
