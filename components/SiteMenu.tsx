@@ -202,6 +202,7 @@ export default function SiteMenu({
                   ) : bookingUrl ? (
                     <a
                       href={bookingUrl}
+                      rel="noreferrer"
                       className="inline-flex min-h-11 items-center text-[clamp(2rem,6vw,3.25rem)] font-semibold leading-tight tracking-tight text-ink-on-card transition-colors hover:text-teal-light"
                     >
                       {item.label}

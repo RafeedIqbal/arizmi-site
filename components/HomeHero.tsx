@@ -423,7 +423,7 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
     : `${activeCard.build.name}, ${activeCard.stateLabel}. ${active + 1} of ${HERO_CARDS.length}.`;
 
   const primaryCta = bookingUrl ? (
-    <a href={bookingUrl} className={buttonClassName("solid")}>
+    <a href={bookingUrl} rel="noreferrer" className={buttonClassName("solid")}>
       {CTA_LABELS.bookBuildCall}
     </a>
   ) : (

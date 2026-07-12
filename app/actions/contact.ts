@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 import nodemailer from "nodemailer";
 import { guardPublicSubmission } from "@/lib/guardSubmission";
+import { getContactMailConfig } from "@/lib/server/config";
 
 export type ContactResult =
   | { success: true }
@@ -42,14 +43,27 @@ export async function submitContactForm(
     return { success: false, error: guardError };
   }
 
-  // --- 3. Send email via Nodemailer ---
+  // --- 3. Resolve centralized recipient/sender (D-15) ---
+  // No SMTP env var is read here; getContactMailConfig owns that. When the
+  // transport is unconfigured we surface a clear error instead of attempting a
+  // doomed send (the missing-config environment case from TASK-017).
+  const mail = getContactMailConfig();
+  if (!mail.ok) {
+    console.error("Contact email not configured:", mail.reason);
+    return {
+      success: false,
+      error: "Messaging is temporarily unavailable. Please try again later.",
+    };
+  }
+
+  // --- 4. Send email via Nodemailer ---
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
     secure: true,
     auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_APP_PASSWORD,
+      user: mail.user,
+      pass: mail.password,
     },
   });
 
@@ -68,10 +82,10 @@ export async function submitContactForm(
 
   try {
     await transporter.sendMail({
-      from: process.env.GMAIL_USER,
-      to: "mish@icontraining.app",
-      replyTo: email,
-      subject: `[Arizmi] Contact from ${name}`,
+      from: mail.user,
+      to: mail.recipient,
+      replyTo: headerSafe(email),
+      subject: headerSafe(`[Arizmi] Contact from ${name}`),
       text: textBody,
       html: htmlBody,
     });
@@ -84,6 +98,14 @@ export async function submitContactForm(
   }
 
   return { success: true };
+}
+
+/**
+ * Strip CR/LF from any user-supplied value used in an email header (subject,
+ * replyTo) so a crafted name/email cannot inject additional headers.
+ */
+function headerSafe(value: string): string {
+  return value.replace(/[\r\n]+/g, " ").trim();
 }
 
 /** Minimal HTML escaping for user-supplied values in the email body */

@@ -1020,3 +1020,261 @@ body {
   line-height: 1.2;
   text-shadow: 0 1px 10px rgba(0, 0, 0, 0.25);
 }
+
+/*
+ * ------------------------------------------------------------------
+ * BluePrint AI guided flow (TASK-011–TASK-014). Light-canvas form
+ * controls and the diagnosis loading indicator. Interaction state is
+ * expressed with :has() so the markup stays native and accessible;
+ * everything degrades to a plain, legible form without motion.
+ * ------------------------------------------------------------------
+ */
+.bp-choice {
+  display: flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-soft);
+  padding: 0.75rem 1rem;
+  font-size: 0.9375rem;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.bp-choice:hover {
+  border-color: var(--border-strong);
+}
+
+.bp-choice:has(input:checked) {
+  border-color: var(--teal-ink);
+  background: color-mix(in srgb, var(--teal-light) 12%, transparent);
+}
+
+.bp-choice:has(input:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.bp-input {
+  width: 100%;
+  min-height: 2.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-soft);
+  background: transparent;
+  padding: 0.625rem 0.875rem;
+  color: var(--ink);
+  font: inherit;
+}
+
+.bp-input:focus {
+  outline: none;
+  border-color: var(--teal-ink);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--teal-light) 20%, transparent);
+}
+
+.bp-input[aria-invalid="true"] {
+  border-color: var(--error);
+}
+
+.bp-select {
+  cursor: pointer;
+  appearance: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bp-choice {
+    transition: none;
+  }
+}
+
+.bp-spinner {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 3px solid var(--border-soft);
+  border-top-color: var(--teal-ink);
+  animation: bp-spin 0.9s linear infinite;
+}
+
+@keyframes bp-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bp-spinner {
+    animation: none;
+    border-top-color: var(--border-strong);
+  }
+}
+
+/*
+ * ------------------------------------------------------------------
+ * About page (TASK-016).
+ * "Why Arizmi?" brand-system visual (D-12) and the studio-motto ticker.
+ * The ticker's phrase is announced once by an sr-only copy in the
+ * component; everything here styles the decorative, aria-hidden layers
+ * and removes all continuous motion for prefers-reduced-motion.
+ * ------------------------------------------------------------------
+ */
+.about-why {
+  display: grid;
+  gap: clamp(2rem, 5vw, 3.5rem);
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  .about-why {
+    grid-template-columns: 1.1fr 0.9fr;
+  }
+}
+
+/*
+ * Abstract, decorative panel — no stock imagery. A dot lattice and
+ * concentric rings under the gradient logomark echo al-Khwarizmi's
+ * system/algorithm theme; replace once an approved image exists (D-12).
+ */
+.about-why__visual {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--gradient-teal);
+  box-shadow: var(--shadow-soft);
+  isolation: isolate;
+}
+
+.about-why__visual::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(255, 255, 255, 0.18) 1px,
+    transparent 0
+  );
+  background-size: 18px 18px;
+}
+
+.about-why__visual::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 118%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: repeating-radial-gradient(
+    circle at center,
+    transparent 0 33px,
+    rgba(255, 255, 255, 0.14) 33px 34px
+  );
+  -webkit-mask-image: radial-gradient(circle at center, #000 42%, transparent 70%);
+  mask-image: radial-gradient(circle at center, #000 42%, transparent 70%);
+}
+
+.about-why__mark {
+  position: relative;
+  width: clamp(4.5rem, 14vw, 8rem);
+  height: auto;
+  filter: drop-shadow(0 8px 24px rgba(16, 19, 19, 0.28));
+}
+
+.about-ticker {
+  position: relative;
+  overflow: hidden;
+  border-block: 1px solid var(--border-soft);
+  padding-block: clamp(1.25rem, 3.5vw, 2.25rem);
+}
+
+.about-ticker__viewport {
+  overflow: hidden;
+}
+
+.about-ticker__track {
+  display: flex;
+  width: max-content;
+  animation: about-ticker-scroll 34s linear infinite;
+}
+
+.about-ticker__group {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.about-ticker__item {
+  display: inline-flex;
+  align-items: center;
+  padding-inline: clamp(1rem, 3vw, 2.5rem);
+  white-space: nowrap;
+  font-size: clamp(1.5rem, 5vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.about-ticker__item::before {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-right: clamp(1rem, 3vw, 2.5rem);
+  border-radius: 50%;
+  background: var(--teal-mid);
+}
+
+@keyframes about-ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.about-ticker:hover .about-ticker__track,
+.about-ticker:focus-within .about-ticker__track,
+.about-ticker[data-paused] .about-ticker__track {
+  animation-play-state: paused;
+}
+
+.about-ticker__toggle {
+  position: absolute;
+  top: 50%;
+  right: var(--section-px);
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-strong);
+  background: color-mix(in srgb, var(--canvas) 86%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: var(--ink);
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.about-ticker__toggle:hover {
+  border-color: var(--teal-ink);
+  color: var(--teal-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-ticker__track {
+    animation: none;
+  }
+
+  .about-ticker__toggle {
+    display: none;
+  }
+}

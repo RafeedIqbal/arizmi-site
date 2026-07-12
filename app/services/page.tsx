@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import BookingCta from "@/components/BookingCta";
 import PageShell from "@/components/PageShell";
+import ServicesAccordion from "@/components/services/ServicesAccordion";
 import { CTA_LABELS, CTA_ROUTES } from "@/lib/content/cta";
-import { SERVICES } from "@/lib/content/services";
 import { ROUTES } from "@/lib/site";
 
 const HERO_COPY =
@@ -47,43 +47,7 @@ export default function ServicesPage() {
         >
           Services
         </h2>
-        {/* Semantic shell only: the accordion disclosure arrives in TASK-015.
-            The full Includes / Best for lists stay preserved on this page. */}
-        <ol className="mt-10 grid gap-6 lg:grid-cols-2">
-          {SERVICES.map((service, index) => (
-            <li key={service.id}>
-              <article className="h-full rounded-[var(--radius-lg)] border border-border-soft bg-white/40 p-6">
-                <p className="font-meta text-xs uppercase tracking-wider text-teal-ink">
-                  {String(index + 1).padStart(2, "0")}
-                </p>
-                <h3 className="mt-2 text-xl font-semibold">{service.title}</h3>
-                <p className="mt-3 text-sm text-ink-muted">{service.fit}</p>
-                <div className="mt-5 grid gap-5 sm:grid-cols-2">
-                  <div>
-                    <h4 className="font-meta text-xs uppercase tracking-wider text-ink-muted">
-                      Includes
-                    </h4>
-                    <ul className="mt-2 space-y-1 text-sm">
-                      {service.includes.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="font-meta text-xs uppercase tracking-wider text-ink-muted">
-                      Best for
-                    </h4>
-                    <ul className="mt-2 space-y-1 text-sm">
-                      {service.bestFor.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </article>
-            </li>
-          ))}
-        </ol>
+        <ServicesAccordion />
       </section>
 
       <section

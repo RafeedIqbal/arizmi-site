@@ -26,7 +26,11 @@ export default function BookingCta({
 
   if (booking.status === "configured") {
     return (
-      <a href={booking.url} className={buttonClassName(VARIANT_MAP[variant])}>
+      <a
+        href={booking.url}
+        rel="noreferrer"
+        className={buttonClassName(VARIANT_MAP[variant])}
+      >
         {label}
       </a>
     );

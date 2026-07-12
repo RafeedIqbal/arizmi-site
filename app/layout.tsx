@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/next"
 import SiteFooter from "@/components/SiteFooter";
 import SiteNav from "@/components/SiteNav";
+import { NAV_SUPPORTING_LINE } from "@/lib/content/navigation";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -52,34 +53,29 @@ const instrumentSerif = localFont({
 
 const siteUrl = SITE_URL;
 
+// Approved homepage copy (docs/redesign/specs/homepage.md hero + global menu
+// supporting line). The share image comes from app/opengraph-image.tsx, so no
+// static og:image path is declared here.
+const HOME_TITLE = `Arizmi Labs — ${NAV_SUPPORTING_LINE}`;
+const HOME_DESCRIPTION =
+  "For founders and teams building beyond the obvious. We shape ideas, build systems and ship digital products that need more than a dev shop.";
+
 export const metadata: Metadata = {
-  title: "Arizmi — Start-Up Apps & Websites",
-  description:
-    "Your technical co-founder, combining business strategy and software engineering to turn your idea into a successful business.",
+  title: HOME_TITLE,
+  description: HOME_DESCRIPTION,
   metadataBase: new URL(siteUrl),
   openGraph: {
-    title: "Arizmi — Start-Up Apps & Websites",
-    description:
-      "Your technical co-founder, combining business strategy and software engineering to turn your idea into a successful business.",
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
     url: siteUrl,
-    siteName: "Arizmi",
+    siteName: "Arizmi Labs",
     type: "website",
     locale: "en_US",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Arizmi — Start-Up Apps & Websites",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Arizmi — Start-Up Apps & Websites",
-    description:
-      "Your technical co-founder, combining business strategy and software engineering to turn your idea into a successful business.",
-    images: ["/og-image.png"],
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
   },
   icons: {
     icon: [

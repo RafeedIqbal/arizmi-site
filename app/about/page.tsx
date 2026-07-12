@@ -1,9 +1,18 @@
 import type { Metadata } from "next";
+import Image from "next/image";
+import AboutTicker from "@/components/about/AboutTicker";
+import TeamGallery from "@/components/about/TeamGallery";
 import BookingCta from "@/components/BookingCta";
 import PageShell from "@/components/PageShell";
 import { CTA_LABELS } from "@/lib/content/cta";
-import { TEAM } from "@/lib/content/team";
 import { ROUTES } from "@/lib/site";
+
+/**
+ * D-10: no approved statistics exist. The image-first stats layout is gated to
+ * non-production so mockup numbers can never ship as fact; it exists only as a
+ * clearly-labelled placeholder to review the layout before values are approved.
+ */
+const SHOW_STATS_PLACEHOLDER = process.env.NODE_ENV !== "production";
 
 const HERO_COPY =
   "Arizmi Labs is a product and software studio helping founders, operators and teams turn early ideas into working digital products, platforms and AI-enabled systems.";
@@ -49,30 +58,74 @@ export default function AboutPage() {
         </p>
       </header>
 
-      {/* Statistics section intentionally omitted: D-10 — no approved
-          label/value pairs exist, and the reference-mockup numbers must not
-          ship as facts. TASK-016 adds the section once values are approved. */}
+      {/* Statistics section is gated: no approved label/value pairs exist yet
+          (D-10), so the reference-mockup numbers must never ship as facts. In
+          production this branch is absent; in development it shows a labelled
+          placeholder that holds the image-first layout for review. */}
+      {SHOW_STATS_PLACEHOLDER ? (
+        <section
+          aria-labelledby="stats-heading"
+          className="mx-auto max-w-[var(--page-content)] px-[var(--section-px)] pb-[var(--space-2xl)]"
+        >
+          <div className="rounded-[var(--radius-lg)] border border-dashed border-warning/50 p-6">
+            <p className="font-meta text-xs uppercase tracking-wider text-warning">
+              Development only — awaiting approved statistics (D-10)
+            </p>
+            <h2
+              id="stats-heading"
+              className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl"
+            >
+              By the numbers
+            </h2>
+            <ul className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {[1, 2, 3, 4].map((slot) => (
+                <li key={slot} className="border-t border-border-soft pt-4">
+                  <p className="text-3xl font-semibold text-ink-muted">—</p>
+                  <p className="mt-2 text-sm text-ink-muted">
+                    Stat {slot}: value pending approval
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      ) : null}
 
       <section
         aria-labelledby="why-arizmi-heading"
-        className="mx-auto max-w-[var(--page-narrow)] px-[var(--section-px)] pb-[var(--space-2xl)]"
+        className="mx-auto max-w-[var(--page-content)] px-[var(--section-px)] pb-[var(--space-2xl)]"
       >
-        <h2
-          id="why-arizmi-heading"
-          className="text-2xl font-semibold tracking-tight sm:text-3xl"
-        >
-          Why Arizmi?
-        </h2>
-        {/* Copy-only shell: the paired image/brand visual is pending D-12. */}
-        <p className="mt-4 text-ink-muted">
-          The name Arizmi is drawn from al-Khwarizmi, one of history’s great
-          system thinkers. His work helped give the world algebra, algorithms
-          and a new way to break complexity down into something solvable.
-        </p>
-        <p className="mt-3 text-ink-muted">
-          This is the idea behind the studio: take something complex, find the
-          logic inside it and turn it into something useful.
-        </p>
+        <div className="about-why">
+          <div>
+            <h2
+              id="why-arizmi-heading"
+              className="text-2xl font-semibold tracking-tight sm:text-3xl"
+            >
+              Why Arizmi?
+            </h2>
+            <p className="mt-4 text-ink-muted">
+              The name Arizmi is drawn from al-Khwarizmi, one of history’s great
+              system thinkers. His work helped give the world algebra, algorithms
+              and a new way to break complexity down into something solvable.
+            </p>
+            <p className="mt-3 text-ink-muted">
+              This is the idea behind the studio: take something complex, find
+              the logic inside it and turn it into something useful.
+            </p>
+          </div>
+          {/* D-12: no approved "Why Arizmi?" image exists, so this is an
+              abstract brand-system panel (not stock imagery) built from brand
+              tokens and the gradient logomark. Decorative only. */}
+          <div className="about-why__visual" aria-hidden="true">
+            <Image
+              src="/assets/arizmi/logomark-white.png"
+              alt=""
+              width={140}
+              height={140}
+              className="about-why__mark"
+            />
+          </div>
+        </div>
       </section>
 
       <section
@@ -119,31 +172,12 @@ export default function AboutPage() {
           thinking, so ideas can be shaped, built and improved from more than
           one angle.
         </p>
-        {/* Semantic shell only: the carousel/"Read more" disclosure and the
-            D-11 image placeholder treatment arrive in TASK-016. Full bios are
-            rendered inline so no content hides behind a missing interaction. */}
-        <ul className="mt-10 grid gap-6 lg:grid-cols-2">
-          {TEAM.map((member) => (
-            <li key={member.id}>
-              <article className="h-full rounded-[var(--radius-lg)] border border-border-soft bg-white/40 p-6">
-                <h3 className="text-xl font-semibold">{member.name}</h3>
-                <p className="mt-2 font-medium">{member.cardLead}</p>
-                {member.bio.map((paragraph) => (
-                  <p key={paragraph} className="mt-3 text-sm text-ink-muted">
-                    {paragraph}
-                  </p>
-                ))}
-                <p className="font-meta mt-4 text-xs uppercase tracking-wider text-ink-muted">
-                  Focus: {member.focus.join(", ")}
-                </p>
-              </article>
-            </li>
-          ))}
-        </ul>
+        <TeamGallery />
       </section>
 
-      {/* Ticker deferred to TASK-016: its copy duplicates the H1 above, and
-          the motion/reduced-motion behavior belongs with that task. */}
+      <section className="pb-[var(--space-2xl)]">
+        <AboutTicker />
+      </section>
 
       <section
         aria-labelledby="ready-heading"
