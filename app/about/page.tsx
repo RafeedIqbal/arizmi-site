@@ -36,7 +36,7 @@ const PRINCIPLES = [
 
 export default function AboutPage() {
   return (
-    <PageShell currentRoute={ROUTES.about}>
+    <PageShell>
       <header className="mx-auto max-w-[var(--page-content)] px-[var(--section-px)] pb-[var(--space-2xl)] pt-[var(--space-3xl)]">
         <h1 className="max-w-[22ch] text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
           For people building something that does not exist yet.

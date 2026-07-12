@@ -1,4 +1,3 @@
-import Nav from "@/components/Nav";
 import HeroSection from "@/components/HeroSection";
 import ServicesSection from "@/components/ServicesSection";
 import ProofSection from "@/components/ProofSection";
@@ -9,10 +8,9 @@ import ContactSection from "@/components/ContactSection";
 export default function Home() {
   return (
     <>
-      <Nav />
       {/* legacy-dark-page: temporary compat canvas for the superseded
           dark theme; remove as sections migrate (TASK-005+) */}
-      <main className="legacy-dark-page">
+      <main id="main" className="legacy-dark-page">
         <HeroSection />
         <div
           data-testid="page-content-shell"

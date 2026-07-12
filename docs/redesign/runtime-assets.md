@@ -4,8 +4,9 @@ Created by `TASK-001`. The supplied originals in [`public/New_Assets`](../../pub
 provenance copies and remain unchanged; components must reference only the URL-safe runtime aliases
 under `public/assets/arizmi/`.
 
-All aliases are byte-identical copies of their source files. Every SVG carries a
-`viewBox="0 0 2000 2000"`, so intrinsic aspect ratio is preserved when sized via CSS or `next/image`.
+All aliases are byte-identical copies of their source files unless a row says "Derived". Every
+source SVG carries a `viewBox="0 0 2000 2000"`, so intrinsic aspect ratio is preserved when sized
+via CSS or `next/image`.
 
 ## Logos
 
@@ -20,6 +21,7 @@ All aliases are byte-identical copies of their source files. Every SVG carries a
 | `logo-primary-solid-teal.svg` | `1. Primary_Logo/ArizmiLabs_Primary_Solid SVG File -01.svg` | Solid teal primary logo |
 | `logo-primary-white.png` | `1. Primary_Logo/ArizmiLabs_Primary_White PNG File-01.png` | Primary logo on card-black surfaces |
 | `wordmark-gradient.svg` | `3. Logo workmark/Wordmark Gradient Color SVG -01.svg` | Standalone wordmark |
+| `wordmark-gradient-tight.svg` | Derived from `wordmark-gradient.svg` (TASK-003): viewBox cropped to the artwork (`262 845 1476 310`, ≈4.76:1) because the original's square 2000×2000 viewBox leaves large transparent padding | Wordmark in compact chrome (footer) |
 | `wordmark-black.svg` | `3. Logo workmark/Wordmark Black Color SVG File-01.svg` | Black wordmark |
 | `wordmark-white.png` | `3. Logo workmark/Wordmark White PNG File-01.png` | Wordmark on card-black surfaces |
 | `logo-horizontal-full-color.png` | `Horizantal-Logo-Full-Color.png` | Horizontal full-colour lockup |

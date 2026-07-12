@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 
 export default function ServicesPage() {
   return (
-    <PageShell currentRoute={ROUTES.services}>
+    <PageShell>
       <header className="mx-auto max-w-[var(--page-content)] px-[var(--section-px)] pb-[var(--space-2xl)] pt-[var(--space-3xl)]">
         <h1 className="max-w-[24ch] text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
           Product and software development for ideas that need more than a

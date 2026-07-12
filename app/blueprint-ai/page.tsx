@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 
 export default function BlueprintAiPage() {
   return (
-    <PageShell currentRoute={ROUTES.blueprintAi}>
+    <PageShell>
       <header className="mx-auto max-w-[var(--page-narrow)] px-[var(--section-px)] py-[var(--section-py)]">
         <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
           Welcome to BluePrint AI.

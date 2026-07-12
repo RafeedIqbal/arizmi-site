@@ -183,6 +183,72 @@ body {
   font-family: var(--font-space-mono), ui-monospace, monospace;
 }
 
+/*
+ * Global chrome (TASK-003): floating logomark/menu controls sit on a
+ * translucent canvas chip so they stay legible over both the warm
+ * off-white canvas and card-black surfaces.
+ */
+.chrome-chip {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-soft);
+  background: color-mix(in srgb, var(--canvas) 88%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-soft);
+}
+
+/*
+ * Full-screen card-black site menu, built on the native <dialog> element
+ * (top layer, inert background, Escape handling from the platform).
+ */
+.site-menu {
+  position: fixed;
+  inset: 0;
+  margin: 0;
+  border: none;
+  padding: 0;
+  width: 100%;
+  max-width: none;
+  height: 100vh;
+  height: 100dvh;
+  max-height: none;
+  overflow-y: auto;
+  background: var(--surface-card);
+  color: var(--ink-on-card);
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.28s ease, transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.site-menu::backdrop {
+  background: transparent;
+}
+
+@starting-style {
+  .site-menu[open] {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-menu {
+    transition: opacity 0.12s linear;
+    transform: none;
+  }
+
+  @starting-style {
+    .site-menu[open] {
+      opacity: 0;
+      transform: none;
+    }
+  }
+}
+
 ::selection {
   background: var(--teal-light);
   color: var(--surface-card);

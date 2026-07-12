@@ -62,7 +62,7 @@ function BuildCta({ cta }: { cta: Build["cta"] }) {
 
 export default function BuildsPage() {
   return (
-    <PageShell currentRoute={ROUTES.builds}>
+    <PageShell>
       <header className="mx-auto max-w-[var(--page-content)] px-[var(--section-px)] pb-[var(--space-2xl)] pt-[var(--space-3xl)]">
         <h1 className="max-w-[22ch] text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
           A look inside the systems we’ve shaped, built and launched.

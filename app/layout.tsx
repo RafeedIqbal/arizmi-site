@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/next"
+import SiteFooter from "@/components/SiteFooter";
+import SiteNav from "@/components/SiteNav";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -107,7 +109,15 @@ export default function RootLayout({
       <body
         className={`${manrope.variable} ${spaceMono.variable} ${inter.variable} ${instrumentSerif.variable} antialiased`}
       >
+        <a
+          href="#main"
+          className="sr-only rounded-md bg-card px-4 py-2 text-ink-on-card focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[120]"
+        >
+          Skip to content
+        </a>
+        <SiteNav />
         {children}
+        <SiteFooter />
         <Analytics />
         <Toaster
           position="bottom-center"
