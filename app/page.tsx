@@ -1,11 +1,16 @@
 import HomeHero from "@/components/HomeHero";
-import ServicesSection from "@/components/ServicesSection";
-import ProofSection from "@/components/ProofSection";
-import HowItWorksSection from "@/components/HowItWorksSection";
-import WhyChooseUsSection from "@/components/WhyChooseUsSection";
-import ContactSection from "@/components/ContactSection";
+import ProcessSection from "@/components/home/ProcessSection";
+import BlueprintPromo from "@/components/home/BlueprintPromo";
+import BuildCategories from "@/components/home/BuildCategories";
+import ClosingCta from "@/components/home/ClosingCta";
 import { getBookingDestination } from "@/lib/server/config";
 
+/**
+ * Homepage assembly (docs/redesign/specs/homepage.md section order):
+ * hero → process → BluePrint promo → build categories → closing CTA. The
+ * global nav and footer are rendered by app/layout.tsx. Each section owns a
+ * labelled landmark so the page is navigable by heading and region.
+ */
 export default function Home() {
   const booking = getBookingDestination();
   return (
@@ -13,16 +18,10 @@ export default function Home() {
       <HomeHero
         bookingUrl={booking.status === "configured" ? booking.url : null}
       />
-      {/* legacy-dark-page: the remaining homepage sections still use the
-          superseded dark theme; TASK-006/007 rebuild them on the light
-          canvas and remove this wrapper. */}
-      <div className="legacy-dark-page" style={{ position: "relative", zIndex: 1 }}>
-        <ServicesSection />
-        <ProofSection />
-        <HowItWorksSection />
-        <WhyChooseUsSection />
-        <ContactSection />
-      </div>
+      <ProcessSection />
+      <BlueprintPromo />
+      <BuildCategories />
+      <ClosingCta />
     </main>
   );
 }

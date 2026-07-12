@@ -130,10 +130,10 @@
 
   /*
    * ------------------------------------------------------------------
-   * TEMPORARY compatibility aliases for the superseded dark theme.
-   * Existing components (Nav, Hero, Services, Proof, HowItWorks,
-   * WhyChooseUs, Contact) still consume these. Delete each once the
-   * matching redesign task replaces its consumers (TASK-003+).
+   * TEMPORARY compatibility aliases for the superseded dark theme. Now
+   * consumed only by the contact plumbing kept for TASK-017 (ContactModal,
+   * ContactTrigger, SuccessMessage) and the Toaster in app/layout.tsx.
+   * Delete once TASK-017 finalizes the contact experience.
    * ------------------------------------------------------------------
    */
   --bg: #06080d;
@@ -145,16 +145,6 @@
   --accent: #59b0ff;
   --accent-dim: rgba(89, 176, 255, 0.15);
   --shadow-card: 0px 4px 32px 0px rgba(0, 0, 0, 0.4);
-}
-
-/*
- * TEMPORARY: the legacy single-page sections paint no canvas of their own
- * and inherit body text color, so the home page keeps the superseded dark
- * base until its sections are rebuilt (TASK-005+). Applied in app/page.tsx.
- */
-.legacy-dark-page {
-  background: var(--bg);
-  color: var(--text);
 }
 
 html {
@@ -400,54 +390,6 @@ body {
   transform: scale(1.05);
   border-color: var(--accent) !important;
   color: var(--accent) !important;
-}
-
-/* ProofSection — responsive card grid */
-.proof-card-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-}
-
-@media (min-width: 600px) {
-  .proof-card-grid {
-    grid-template-columns: 220px 1fr;
-  }
-}
-
-/* HowItWorks — responsive timeline grid */
-.timeline-grid {
-  display: grid;
-  grid-template-columns: 40px 1fr;
-  gap: 0 1.25rem;
-  align-items: stretch;
-}
-
-@media (min-width: 640px) {
-  .timeline-grid {
-    grid-template-columns: 64px 1fr;
-    gap: 0 2.5rem;
-  }
-}
-
-/* HowItWorks card visual animations */
-@keyframes hiw-shimmer {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
-}
-
-@keyframes hiw-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
-}
-
-@keyframes hiw-pulse {
-  0%, 100% { transform: scale(1); opacity: 0.6; }
-  50% { transform: scale(1.12); opacity: 1; }
-}
-
-@keyframes hiw-bar-bounce {
-  0%, 100% { transform: scaleY(0.85); }
-  50% { transform: scaleY(1); }
 }
 
 /*
@@ -769,4 +711,312 @@ body {
 
 .home-hero__detail-cta {
   margin-top: 0.25rem;
+}
+
+/*
+ * ------------------------------------------------------------------
+ * Homepage process — "How ideas become systems" (TASK-006).
+ * Baseline is a plain, fully legible stacked list. On wide, tall
+ * viewports with motion allowed, ProcessSection pins the section and
+ * moves emphasis down the steps; the emphasis is supplementary only,
+ * so inactive steps stay at contrast-safe text (never hidden/blurred).
+ * ------------------------------------------------------------------
+ */
+.process {
+  background: var(--canvas);
+  color: var(--ink);
+}
+
+.process__inner {
+  padding-block: var(--section-py);
+}
+
+.process__head {
+  margin-bottom: clamp(2rem, 5vw, 3.5rem);
+}
+
+.process__body {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.process__rail {
+  display: none;
+}
+
+.process__steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.process__step {
+  border-left: 2px solid var(--border-soft);
+  padding: 0.75rem 0 0.75rem 1.5rem;
+}
+
+.process__index {
+  margin: 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  color: var(--teal-ink);
+}
+
+.process__title {
+  margin: 0.5rem 0 0;
+  font-size: clamp(1.25rem, 2.5vw, 1.6rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.process__desc {
+  margin: 0.5rem 0 0;
+  max-width: 52ch;
+  color: var(--ink-muted);
+  line-height: 1.55;
+}
+
+@media (min-width: 900px) {
+  .process {
+    display: flex;
+    align-items: center;
+  }
+
+  .process__inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+
+  .process__body {
+    grid-template-columns: 3px 1fr;
+    gap: 3rem;
+    align-items: stretch;
+  }
+
+  .process__rail {
+    display: block;
+    position: relative;
+    width: 3px;
+    border-radius: 2px;
+    background: var(--border-soft);
+  }
+
+  .process__rail-fill {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: calc(var(--progress, 0) * 100%);
+    border-radius: 2px;
+    background: var(--gradient-teal);
+  }
+
+  .process__steps {
+    gap: clamp(1.75rem, 5vh, 3.5rem);
+  }
+
+  .process__step {
+    border-left: none;
+    padding: 0;
+  }
+
+  /* Supplementary emphasis while pinned — inactive stays legible. */
+  .process__step[data-state] .process__title {
+    color: var(--ink-muted);
+    transition: color 0.4s ease, transform 0.4s ease;
+  }
+
+  .process__step[data-state="active"] .process__title {
+    color: var(--ink);
+    transform: translateX(4px);
+  }
+
+  .process__step[data-state] .process__index {
+    transition: opacity 0.4s ease;
+    opacity: 0.55;
+  }
+
+  .process__step[data-state="active"] .process__index {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .process__step .process__title,
+  .process__step .process__index {
+    transition: none;
+    transform: none;
+  }
+}
+
+/*
+ * ------------------------------------------------------------------
+ * Featured builds slider and media placeholder (TASK-009).
+ * A native horizontal scroll-snap track (stable touch/trackpad drag)
+ * paired with an always-present detail region. Works as a plain
+ * list + detail when motion is disabled.
+ * ------------------------------------------------------------------
+ */
+.featured__layout {
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .featured__layout {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: 2.5rem;
+    align-items: start;
+  }
+}
+
+.featured__track {
+  list-style: none;
+  margin: 0;
+  padding: 0.25rem 0 1rem;
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.featured__item {
+  flex: 0 0 auto;
+  width: min(80%, 20rem);
+  scroll-snap-align: center;
+}
+
+@media (min-width: 1024px) {
+  .featured__item {
+    width: min(62%, 16rem);
+  }
+}
+
+.featured-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem;
+  text-align: left;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-soft);
+  background: color-mix(in srgb, var(--canvas) 40%, #ffffff);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.featured-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-soft);
+}
+
+.featured-card[aria-current] {
+  border-color: var(--teal-ink);
+  box-shadow: var(--shadow-lifted);
+}
+
+.featured-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0 0.25rem 0.25rem;
+}
+
+.featured-card__name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.featured__controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.featured__detail {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-soft);
+  background: color-mix(in srgb, var(--canvas) 55%, #ffffff);
+  padding: clamp(1.5rem, 3vw, 2rem);
+}
+
+@media (min-width: 1024px) {
+  .featured__detail {
+    position: sticky;
+    top: 5rem;
+  }
+}
+
+/* Subtle parallax on the decorative layer only; scaled so it always covers. */
+.build-media__grid {
+  transform: translate3d(calc(var(--p, 0) * -20px), 0, 0) scale(1.15);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .featured-card {
+    transition: none;
+    transform: none;
+  }
+
+  .build-media__grid {
+    transform: none;
+  }
+}
+
+.build-media {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.75rem;
+  aspect-ratio: 3 / 2;
+  width: 100%;
+  padding: 0.85rem;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  color: #ffffff;
+  background: var(--gradient-teal);
+  isolation: isolate;
+}
+
+.build-media[data-state="blueprint"] {
+  background: linear-gradient(135deg, #185f92 0%, var(--arizmi-tech-blue) 100%);
+}
+
+.build-media[data-state="concept"] {
+  background: linear-gradient(135deg, #4a35a0 0%, var(--arizmi-deep-violet) 100%);
+}
+
+.build-media__grid {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.7;
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(255, 255, 255, 0.16) 1px,
+    transparent 0
+  );
+  background-size: 16px 16px;
+}
+
+.build-media__label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.build-media__name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.25);
 }

@@ -369,3 +369,72 @@ export const FEATURED_BUILDS: readonly Build[] = BUILDS.filter(
 export const ARCHIVE_BUILDS: readonly Build[] = BUILDS.filter(
   (build) => !build.featured,
 );
+
+/* ------------------------------------------------------------------ */
+/* Filtering (TASK-008)                                                */
+/* ------------------------------------------------------------------ */
+
+/** "All" is a UI concern, not a source category — kept separate here. */
+export const ALL_FILTER_ID = "all" as const;
+export type BuildFilterId = typeof ALL_FILTER_ID | BuildFilterCategory;
+
+/** Ordered tab list rendered by the filter toolbar: "All" then the source tabs. */
+export const FILTER_TABS: readonly { id: BuildFilterId; label: string }[] = [
+  { id: ALL_FILTER_ID, label: "All" },
+  ...BUILD_FILTERS.map(({ id, label }) => ({ id, label })),
+];
+
+const FILTER_IDS: ReadonlySet<string> = new Set(FILTER_TABS.map((tab) => tab.id));
+
+/**
+ * Coerce an untrusted query-parameter value to a valid filter id. Unknown or
+ * missing values fall back to "All" without throwing (TASK-008: shareable,
+ * fault-tolerant URL state).
+ */
+export function parseFilterId(value: string | null | undefined): BuildFilterId {
+  return value && FILTER_IDS.has(value)
+    ? (value as BuildFilterId)
+    : ALL_FILTER_ID;
+}
+
+/** True when a build belongs to the given filter. "All" matches everything. */
+export function matchesFilter(build: Build, filter: BuildFilterId): boolean {
+  return (
+    filter === ALL_FILTER_ID || build.filterCategories.includes(filter)
+  );
+}
+
+/** Entries from `list` that match `filter`, preserving source order. */
+export function filterBuilds(
+  list: readonly Build[],
+  filter: BuildFilterId,
+): readonly Build[] {
+  return filter === ALL_FILTER_ID
+    ? list
+    : list.filter((build) => matchesFilter(build, filter));
+}
+
+/* ------------------------------------------------------------------ */
+/* Display state (D-08)                                                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Brand card-back state derived from the unresolved source status (D-08),
+ * used for the featured media placeholder accent and state chips. Same rule
+ * the hero archive documents: shipped public work is "live" (teal), strategic
+ * concepts are "concept" (violet), and everything still in flight
+ * (Product / Launch / Private builds) is "blueprint" (tech blue). Revisit when
+ * D-08 normalizes the taxonomy.
+ */
+export type BuildDisplayState = "live" | "blueprint" | "concept";
+
+export function buildDisplayState(build: Build): BuildDisplayState {
+  switch (build.sourceStatus) {
+    case "Live Build":
+      return "live";
+    case "Concept Build":
+      return "concept";
+    default:
+      return "blueprint";
+  }
+}
