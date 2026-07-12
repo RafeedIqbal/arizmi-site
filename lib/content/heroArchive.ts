@@ -25,6 +25,8 @@ interface CardBackArt {
   readonly alt: string;
   /** Short human label for the state, shown on the opened detail panel. */
   readonly stateLabel: string;
+  /** Archive code printed on the approved card-back art (`// ARZ-…`). */
+  readonly stateCode: string;
 }
 
 const CARD_BACKS: Record<CardBackState, CardBackArt> = {
@@ -32,16 +34,19 @@ const CARD_BACKS: Record<CardBackState, CardBackArt> = {
     src: "/assets/arizmi/card-back-live-teal.png",
     alt: "Arizmi Labs live-build archive card",
     stateLabel: "Live build",
+    stateCode: "ARZ-LIVE",
   },
   blueprint: {
     src: "/assets/arizmi/card-back-blueprint-tech-blue.png",
     alt: "Arizmi Labs BluePrint archive card",
     stateLabel: "BluePrint",
+    stateCode: "ARZ-BLUEPRINT",
   },
   concept: {
     src: "/assets/arizmi/card-back-concept-deep-violet.png",
     alt: "Arizmi Labs concept archive card",
     stateLabel: "Concept",
+    stateCode: "ARZ-CONCEPT",
   },
 };
 
@@ -82,6 +87,7 @@ export interface HeroCard {
   readonly cardBackSrc: string;
   readonly cardBackAlt: string;
   readonly stateLabel: string;
+  readonly stateCode: string;
 }
 
 export const HERO_CARDS: readonly HeroCard[] = HERO_BUILD_IDS.map((id) => {
@@ -97,5 +103,6 @@ export const HERO_CARDS: readonly HeroCard[] = HERO_BUILD_IDS.map((id) => {
     cardBackSrc: art.src,
     cardBackAlt: art.alt,
     stateLabel: art.stateLabel,
+    stateCode: art.stateCode,
   };
 });

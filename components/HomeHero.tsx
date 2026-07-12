@@ -11,6 +11,7 @@ import {
   type KeyboardEvent,
   type PointerEvent,
   type RefObject,
+  type TransitionEvent,
 } from "react";
 import PrevNextControls from "@/components/ui/PrevNextControls";
 import LiveRegion from "@/components/ui/LiveRegion";
@@ -31,54 +32,115 @@ const LAST = HERO_CARDS.length - 1;
 /*
  * Arc geometry. Cards sit on one large invisible wheel whose centre is far
  * off the right of the archive; a single active index drives every card's
- * position. Constants are tuned conservatively so the visible window stays
- * on-screen at any viewport (the arc is measured from the live container
- * size, not hard-coded pixels).
+ * position. Cards are oriented radially — long axis pointing at the wheel
+ * hub — so the active card lands landscape mid-arc and cards trend toward
+ * portrait at the top of the sweep, matching the hero layout reference.
+ * The arc is measured from the live container size, not hard-coded pixels.
  */
 const CARD_RATIO = 652 / 428; // production card-back aspect (height / width)
-const ARC_STEP_DEG = 10; // angular gap between adjacent cards
+const BASE_ROTATION_DEG = 90; // radial orientation: active card is landscape
+const ARC_STEP_DEG = 24; // angular gap between adjacent cards
 const ARC_STEP_RAD = (ARC_STEP_DEG * Math.PI) / 180;
-const RADIUS_FACTOR = 1.15; // wheel radius relative to archive height
+const RADIUS_FACTOR = 0.58; // wheel radius relative to archive height
+const ACTIVE_NUDGE_PX = 20; // active card peeks toward the main canvas
 const DRAG_STEP_PX = 96; // pointer travel that advances one card
 const WHEEL_STEP = 42; // wheel delta that advances one card
+const CLOSE_FALLBACK_MS = 700; // clears the closing phase if transitionend is lost
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
-type Size = { w: number; h: number };
+/**
+ * Measured layout frame. `w`/`h` are the archive box driving arc geometry;
+ * the section values place the opened card in the main canvas, and
+ * `visibleCy` is the vertical centre of the on-screen part of the section
+ * (in section coordinates) so the opened card stays fully visible even when
+ * the hero is partly scrolled away.
+ */
+type Frame = {
+  w: number;
+  h: number;
+  offsetX: number;
+  offsetY: number;
+  sectionW: number;
+  sectionH: number;
+  visibleCy: number;
+};
 
-function cardWidthFor(size: Size) {
-  return clamp(size.w * 0.44, 152, 288);
+function cardWidthFor(frame: Frame) {
+  return clamp(frame.w * 0.3, 168, 272);
 }
 
 /** Position/scale/opacity for a card `pos` steps from the active index. */
-function slotStyle(pos: number, size: Size, cardW: number): CSSProperties {
+function slotStyle(pos: number, frame: Frame, cardW: number): CSSProperties {
   const cardH = cardW * CARD_RATIO;
-  const radius = size.h * RADIUS_FACTOR;
-  const centerY = size.h / 2;
-  // Active card (pos 0) sits just inside the right edge; the wheel centre is
-  // `radius` further right, i.e. far off-screen.
-  const activeCenterX = size.w - cardW * 0.6;
-  const centerX = activeCenterX + radius;
+  const radius = frame.h * RADIUS_FACTOR;
+  const centerY = frame.h / 2;
+  // The active card (pos 0) sits landscape inside the right column; the
+  // wheel centre is `radius` further right, i.e. far off-screen.
+  const centerX = frame.w * 0.6 + radius;
   const angle = pos * ARC_STEP_RAD;
-  const cx = centerX - radius * Math.cos(angle);
-  const cy = centerY + radius * Math.sin(angle);
   const a = Math.abs(pos);
-  const scale = clamp(1.06 - a * 0.045, 0.8, 1.06);
-  const opacity = a <= 2.2 ? 1 : clamp(1 - (a - 2.2) / 1.4, 0, 1);
+  const cx = centerX - radius * Math.cos(angle) - ACTIVE_NUDGE_PX * clamp(1 - a, 0, 1);
+  const cy = centerY + radius * Math.sin(angle);
+  const scale = clamp(1.12 - a * 0.05, 0.84, 1.12);
+  const opacity = a <= 3 ? 1 : clamp(1 - (a - 3), 0, 1);
   return {
     width: `${cardW}px`,
     height: `${cardH}px`,
-    transform: `translate3d(${(cx - cardW / 2).toFixed(2)}px, ${(cy - cardH / 2).toFixed(2)}px, 0) rotate(${(pos * ARC_STEP_DEG).toFixed(2)}deg) scale(${scale.toFixed(3)})`,
+    transform: `translate3d(${(cx - cardW / 2).toFixed(2)}px, ${(cy - cardH / 2).toFixed(2)}px, 0) rotate(${(BASE_ROTATION_DEG + pos * ARC_STEP_DEG).toFixed(2)}deg) scale(${scale.toFixed(3)})`,
     opacity,
     zIndex: Math.round(1000 - a * 12),
     pointerEvents: opacity < 0.15 ? "none" : "auto",
   };
 }
 
+/**
+ * Target for the selected card: detached from the arc, upright in the main
+ * canvas (over the copy column on desktop, centred on mobile), at the
+ * largest size that keeps the full 428:652 card on screen.
+ */
+function openSlotStyle(frame: Frame): CSSProperties {
+  const maxW = Math.min(frame.sectionW * 0.86, 430);
+  const h = Math.min(frame.sectionH * 0.82, maxW * CARD_RATIO);
+  const w = h / CARD_RATIO;
+  const desktop = frame.offsetX > 40; // archive rendered as a right column
+  const cx = desktop ? Math.max(frame.sectionW * 0.26, w / 2 + 24) : frame.sectionW / 2;
+  const cy = clamp(frame.visibleCy, h / 2 + 12, frame.sectionH - h / 2 - 12);
+  return {
+    width: `${w.toFixed(2)}px`,
+    height: `${h.toFixed(2)}px`,
+    transform: `translate3d(${(cx - frame.offsetX - w / 2).toFixed(2)}px, ${(cy - frame.offsetY - h / 2).toFixed(2)}px, 0) rotate(0deg) scale(1)`,
+    opacity: 1,
+    zIndex: 1200,
+    pointerEvents: "auto",
+  };
+}
+
 const useIsomorphicLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
+function CtaArrow({ onDark = false }: { onDark?: boolean }) {
+  return (
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 12 12"
+      fill="none"
+      aria-hidden="true"
+      className={onDark ? "home-hero__cta-arrow is-on-dark" : "home-hero__cta-arrow"}
+    >
+      <path
+        d="M2.75 9.25l6.5-6.5M4.25 2.75h5v5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 function DetailCta({ build }: { build: Build }) {
   const { cta } = build;
@@ -108,25 +170,30 @@ function DetailCta({ build }: { build: Build }) {
   return <MetaLabel tone="muted">{cta.label}</MetaLabel>;
 }
 
-function CardDetail({
+/**
+ * The card front: same card-black design system as the production backs,
+ * framed in the state colour, revealed by the 3D flip once the selected
+ * card has glided into the canvas.
+ */
+function CardFront({
   card,
-  flat,
-  detailRef,
+  frontRef,
   onClose,
 }: {
   card: HeroCard;
-  flat: boolean;
-  detailRef: RefObject<HTMLDivElement | null>;
+  frontRef: RefObject<HTMLDivElement | null>;
   onClose: () => void;
 }) {
   const { build } = card;
   return (
     <div
-      ref={detailRef}
+      ref={frontRef}
       tabIndex={-1}
       role="group"
       aria-label={`${build.name} — project details`}
-      className={`home-hero__detail${flat ? " is-flat" : ""}`}
+      data-surface="card"
+      data-state={card.state}
+      className="arc__face arc__face--front"
       onKeyDown={(event) => {
         if (event.key === "Escape") {
           event.preventDefault();
@@ -134,15 +201,15 @@ function CardDetail({
         }
       }}
     >
-      <div className="home-hero__detail-head">
-        <MetaLabel tone="accent">
-          {card.stateLabel} · {build.sourceStatus}
+      <div className="arc__front-head">
+        <MetaLabel tone="inherit" className="arc__front-code">
+          {`// ${card.stateCode}`}
         </MetaLabel>
         <button
           type="button"
           onClick={onClose}
           aria-label="Close details"
-          className="home-hero__detail-close"
+          className="arc__front-close"
         >
           <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path
@@ -154,18 +221,23 @@ function CardDetail({
           </svg>
         </button>
       </div>
-      <p className="home-hero__detail-name">{build.name}</p>
-      <p className="home-hero__detail-summary">{build.summary}</p>
-      <div>
-        <MetaLabel>What Arizmi shaped</MetaLabel>
-        <p className="home-hero__detail-contrib">{build.contribution}</p>
+      <div className="arc__front-body">
+        <p className="arc__front-name">{build.name}</p>
+        <MetaLabel as="p" className="arc__front-status">
+          {card.stateLabel} · {build.sourceStatus}
+        </MetaLabel>
+        <p className="arc__front-summary">{build.summary}</p>
+        <div>
+          <MetaLabel>What Arizmi shaped</MetaLabel>
+          <p className="arc__front-contrib">{build.contribution}</p>
+        </div>
+        <ul className="arc__front-caps">
+          {build.capabilities.map((capability) => (
+            <li key={capability}>{capability}</li>
+          ))}
+        </ul>
       </div>
-      <ul className="home-hero__detail-caps">
-        {build.capabilities.map((capability) => (
-          <li key={capability}>{capability}</li>
-        ))}
-      </ul>
-      <div className="home-hero__detail-cta">
+      <div className="arc__front-cta">
         <DetailCta build={build} />
       </div>
     </div>
@@ -178,22 +250,26 @@ function CardDetail({
  * A single `active` index drives the arc; `dragFraction` adds fractional
  * offset while a pointer drag is in flight. Browsing works with wheel/trackpad
  * over the archive, pointer/touch drag, arrow keys, and the explicit
- * previous/next controls. Selecting a card opens a detail panel (the card
- * "front") and softens the archive behind it. Reduced motion keeps every
- * control but removes the arc travel and flip.
+ * previous/next controls. Selecting a card detaches it from the arc: the slot
+ * glides into the main canvas while the card flips from its back to a dark
+ * project front, and the rest of the archive softens behind it. Closing
+ * reverses the glide (one `closing` phase keeps the front mounted and the
+ * archive stacked above the copy until the card is home). Reduced motion
+ * keeps every control and state but removes the arc travel and flip.
  */
 export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) {
   const reducedMotion = useReducedMotion();
 
   const rootRef = useRef<HTMLElement>(null);
   const archiveRef = useRef<HTMLDivElement>(null);
-  const detailRef = useRef<HTMLDivElement>(null);
+  const frontRef = useRef<HTMLDivElement>(null);
 
   const [active, setActive] = useState(HERO_INITIAL_INDEX);
   const [dragFraction, setDragFraction] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [size, setSize] = useState<Size | null>(null);
+  const [closing, setClosing] = useState<number | null>(null);
+  const [frame, setFrame] = useState<Frame | null>(null);
 
   // Refs mirror state for the imperative wheel/pointer handlers.
   const activeRef = useRef(active);
@@ -208,6 +284,7 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
   } | null>(null);
   const pendingFractionRef = useRef(0);
   const rafRef = useRef<number | null>(null);
+  const closeTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     activeRef.current = active;
@@ -220,30 +297,79 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
     setActive((current) => clampIndex(current + delta, HERO_CARDS.length));
   }, []);
 
-  const openCard = useCallback((index: number) => {
-    setActive(index);
-    setOpenIndex(index);
+  const measure = useCallback(() => {
+    const archiveEl = archiveRef.current;
+    const sectionEl = rootRef.current;
+    if (!archiveEl || !sectionEl) return;
+    const rect = archiveEl.getBoundingClientRect();
+    const srect = sectionEl.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return;
+    const viewportH = window.innerHeight;
+    const visTop = Math.max(srect.top, 0);
+    const visBottom = Math.min(srect.bottom, viewportH);
+    const visibleCy =
+      (visBottom > visTop ? (visTop + visBottom) / 2 : srect.top + srect.height / 2) -
+      srect.top;
+    setFrame({
+      w: rect.width,
+      h: rect.height,
+      offsetX: rect.left - srect.left,
+      offsetY: rect.top - srect.top,
+      sectionW: srect.width,
+      sectionH: srect.height,
+      visibleCy,
+    });
   }, []);
+
+  const clearCloseTimer = useCallback(() => {
+    if (closeTimerRef.current !== null) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  }, []);
+
+  const openCard = useCallback(
+    (index: number) => {
+      // Refresh the frame so the canvas target reflects the current scroll
+      // position before the glide starts.
+      measure();
+      clearCloseTimer();
+      setClosing(null);
+      setActive(index);
+      setOpenIndex(index);
+    },
+    [measure, clearCloseTimer],
+  );
 
   const closeCard = useCallback(() => {
+    if (openIndex === null) return;
+    if (!reducedMotion) {
+      // Hold the front face and stacking through the return glide; the
+      // slot's transitionend (or the fallback timer) clears the phase.
+      setClosing(openIndex);
+      clearCloseTimer();
+      closeTimerRef.current = window.setTimeout(() => {
+        setClosing(null);
+        closeTimerRef.current = null;
+      }, CLOSE_FALLBACK_MS);
+    }
     setOpenIndex(null);
-  }, []);
+  }, [openIndex, reducedMotion, clearCloseTimer]);
 
-  // Measure the archive so arc geometry adapts to any viewport.
+  useEffect(() => clearCloseTimer, [clearCloseTimer]);
+
+  // Measure the archive and section so arc geometry and the opened-card
+  // target adapt to any viewport.
   useIsomorphicLayoutEffect(() => {
-    const el = archiveRef.current;
-    if (!el) return;
-    const measure = () => {
-      const rect = el.getBoundingClientRect();
-      if (rect.width > 0 && rect.height > 0) {
-        setSize({ w: rect.width, h: rect.height });
-      }
-    };
+    const archiveEl = archiveRef.current;
+    const sectionEl = rootRef.current;
+    if (!archiveEl || !sectionEl) return;
     measure();
     const observer = new ResizeObserver(measure);
-    observer.observe(el);
+    observer.observe(archiveEl);
+    observer.observe(sectionEl);
     return () => observer.disconnect();
-  }, []);
+  }, [measure]);
 
   // Track visibility so wheel input is only intercepted while the hero is
   // on-screen (also guarantees nothing runs when the hero is scrolled away).
@@ -260,14 +386,17 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
     return () => observer.disconnect();
   }, []);
 
-  // Move focus into the detail panel on open; restore it to the archive on
+  // Move focus into the card front on open; restore it to the archive on
   // close so a keyboard user never loses their place.
   const prevOpenRef = useRef<number | null>(null);
   useEffect(() => {
+    // preventScroll: the card may still be gliding from its arc position
+    // (partly off-screen right) when focus lands — never let focus yank the
+    // page; the glide itself brings the card fully into view.
     if (openIndex !== null) {
-      detailRef.current?.focus();
+      frontRef.current?.focus({ preventScroll: true });
     } else if (prevOpenRef.current !== null) {
-      archiveRef.current?.focus();
+      archiveRef.current?.focus({ preventScroll: true });
     }
     prevOpenRef.current = openIndex;
   }, [openIndex]);
@@ -379,7 +508,7 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (openRef.current) return; // panel handles its own keys
+    if (openRef.current) return; // the card front handles its own keys
     switch (event.key) {
       case "ArrowRight":
       case "ArrowDown":
@@ -411,10 +540,20 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
     }
   };
 
+  // Ends the closing phase once the returning slot's glide settles; the
+  // filter/opacity transitions on siblings are ignored by design.
+  const onSlotTransitionEnd = (event: TransitionEvent<HTMLDivElement>) => {
+    if (closing === null) return;
+    if (event.target !== event.currentTarget) return;
+    if (event.propertyName !== "transform") return;
+    if (Number(event.currentTarget.dataset.cardIndex) !== closing) return;
+    clearCloseTimer();
+    setClosing(null);
+  };
+
   const isOpen = openIndex !== null;
-  const cardWidth = size ? cardWidthFor(size) : 0;
+  const cardWidth = frame ? cardWidthFor(frame) : 0;
   const effectiveActive = active + dragFraction;
-  const openCardData = openIndex !== null ? HERO_CARDS[openIndex] : null;
   // Derived during render so the live region announces on every active change
   // without a state-syncing effect.
   const activeCard = HERO_CARDS[active];
@@ -425,6 +564,7 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
   const primaryCta = bookingUrl ? (
     <a href={bookingUrl} rel="noreferrer" className={buttonClassName("solid")}>
       {CTA_LABELS.bookBuildCall}
+      <CtaArrow onDark />
     </a>
   ) : (
     <span aria-disabled="true" className={disabledCtaClassName()}>
@@ -443,6 +583,7 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
       className="home-hero"
     >
       <div className="home-hero__rings" aria-hidden="true" />
+      <div className="home-hero__marks" aria-hidden="true" />
 
       <div className="home-hero__inner">
         <div className="home-hero__copy" inert={isOpen || undefined}>
@@ -455,6 +596,7 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
             {primaryCta}
             <ButtonLink href={ROUTES.blueprintAi} variant="outline">
               {CTA_LABELS.discoverBlueprint}
+              <CtaArrow />
             </ButtonLink>
           </div>
           <div className="home-hero__browse">
@@ -480,10 +622,10 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
           aria-roledescription="carousel"
           aria-label="Arizmi Labs product archive"
           aria-describedby="home-hero-archive-help"
-          tabIndex={0}
-          inert={isOpen || undefined}
+          tabIndex={isOpen ? -1 : 0}
           data-dragging={dragging || undefined}
-          data-dimmed={isOpen || undefined}
+          data-open={isOpen || undefined}
+          data-closing={closing !== null || undefined}
           data-flat={reducedMotion || undefined}
           onKeyDown={onKeyDown}
           onPointerDown={onPointerDown}
@@ -492,31 +634,52 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
           onPointerCancel={endPointer}
         >
           <div className="home-hero__stage">
-            {size
-              ? HERO_CARDS.map((card, index) => (
-                  <div
-                    key={card.build.id}
-                    className="arc__slot"
-                    data-card-index={index}
-                    data-active={index === active || undefined}
-                    style={slotStyle(index - effectiveActive, size, cardWidth)}
-                    aria-hidden="true"
-                  >
-                    <div className="arc__card">
-                      <Image
-                        src={card.cardBackSrc}
-                        alt=""
-                        width={428}
-                        height={652}
-                        draggable={false}
-                        priority={index === HERO_INITIAL_INDEX}
-                        sizes="(max-width: 900px) 45vw, 300px"
-                        style={{ width: "100%", height: "auto", display: "block" }}
-                        className="arc__img"
-                      />
+            {frame
+              ? HERO_CARDS.map((card, index) => {
+                  const open = openIndex === index;
+                  const leaving = closing === index;
+                  return (
+                    <div
+                      key={card.build.id}
+                      className="arc__slot"
+                      data-card-index={index}
+                      data-active={index === active || undefined}
+                      data-open={open || undefined}
+                      data-closing={leaving || undefined}
+                      inert={isOpen && !open ? true : undefined}
+                      aria-hidden={open ? undefined : true}
+                      style={
+                        open
+                          ? openSlotStyle(frame)
+                          : slotStyle(index - effectiveActive, frame, cardWidth)
+                      }
+                      onTransitionEnd={onSlotTransitionEnd}
+                    >
+                      <div className="arc__card">
+                        <div className="arc__face arc__face--back">
+                          <Image
+                            src={card.cardBackSrc}
+                            alt=""
+                            width={428}
+                            height={652}
+                            draggable={false}
+                            priority={Math.abs(index - HERO_INITIAL_INDEX) <= 1}
+                            // Every card back is above the fold in the hero.
+                            loading={
+                              Math.abs(index - HERO_INITIAL_INDEX) <= 1 ? undefined : "eager"
+                            }
+                            sizes="(max-width: 900px) 50vw, 320px"
+                            style={{ width: "100%", height: "100%", display: "block" }}
+                            className="arc__img"
+                          />
+                        </div>
+                        {open || leaving ? (
+                          <CardFront card={card} frontRef={frontRef} onClose={closeCard} />
+                        ) : null}
+                      </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               : null}
           </div>
         </div>
@@ -527,15 +690,6 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
         to open a card, and Escape to close it.
       </p>
       <LiveRegion>{liveMessage}</LiveRegion>
-
-      {openCardData ? (
-        <CardDetail
-          card={openCardData}
-          flat={reducedMotion}
-          detailRef={detailRef}
-          onClose={closeCard}
-        />
-      ) : null}
     </section>
   );
 }

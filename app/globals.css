@@ -430,6 +430,43 @@ body {
   mask-image: radial-gradient(circle at center, #000 55%, transparent 72%);
 }
 
+/*
+ * Faint drafting marks echoing the layout reference: two crosshairs, a solid
+ * teal dot and a pair of hairline dots. Static, decorative only.
+ */
+.home-hero__marks {
+  --mark: color-mix(in srgb, var(--ink) 16%, transparent);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(var(--mark), var(--mark)),
+    linear-gradient(var(--mark), var(--mark)),
+    linear-gradient(var(--mark), var(--mark)),
+    linear-gradient(var(--mark), var(--mark)),
+    radial-gradient(circle, var(--teal-mid) 0 3px, transparent 3.5px),
+    radial-gradient(circle, var(--mark) 0 1.5px, transparent 2px),
+    radial-gradient(circle, var(--mark) 0 1.5px, transparent 2px);
+  background-repeat: no-repeat;
+  background-size:
+    18px 1px,
+    1px 18px,
+    18px 1px,
+    1px 18px,
+    8px 8px,
+    4px 4px,
+    4px 4px;
+  background-position:
+    left 45% top 11%,
+    left 45% top 11%,
+    left 43% bottom 9%,
+    left 43% bottom 9%,
+    left 47% top 58%,
+    left 38% top 26%,
+    left 50% top 80%;
+}
+
 .home-hero__inner {
   position: relative;
   z-index: 1;
@@ -474,6 +511,16 @@ body {
   margin-top: clamp(1.75rem, 4vh, 2.5rem);
 }
 
+/* Teal ↗ accents inside the hero CTA pills (layout reference). */
+.home-hero__cta-arrow {
+  flex-shrink: 0;
+  color: var(--teal-ink);
+}
+
+.home-hero__cta-arrow.is-on-dark {
+  color: var(--teal-light);
+}
+
 .home-hero__browse {
   display: flex;
   align-items: center;
@@ -491,6 +538,8 @@ body {
 /* Archive — mobile default: a bounded region below the copy. */
 .home-hero__archive {
   position: relative;
+  /* Contain slot z-indexes below the copy while browsing… */
+  z-index: 1;
   width: 100%;
   height: 46vh;
   min-height: 320px;
@@ -499,19 +548,15 @@ body {
   outline-offset: -4px;
 }
 
+/* …and above it while a selected card is out in the canvas (or returning). */
+.home-hero__archive[data-open],
+.home-hero__archive[data-closing] {
+  z-index: 6;
+}
+
 .home-hero__stage {
   position: absolute;
   inset: 0;
-  transition: filter 0.3s ease, opacity 0.3s ease;
-}
-
-.home-hero__archive[data-dimmed] .home-hero__stage {
-  filter: blur(3px) saturate(0.72) brightness(0.94);
-  opacity: 0.5;
-}
-
-.home-hero__archive[data-flat] .home-hero__stage {
-  transition: none;
 }
 
 .arc__slot {
@@ -520,8 +565,28 @@ body {
   left: 0;
   transform-origin: center center;
   will-change: transform, opacity;
+  perspective: 1400px;
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.4s ease, filter 0.35s ease;
+}
+
+/*
+ * The selected slot glides between its arc position and the canvas target;
+ * width/height join the transition because the opened card is larger than
+ * its arc footprint (the slot is absolutely positioned, so nothing reflows).
+ */
+.arc__slot[data-open],
+.arc__slot[data-closing] {
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.55s cubic-bezier(0.22, 1, 0.36, 1),
     opacity 0.4s ease;
+}
+
+/* Siblings soften while a card is open; the fade lives inside the filter
+   list so it never fights the slot's inline opacity. */
+.home-hero__archive[data-open] .arc__slot:not([data-open]) {
+  filter: blur(3px) saturate(0.72) brightness(0.94) opacity(0.55);
 }
 
 .home-hero__archive[data-dragging] .arc__slot,
@@ -529,13 +594,15 @@ body {
   transition: none;
 }
 
+/* The card is a two-face 3D flipper: production back art / project front. */
 .arc__card {
   position: relative;
-  display: block;
   width: 100%;
+  height: 100%;
   border-radius: 14px;
   box-shadow: var(--shadow-lifted);
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.3s ease;
 }
 
@@ -543,27 +610,78 @@ body {
   box-shadow: 0 24px 70px rgba(16, 19, 19, 0.36);
 }
 
-.arc__card:hover {
+/* Flip lands as the glide finishes; closing flips back with no delay so the
+   card returns to the arc already showing its back. */
+.arc__slot[data-open] .arc__card {
+  transform: rotateY(180deg);
+  transition-delay: 0.18s;
+  box-shadow: 0 32px 90px rgba(16, 19, 19, 0.38);
+}
+
+/* Hover lift + subtle foil glint on the border — browsing only, never on a
+   card that is opening or returning. */
+.home-hero__archive:not([data-open]) .arc__slot:not([data-closing]) .arc__card:hover {
   transform: translate(-6px, -5px) scale(1.03);
   box-shadow: 0 22px 64px rgba(16, 19, 19, 0.34);
+}
+
+.arc__card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  padding: 1.5px;
+  background: linear-gradient(
+    120deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.6) 50%,
+    transparent 70%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.home-hero__archive:not([data-open]) .arc__slot:not([data-closing]) .arc__card:hover::after {
+  opacity: 1;
 }
 
 .home-hero__archive[data-flat] .arc__card {
   transition: none;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .arc__slot,
-  .arc__card,
-  .home-hero__stage {
-    transition: none;
-  }
+.arc__face {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.arc__face--back {
+  transform: rotateY(0deg);
 }
 
 .arc__img {
   border-radius: 14px;
   -webkit-user-drag: none;
   user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arc__slot,
+  .arc__slot[data-open],
+  .arc__slot[data-closing],
+  .arc__card,
+  .arc__slot[data-open] .arc__card,
+  .home-hero__stage {
+    transition: none;
+  }
 }
 
 /* Desktop: reading area on the left, archive filling the right. */
@@ -594,66 +712,85 @@ body {
   }
 }
 
-/* Opened-card detail panel — the card "front", revealed in the canvas. */
-.home-hero__detail {
-  position: absolute;
-  z-index: 5;
-  top: clamp(5.5rem, 14vh, 8rem);
-  left: var(--section-px);
-  right: var(--section-px);
-  max-width: 32rem;
-  max-height: calc(100vh - clamp(7rem, 18vh, 10rem));
-  overflow-y: auto;
+/*
+ * Opened-card front — the same card-black design system as the production
+ * backs, framed and cornered in the build-state colour. Lives on the far
+ * face of the flipper; content scrolls internally so the close control and
+ * CTA stay reachable at any viewport height.
+ */
+.arc__face--front {
+  --card-accent: var(--teal-light);
+  /* Body-text-safe version of the accent on card black. */
+  --card-accent-ink: color-mix(in srgb, var(--card-accent) 62%, #f7f5ef);
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding: clamp(1.5rem, 3vw, 2rem);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-soft);
-  background: color-mix(in srgb, var(--canvas) 92%, #ffffff);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-  box-shadow: var(--shadow-lifted);
-  transform-origin: left center;
-  animation: hero-detail-in 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  gap: 0.875rem;
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+  transform: rotateY(180deg);
+  background:
+    radial-gradient(
+      120% 90% at 50% 0%,
+      color-mix(in srgb, var(--card-accent) 9%, transparent) 0%,
+      transparent 55%
+    ),
+    var(--surface-card);
+  border: 1px solid color-mix(in srgb, var(--card-accent) 55%, transparent);
+  color: var(--ui-ink);
 }
 
-@media (min-width: 900px) {
-  .home-hero__detail {
-    left: var(--section-px);
-    right: auto;
-  }
+.arc__face--front[data-state="blueprint"] {
+  --card-accent: var(--blueprint);
 }
 
-.home-hero__detail.is-flat {
-  animation: none;
+.arc__face--front[data-state="concept"] {
+  --card-accent: var(--concept);
 }
 
-@keyframes hero-detail-in {
-  from {
-    opacity: 0;
-    transform: perspective(1400px) rotateY(-32deg) translateX(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+/* Inner hairline frame with corner brackets, echoing the back art. */
+.arc__face--front::before {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--card-accent) 30%, transparent);
+  background-image:
+    linear-gradient(var(--card-accent), var(--card-accent)),
+    linear-gradient(var(--card-accent), var(--card-accent)),
+    linear-gradient(var(--card-accent), var(--card-accent)),
+    linear-gradient(var(--card-accent), var(--card-accent)),
+    linear-gradient(var(--card-accent), var(--card-accent)),
+    linear-gradient(var(--card-accent), var(--card-accent)),
+    linear-gradient(var(--card-accent), var(--card-accent)),
+    linear-gradient(var(--card-accent), var(--card-accent));
+  background-repeat: no-repeat;
+  background-size:
+    10px 1.5px, 1.5px 10px,
+    10px 1.5px, 1.5px 10px,
+    10px 1.5px, 1.5px 10px,
+    10px 1.5px, 1.5px 10px;
+  background-position:
+    top left, top left,
+    top right, top right,
+    bottom left, bottom left,
+    bottom right, bottom right;
+  pointer-events: none;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .home-hero__detail {
-    animation: none;
-  }
-}
-
-.home-hero__detail-head {
+.arc__front-head {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  flex-shrink: 0;
 }
 
-.home-hero__detail-close {
+.arc__front-code {
+  color: var(--card-accent-ink);
+}
+
+.arc__front-close {
+  position: relative;
+  z-index: 1;
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
@@ -661,35 +798,53 @@ body {
   width: 2.25rem;
   height: 2.25rem;
   border-radius: var(--radius-pill);
-  border: 1px solid var(--border-strong);
-  color: var(--ink);
+  border: 1px solid var(--ui-border-strong);
+  color: var(--ui-ink);
   transition: border-color 0.2s ease, color 0.2s ease;
 }
 
-.home-hero__detail-close:hover {
-  border-color: var(--teal-ink);
-  color: var(--teal-ink);
+.arc__front-close:hover {
+  border-color: var(--card-accent-ink);
+  color: var(--card-accent-ink);
 }
 
-.home-hero__detail-name {
+.arc__front-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  /* Keep scrolling inside the card; never hand the gesture to the arc. */
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+}
+
+.arc__front-name {
   margin: 0;
-  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-size: clamp(1.375rem, 2.6vw, 1.75rem);
   font-weight: 700;
   letter-spacing: -0.01em;
 }
 
-.home-hero__detail-summary {
+.arc__front-status {
+  margin: -0.5rem 0 0;
+}
+
+.arc__front-summary {
   margin: 0;
-  color: var(--ink-muted);
+  color: var(--ui-ink-muted);
+  font-size: 0.9375rem;
   line-height: 1.55;
 }
 
-.home-hero__detail-contrib {
+.arc__front-contrib {
   margin: 0.375rem 0 0;
+  font-size: 0.9375rem;
   line-height: 1.5;
 }
 
-.home-hero__detail-caps {
+.arc__front-caps {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
@@ -698,19 +853,21 @@ body {
   list-style: none;
 }
 
-.home-hero__detail-caps li {
+.arc__front-caps li {
   border-radius: var(--radius-pill);
-  border: 1px solid var(--border-soft);
+  border: 1px solid var(--ui-border);
   padding: 0.25rem 0.75rem;
   font-family: var(--font-space-mono), ui-monospace, monospace;
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--ink-muted);
+  color: var(--ui-ink-muted);
 }
 
-.home-hero__detail-cta {
-  margin-top: 0.25rem;
+.arc__front-cta {
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
 }
 
 /*
