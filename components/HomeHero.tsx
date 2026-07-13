@@ -305,7 +305,8 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
     y: number;
     startActive: number;
     downIndex: number | null;
-    intent: "pending" | "horizontal" | "vertical";
+    pointerType: string;
+    intent: "pending" | "horizontal" | "vertical" | "page";
   } | null>(null);
   const pendingFractionRef = useRef(0);
   const rafRef = useRef<number | null>(null);
@@ -583,6 +584,7 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
       y: event.clientY,
       startActive: activeRef.current,
       downIndex: Number.isInteger(downIndex) ? downIndex : null,
+      pointerType: event.pointerType,
       intent: "pending",
     };
     // Capture immediately so a fast mouse/pen movement outside the archive
@@ -603,14 +605,23 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
     const dy = event.clientY - info.y;
     if (info.intent === "pending" && isDragGesture(dx, dy)) {
       if (Math.abs(dy) > Math.abs(dx)) {
+        // A vertical touch gesture belongs to the page. Mouse and pen input,
+        // however, should be able to grab the fan along its natural vertical
+        // tangent and rotate it directly.
+        if (info.pointerType === "touch") {
+          info.intent = "page";
+          return;
+        }
         info.intent = "vertical";
-        return;
+      } else {
+        info.intent = "horizontal";
       }
-      info.intent = "horizontal";
       updatePhase("dragging");
     }
-    if (info.intent !== "horizontal") return;
-    const rawFraction = -dx / DRAG_STEP_PX;
+    if (info.intent !== "horizontal" && info.intent !== "vertical") return;
+    event.preventDefault();
+    const travel = info.intent === "vertical" ? dy : dx;
+    const rawFraction = -travel / DRAG_STEP_PX;
     const targetIndex = clamp(
       info.startActive + rawFraction,
       0,
@@ -639,7 +650,7 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
     pendingFractionRef.current = 0;
     setDragFraction(0);
     updatePhase("browsing");
-    if (info.intent === "horizontal") {
+    if (info.intent === "horizontal" || info.intent === "vertical") {
       // Snap to the nearest card. A drag never counts as a selection.
       const next = clampIndex(
         Math.round(info.startActive + fraction),
@@ -675,7 +686,7 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
     );
     pendingFractionRef.current = 0;
     setDragFraction(0);
-    if (info.intent === "horizontal") {
+    if (info.intent === "horizontal" || info.intent === "vertical") {
       activeRef.current = next;
       setActive(next);
     }
@@ -878,9 +889,9 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
       </div>
 
       <p id="home-hero-archive-help" className="sr-only">
-        Use the arrow keys, Page Up and Page Down, Home and End to browse the
-        product archive. Press Enter or Space to open a card, and Escape to
-        close it.
+        Drag the archive or use the arrow keys, Page Up and Page Down, Home and
+        End to browse. Press Enter or Space to open a card, and Escape to close
+        it.
       </p>
       <LiveRegion>{liveMessage}</LiveRegion>
     </section>

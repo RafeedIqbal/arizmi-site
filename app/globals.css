@@ -176,11 +176,16 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 3.5rem;
+  height: 3.5rem;
   color: var(--ink);
   background: transparent;
   transition: color 0.2s ease, filter 0.2s ease;
+}
+
+.site-chrome-logo {
+  width: 4.25rem;
+  height: 4.25rem;
 }
 
 .site-chrome-control[data-tone="light"]:hover {
@@ -521,6 +526,7 @@ body {
   min-height: 20rem;
   margin-top: -0.75rem;
   touch-action: pan-y;
+  user-select: none;
   outline-offset: -4px;
   cursor: grab;
 }

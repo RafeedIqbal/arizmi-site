@@ -147,7 +147,7 @@ export default function SiteMenu({
             ref={logoRef}
             href={ROUTES.home}
             aria-current={pathname === ROUTES.home ? "page" : undefined}
-            className="site-chrome-control"
+            className="site-chrome-control site-chrome-logo"
             data-tone={chromeTones.logo}
           >
             <Image
@@ -157,8 +157,8 @@ export default function SiteMenu({
                   : "/assets/arizmi/logos/logomark-gradient.svg"
               }
               alt="Arizmi Labs — home"
-              width={38}
-              height={38}
+              width={60}
+              height={60}
               priority
             />
           </Link>
@@ -178,16 +178,16 @@ export default function SiteMenu({
             data-tone={chromeTones.menu}
           >
             <svg
-              width="18"
-              height="12"
-              viewBox="0 0 18 12"
+              width="26"
+              height="18"
+              viewBox="0 0 26 18"
               fill="none"
               aria-hidden="true"
             >
               <path
-                d="M1 1h16M1 6h16M1 11h16"
+                d="M1 1h24M1 9h24M1 17h24"
                 stroke="currentColor"
-                strokeWidth="1.25"
+                strokeWidth="1.5"
                 strokeLinecap="round"
               />
             </svg>
