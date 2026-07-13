@@ -38,7 +38,7 @@ export default function TeamGallery() {
       <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {TEAM.map((member) => (
           <li key={member.id}>
-            <article className="flex h-full flex-col gap-4 rounded-[var(--radius-lg)] border border-border-soft bg-white/40 p-6 transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[var(--shadow-soft)] motion-reduce:transform-none motion-reduce:transition-none">
+            <article className="flex h-full flex-col gap-4 rounded-[var(--radius-lg)] border border-border-soft bg-[var(--surface-raised)] p-6 transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[var(--shadow-soft)] motion-reduce:transform-none motion-reduce:transition-none">
               <span
                 aria-hidden="true"
                 className="flex h-14 w-14 items-center justify-center rounded-[var(--radius-md)] text-lg font-semibold text-white"

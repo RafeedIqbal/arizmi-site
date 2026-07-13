@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useId } from "react";
 import type { ComponentPropsWithoutRef } from "react";
 
 /*
@@ -8,7 +9,7 @@ import type { ComponentPropsWithoutRef } from "react";
  * any container marked data-surface="card".
  */
 const BASE_CLASSES =
-  "inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-colors";
+  "inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:border-[var(--ui-border)] disabled:bg-transparent disabled:text-[var(--ui-ink-muted)] disabled:opacity-70 disabled:hover:bg-transparent disabled:hover:text-[var(--ui-ink-muted)]";
 
 const VARIANT_CLASSES = {
   solid:
@@ -32,18 +33,44 @@ export function buttonClassName(
 }
 
 /**
- * Classes for a visibly disabled CTA placeholder (unresolved destinations
- * like D-01 booking). Render as a `span` with `aria-disabled="true"` and a
- * reason, never a dead link.
+ * Focusable, non-operative CTA for destinations that are intentionally
+ * unavailable until a business decision is configured. `aria-disabled`
+ * preserves discoverability for keyboard and screen-reader users, while the
+ * responsive layout keeps the reason readable at the 320px baseline.
  */
-export function disabledCtaClassName(className?: string): string {
-  return [
-    BASE_CLASSES,
-    "cursor-not-allowed border border-[var(--ui-border)] text-[var(--ui-ink-muted)]",
-    className,
-  ]
-    .filter(Boolean)
-    .join(" ");
+export function UnavailableCta({
+  label,
+  reason,
+  className,
+}: {
+  label: string;
+  reason: string;
+  className?: string;
+}) {
+  const reasonId = useId();
+
+  return (
+    <button
+      type="button"
+      aria-disabled="true"
+      aria-describedby={reasonId}
+      className={[
+        BASE_CLASSES,
+        "max-w-full cursor-not-allowed flex-wrap border border-[var(--ui-border)] text-[var(--ui-ink-muted)] sm:flex-nowrap",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      <span>{label}</span>
+      <span
+        id={reasonId}
+        className="basis-full font-meta text-[0.65rem] uppercase tracking-wider sm:basis-auto sm:text-xs"
+      >
+        {reason}
+      </span>
+    </button>
+  );
 }
 
 export function Button({

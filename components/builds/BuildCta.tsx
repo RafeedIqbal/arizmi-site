@@ -1,7 +1,7 @@
 import {
   ButtonLink,
+  UnavailableCta,
   buttonClassName,
-  disabledCtaClassName,
 } from "@/components/ui/Button";
 import MetaLabel from "@/components/ui/MetaLabel";
 import type { Build } from "@/lib/content/builds";
@@ -30,14 +30,7 @@ export default function BuildCta({ cta }: { cta: Build["cta"] }) {
       <a href={cta.url} className={buttonClassName("solid")}>
         {cta.label}
       </a>
-    ) : (
-      <span aria-disabled="true" className={disabledCtaClassName()}>
-        {cta.label}
-        <span className="font-meta text-xs uppercase tracking-wider">
-          Link coming soon
-        </span>
-      </span>
-    );
+    ) : <UnavailableCta label={cta.label} reason="Link coming soon" />;
   }
 
   // Protected: non-navigational status text only.

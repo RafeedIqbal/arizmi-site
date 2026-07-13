@@ -66,7 +66,7 @@ export function ChoiceGroup({
   onOtherChange?: (value: string) => void;
 }) {
   return (
-    <fieldset aria-describedby={error ? errorId(name) : undefined}>
+    <fieldset id={fieldId(name)} aria-describedby={error ? errorId(name) : undefined}>
       <legend className="text-lg font-semibold text-ink">
         {legend}
         <RequiredMark required />
@@ -281,7 +281,7 @@ export function ErrorSummary({
   return (
     <div
       role="alert"
-      className="mb-6 rounded-lg border border-error/40 bg-[color-mix(in_srgb,var(--error)_8%,transparent)] p-4"
+      className="mb-6 rounded-[var(--radius-lg)] border border-error/40 bg-[color-mix(in_srgb,var(--error)_8%,transparent)] p-4"
     >
       <h2 ref={headingRef} tabIndex={-1} className="text-sm font-semibold text-error outline-none">
         Please fix {errors.length} {errors.length === 1 ? "issue" : "issues"} before continuing
@@ -302,24 +302,25 @@ export function ErrorSummary({
 /* ---------------------------- Progress indicator -------------------------- */
 
 export function ProgressIndicator({
-  phaseNames,
-  currentIndex,
+  phaseIndex,
+  phaseCount,
   currentName,
-  totalScreens,
-  screenIndex,
+  intakePosition,
 }: {
-  phaseNames: readonly string[];
-  currentIndex: number;
+  /** Zero-based index within the five post-intro phases. */
+  phaseIndex: number;
+  phaseCount: number;
   currentName: string;
-  totalScreens: number;
-  screenIndex: number;
+  /** Intake pagination is intentionally separate from overall phase progress. */
+  intakePosition?: { readonly current: number; readonly total: number };
 }) {
-  const pct = Math.round((screenIndex / (totalScreens - 1)) * 100);
+  const step = Math.min(Math.max(phaseIndex + 1, 1), phaseCount);
+  const pct = Math.round((step / phaseCount) * 100);
   return (
     <div className="mb-8">
       <div className="flex items-center justify-between gap-3">
         <p className="font-meta text-xs uppercase tracking-wider text-teal-ink">
-          Step {currentIndex + 1} of {phaseNames.length} — {currentName}
+          Step {step} of {phaseCount} — {currentName}
         </p>
         <span className="font-meta text-xs text-ink-muted" aria-hidden="true">
           {pct}%
@@ -334,10 +335,15 @@ export function ProgressIndicator({
         aria-label={`Progress: ${currentName}`}
       >
         <div
-          className="h-full rounded-full transition-[width] duration-500"
+          className="h-full rounded-full transition-[width] duration-500 motion-reduce:transition-none"
           style={{ width: `${pct}%`, backgroundImage: "var(--gradient-teal)" }}
         />
       </div>
+      {intakePosition ? (
+        <p className="mt-2 font-meta text-xs text-ink-muted">
+          Question set {intakePosition.current} of {intakePosition.total}
+        </p>
+      ) : null}
     </div>
   );
 }

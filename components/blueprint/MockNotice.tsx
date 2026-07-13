@@ -8,7 +8,7 @@ export default function MockNotice() {
   return (
     <div
       role="note"
-      className="mb-5 rounded-lg border border-warning/50 bg-[color-mix(in_srgb,var(--warning)_8%,transparent)] p-4"
+      className="mb-5 rounded-[var(--radius-lg)] border border-warning/50 bg-[color-mix(in_srgb,var(--warning)_8%,transparent)] p-4"
     >
       <p className="font-meta text-xs uppercase tracking-wider text-warning">Development preview</p>
       <p className="mt-1 text-sm text-ink">

@@ -113,7 +113,7 @@ export default function LeadStep({
         </div>
       </div>
 
-      <div className="mt-6 flex items-start gap-3 rounded-lg border border-border-soft p-4">
+      <div className="mt-6 flex items-start gap-3 rounded-[var(--radius-lg)] border border-border-soft bg-[var(--surface-subtle)] p-4">
         <input
           id="bp-consent"
           type="checkbox"
@@ -148,7 +148,13 @@ export default function LeadStep({
       ) : null}
 
       <div className="mt-6">
-        <Button type="submit" variant="solid" disabled={submitting} aria-busy={submitting}>
+        <Button
+          type="submit"
+          variant="solid"
+          disabled={submitting}
+          aria-busy={submitting}
+          className="disabled:cursor-wait disabled:opacity-60"
+        >
           {submitting ? "Revealing…" : LEAD_GATE.submit}
         </Button>
       </div>

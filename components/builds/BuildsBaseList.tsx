@@ -17,7 +17,7 @@ export default function BuildsBaseList() {
       <ul className="mt-6 grid gap-6 lg:grid-cols-2">
         {BUILDS.map((build) => (
           <li key={build.id}>
-            <article className="flex h-full flex-col gap-4 rounded-[var(--radius-lg)] border border-border-soft bg-white/40 p-6">
+            <article className="flex h-full flex-col gap-4 rounded-[var(--radius-lg)] border border-border-soft bg-[var(--surface-raised)] p-6">
               <h3 className="text-xl font-semibold">{build.name}</h3>
               <BuildDetail build={build} />
             </article>

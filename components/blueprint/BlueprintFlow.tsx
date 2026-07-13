@@ -21,6 +21,8 @@ import {
 } from "@/lib/blueprint/validate";
 import { Button } from "@/components/ui/Button";
 import LiveRegion from "@/components/ui/LiveRegion";
+import PageHeader from "@/components/ui/PageHeader";
+import Section from "@/components/ui/Section";
 import {
   diagnoseAction,
   emailBlueprintAction,
@@ -39,6 +41,7 @@ import LeadStep from "./LeadStep";
 import RevealStep from "./RevealStep";
 
 const STORAGE_KEY = "arizmi.blueprint.draft.v1";
+const IDEMPOTENCY_STORAGE_KEY = "arizmi.blueprint.idempotency.v1";
 
 /**
  * Ordered field list for the error summary. Only the user's own answers are
@@ -61,6 +64,8 @@ const STEP_TITLES: Record<string, string> = {
   reveal: "Your BluePrint",
 };
 
+const INTAKE_SCREEN_COUNT = SCREENS.filter((candidate) => candidate.phase === "intake").length;
+
 export default function BlueprintFlow({
   privacyHref,
   bookingHref,
@@ -81,15 +86,18 @@ export default function BlueprintFlow({
   const headingRef = useRef<HTMLHeadingElement>(null);
   const errorRef = useRef<HTMLHeadingElement>(null);
   const skipPersist = useRef(true);
+  const skipIdempotencyPersist = useRef(true);
+  const completed = useRef(false);
+  const leadRequestInFlight = useRef(false);
   const mounted = useRef(false);
 
   const screen = SCREENS[state.screenIndex];
 
   /* ----------------------- session persistence (draft) ---------------------- */
   // Decision (TASK-011): refresh persistence is enabled but privacy-conscious.
-  // Only the user's own idea answers are stored in sessionStorage (cleared on
-  // tab close). PII (lead fields), consent, and all generated AI output are
-  // never persisted and are cleared on successful submission.
+  // Only the user's own idea answers and the opaque retry key are stored in
+  // sessionStorage (cleared on tab close). PII (lead fields), consent, and all
+  // generated AI output are never persisted and are cleared on success.
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem(STORAGE_KEY);
@@ -102,6 +110,13 @@ export default function BlueprintFlow({
     } catch {
       /* ignore malformed drafts */
     }
+
+    try {
+      const idempotencyKey = sessionStorage.getItem(IDEMPOTENCY_STORAGE_KEY);
+      if (idempotencyKey) dispatch({ type: "setIdempotencyKey", key: idempotencyKey });
+    } catch {
+      /* ignore unavailable storage */
+    }
   }, []);
 
   useEffect(() => {
@@ -111,6 +126,7 @@ export default function BlueprintFlow({
       skipPersist.current = false;
       return;
     }
+    if (completed.current) return;
     try {
       sessionStorage.setItem(
         STORAGE_KEY,
@@ -126,9 +142,35 @@ export default function BlueprintFlow({
     }
   }, [state.qualifying, state.intake, state.addedDetail, state.screenIndex]);
 
+  useEffect(() => {
+    // Let the mount hydration effect read a stored key before deciding whether
+    // the initial null state should remove it.
+    if (skipIdempotencyPersist.current) {
+      skipIdempotencyPersist.current = false;
+      return;
+    }
+    try {
+      if (state.idempotencyKey) {
+        sessionStorage.setItem(IDEMPOTENCY_STORAGE_KEY, state.idempotencyKey);
+      } else {
+        sessionStorage.removeItem(IDEMPOTENCY_STORAGE_KEY);
+      }
+    } catch {
+      /* storage is an enhancement; in-memory retry still works */
+    }
+  }, [state.idempotencyKey]);
+
   const clearDraft = useCallback(() => {
     try {
       sessionStorage.removeItem(STORAGE_KEY);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const clearStoredIdempotencyKey = useCallback(() => {
+    try {
+      sessionStorage.removeItem(IDEMPOTENCY_STORAGE_KEY);
     } catch {
       /* ignore */
     }
@@ -171,6 +213,8 @@ export default function BlueprintFlow({
   }, [state.screenIndex, state.diagnosisStatus, runDiagnosis]);
 
   const submitLead = useCallback(async () => {
+    if (leadRequestInFlight.current) return;
+
     const s = stateRef.current;
     const lead = validateLead(s.lead);
     const q = validateQualifying(s.qualifying);
@@ -181,37 +225,52 @@ export default function BlueprintFlow({
       return;
     }
 
+    leadRequestInFlight.current = true;
+
     let key = s.idempotencyKey;
     if (!key) {
       key = crypto.randomUUID();
       dispatch({ type: "setIdempotencyKey", key });
+      try {
+        // Write immediately so a refresh during an in-flight request reuses
+        // the same key even before React commits the state update.
+        sessionStorage.setItem(IDEMPOTENCY_STORAGE_KEY, key);
+      } catch {
+        /* in-memory duplicate protection remains available */
+      }
     }
 
     dispatch({ type: "leadSubmitting" });
-    const resp = await submitLeadAction({
-      qualifying: s.qualifying,
-      intake: s.intake,
-      addedDetail: s.addedDetail.trim() || undefined,
-      lead: s.lead,
-      marketingConsent: s.marketingConsent,
-      idempotencyKey: key,
-    });
-    if (resp.ok) {
-      clearDraft();
-      dispatch({
-        type: "leadSuccess",
-        reveal: {
-          leadId: resp.leadId,
-          preview: resp.preview,
-          conversionCategory: resp.conversionCategory,
-          mode: resp.mode,
-          internalNotified: resp.internalNotified,
-        },
+    try {
+      const resp = await submitLeadAction({
+        qualifying: s.qualifying,
+        intake: s.intake,
+        addedDetail: s.addedDetail.trim() || undefined,
+        lead: s.lead,
+        marketingConsent: s.marketingConsent,
+        idempotencyKey: key,
       });
-    } else {
-      dispatch({ type: "leadError", message: resp.message, fieldErrors: resp.fieldErrors });
+      if (resp.ok) {
+        completed.current = true;
+        clearDraft();
+        clearStoredIdempotencyKey();
+        dispatch({
+          type: "leadSuccess",
+          reveal: {
+            leadId: resp.leadId,
+            preview: resp.preview,
+            conversionCategory: resp.conversionCategory,
+            mode: resp.mode,
+            internalNotified: resp.internalNotified,
+          },
+        });
+      } else {
+        dispatch({ type: "leadError", message: resp.message, fieldErrors: resp.fieldErrors });
+      }
+    } finally {
+      leadRequestInFlight.current = false;
     }
-  }, [clearDraft]);
+  }, [clearDraft, clearStoredIdempotencyKey]);
 
   const sendEmail = useCallback(async () => {
     const s = stateRef.current;
@@ -253,18 +312,17 @@ export default function BlueprintFlow({
   /* -------------------------------- render ---------------------------------- */
   if (screen.phase === "intro") {
     return (
-      <section className="mx-auto max-w-[var(--page-narrow)] px-[var(--section-px)] py-[var(--section-py)]">
-        <p className="font-meta text-xs uppercase tracking-wider text-ink-muted">BluePrint AI</p>
-        <h1 className="mt-2 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
-          {HERO.headline}
-        </h1>
-        <p className="mt-6 text-lg text-ink-muted">{HERO.supporting}</p>
-        <div className="mt-8">
+      <PageHeader
+        width="narrow"
+        eyebrow="BluePrint AI"
+        title={HERO.headline}
+        description={<p>{HERO.supporting}</p>}
+        actions={
           <Button variant="solid" onClick={() => dispatch({ type: "goto", index: 1 })}>
             {HERO.cta}
           </Button>
-        </div>
-      </section>
+        }
+      />
     );
   }
 
@@ -278,13 +336,17 @@ export default function BlueprintFlow({
   const showBack = state.screenIndex > 0 && screen.phase !== "reveal";
 
   return (
-    <section className="mx-auto max-w-[var(--page-narrow)] px-[var(--section-px)] py-[var(--section-py)]">
+    <Section width="narrow">
+      <h1 className="sr-only">{HERO.headline}</h1>
       <ProgressIndicator
-        phaseNames={PHASE_ORDER.map((p) => PHASE_NAMES[p])}
-        currentIndex={phaseIndex}
+        phaseIndex={phaseIndex}
+        phaseCount={PHASE_ORDER.length}
         currentName={PHASE_NAMES[screen.phase]}
-        totalScreens={SCREENS.length}
-        screenIndex={state.screenIndex}
+        intakePosition={
+          screen.phase === "intake" && screen.page
+            ? { current: screen.page, total: INTAKE_SCREEN_COUNT }
+            : undefined
+        }
       />
 
       <LiveRegion>{state.announcement}</LiveRegion>
@@ -371,6 +433,6 @@ export default function BlueprintFlow({
           ) : null}
         </div>
       ) : null}
-    </section>
+    </Section>
   );
 }

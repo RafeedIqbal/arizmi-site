@@ -1,6 +1,6 @@
 import { CONVERSION_MESSAGES, PLAN_DISCLAIMER, REVEAL, nextStepLabel } from "@/lib/blueprint/content";
 import type { BluePrintPreview, ConversionCategory, GenerationMode } from "@/lib/blueprint/schema";
-import { Button, buttonClassName, disabledCtaClassName } from "@/components/ui/Button";
+import { Button, UnavailableCta, buttonClassName } from "@/components/ui/Button";
 import MockNotice from "./MockNotice";
 
 function List({ items }: { items: readonly string[] }) {
@@ -66,7 +66,7 @@ export default function RevealStep({
       </div>
 
       {/* Email delivery — only sent on this explicit action. */}
-      <div className="mt-8 rounded-lg border border-border-soft p-5">
+      <div className="mt-8 rounded-[var(--radius-lg)] border border-border-soft bg-[var(--surface-subtle)] p-5">
         {emailStatus === "sent" ? (
           <p className="text-ink">
             <span className="font-semibold">Check your inbox.</span> Your full BluePrint — all eleven
@@ -88,6 +88,7 @@ export default function RevealStep({
                 onClick={onEmail}
                 disabled={emailStatus === "sending"}
                 aria-busy={emailStatus === "sending"}
+                className="disabled:cursor-wait disabled:opacity-60"
               >
                 {emailStatus === "sending" ? "Sending…" : REVEAL.emailAction}
               </Button>
@@ -97,19 +98,14 @@ export default function RevealStep({
       </div>
 
       {/* Diagnosis-dependent conversion message + booking CTA. */}
-      <div className="mt-8 rounded-lg bg-card p-6 text-ink-on-card" data-surface="card">
+      <div className="mt-8 rounded-[var(--radius-lg)] bg-card p-6 text-ink-on-card" data-surface="card">
         <p className="text-lg">{CONVERSION_MESSAGES[conversionCategory]}</p>
         <div className="mt-4">
           {bookingHref ? (
             <a href={bookingHref} rel="noreferrer" className={buttonClassName("solid")}>
               {REVEAL.bookCta}
             </a>
-          ) : (
-            <span aria-disabled="true" className={disabledCtaClassName()}>
-              {REVEAL.bookCta}
-              <span className="font-meta text-xs uppercase tracking-wider">Booking opens soon</span>
-            </span>
-          )}
+          ) : <UnavailableCta label={REVEAL.bookCta} reason="Booking opens soon" />}
         </div>
       </div>
 

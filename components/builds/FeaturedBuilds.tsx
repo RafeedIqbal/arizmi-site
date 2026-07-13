@@ -4,7 +4,6 @@ import {
   useCallback,
   useEffect,
   useRef,
-  useState,
   type KeyboardEvent,
   type PointerEvent,
 } from "react";
@@ -35,8 +34,12 @@ import type { Build } from "@/lib/content/builds";
  */
 export default function FeaturedBuilds({
   builds,
+  selectedId,
+  onSelect,
 }: {
   builds: readonly Build[];
+  selectedId: string;
+  onSelect: (id: string) => void;
 }) {
   const reducedMotion = useReducedMotion();
 
@@ -49,13 +52,6 @@ export default function FeaturedBuilds({
   // browsing (prev/next) rather than explicit activation.
   const focusOnSelectRef = useRef(false);
   const rafRef = useRef<number | null>(null);
-
-  // The explorer remounts this component (key={filter}) whenever the active
-  // filter changes, so the selection always re-initialises to the first
-  // remaining build — no reconciliation effect needed.
-  const [selectedId, setSelectedId] = useState<string | null>(
-    builds[0]?.id ?? null,
-  );
 
   const selectedIndex = Math.max(
     0,
@@ -87,9 +83,9 @@ export default function FeaturedBuilds({
         return;
       }
       focusOnSelectRef.current = focusDetail;
-      setSelectedId(target.id);
+      onSelect(target.id);
     },
-    [builds, scrollCardIntoView, selectedId],
+    [builds, onSelect, scrollCardIntoView, selectedId],
   );
 
   // Move focus into the detail region only on explicit activation.

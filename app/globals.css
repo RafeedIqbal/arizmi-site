@@ -3,8 +3,6 @@
 @theme inline {
   --font-sans: var(--font-manrope);
   --font-mono: var(--font-space-mono);
-  /* Legacy (superseded theme) — remove after all sections migrate */
-  --font-serif: var(--font-instrument-serif);
 
   --color-canvas: var(--canvas);
   --color-card: var(--surface-card);
@@ -44,6 +42,8 @@
   /* Surfaces */
   --canvas: var(--arizmi-off-white);
   --surface-card: var(--arizmi-card-black);
+  --surface-subtle: #f0eee7;
+  --surface-raised: #fffdf8;
 
   /*
    * Text. Contrast ratios measured against their intended surface:
@@ -69,6 +69,17 @@
     var(--arizmi-teal-dark) 0%,
     var(--arizmi-teal-light) 100%
   );
+  --gradient-blueprint: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--arizmi-tech-blue) 68%, var(--surface-card)) 0%,
+    var(--arizmi-tech-blue) 100%
+  );
+  --gradient-concept: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--arizmi-deep-violet) 72%, var(--surface-card)) 0%,
+    var(--arizmi-deep-violet) 100%
+  );
+  --ink-on-accent: var(--arizmi-off-white);
 
   /*
    * Build-state accents. Brand values pass 3:1 on canvas (UI/large text);
@@ -128,23 +139,6 @@
   --page-content: 75rem;
   --page-narrow: 44rem;
 
-  /*
-   * ------------------------------------------------------------------
-   * TEMPORARY compatibility aliases for the superseded dark theme. Now
-   * consumed only by the contact plumbing kept for TASK-017 (ContactModal,
-   * ContactTrigger, SuccessMessage) and the Toaster in app/layout.tsx.
-   * Delete once TASK-017 finalizes the contact experience.
-   * ------------------------------------------------------------------
-   */
-  --bg: #06080d;
-  --surface: #111318;
-  --surface-alt: #1c1e24;
-  --border: rgba(255, 255, 255, 0.08);
-  --text: #f0f0f0;
-  --text-muted: rgba(240, 240, 240, 0.55);
-  --accent: #59b0ff;
-  --accent-dim: rgba(89, 176, 255, 0.15);
-  --shadow-card: 0px 4px 32px 0px rgba(0, 0, 0, 0.4);
 }
 
 html {
@@ -255,7 +249,7 @@ body {
   --ui-accent: var(--teal-ink);
   --ui-solid-bg: var(--surface-card);
   --ui-solid-ink: var(--ink-on-card);
-  --ui-solid-hover-bg: #2a2f2f;
+  --ui-solid-hover-bg: color-mix(in srgb, var(--surface-card) 88%, var(--canvas));
   --ui-solid-hover-ink: var(--ink-on-card);
 }
 
@@ -372,24 +366,6 @@ body {
 :focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
-}
-
-/* Button hover animations */
-.btn-primary {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.btn-primary:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 20px rgba(89, 176, 255, 0.4);
-}
-
-.btn-outline {
-  transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
-}
-.btn-outline:hover {
-  transform: scale(1.05);
-  border-color: var(--accent) !important;
-  color: var(--accent) !important;
 }
 
 /*
@@ -541,8 +517,8 @@ body {
   /* Contain slot z-indexes below the copy while browsing… */
   z-index: 1;
   width: 100%;
-  height: 46vh;
-  min-height: 320px;
+  height: clamp(18rem, 46svh, 32rem);
+  min-height: 18rem;
   margin-top: auto;
   touch-action: pan-y;
   outline-offset: -4px;
@@ -618,9 +594,15 @@ body {
   box-shadow: 0 32px 90px rgba(16, 19, 19, 0.38);
 }
 
-/* Hover lift + subtle foil glint on the border — browsing only, never on a
-   card that is opening or returning. */
-.home-hero__archive:not([data-open]) .arc__slot:not([data-closing]) .arc__card:hover {
+/* Hover/focus lift + subtle foil glint — browsing only. */
+@media (hover: hover) {
+  .home-hero__archive:not([data-open]) .arc__slot:not([data-closing]) .arc__card:hover {
+    transform: translate(-6px, -5px) scale(1.03);
+    box-shadow: 0 22px 64px rgba(16, 19, 19, 0.34);
+  }
+}
+
+.home-hero__archive:not([data-open]):focus-visible .arc__slot[data-active] .arc__card {
   transform: translate(-6px, -5px) scale(1.03);
   box-shadow: 0 22px 64px rgba(16, 19, 19, 0.34);
 }
@@ -646,7 +628,8 @@ body {
   pointer-events: none;
 }
 
-.home-hero__archive:not([data-open]) .arc__slot:not([data-closing]) .arc__card:hover::after {
+.home-hero__archive:not([data-open]) .arc__slot:not([data-closing]) .arc__card:hover::after,
+.home-hero__archive:not([data-open]):focus-visible .arc__slot[data-active] .arc__card::after {
   opacity: 1;
 }
 
@@ -679,8 +662,13 @@ body {
   .arc__slot[data-closing],
   .arc__card,
   .arc__slot[data-open] .arc__card,
+  .arc__card::after,
   .home-hero__stage {
     transition: none;
+  }
+
+  .home-hero__archive:not([data-open]):focus-visible .arc__slot[data-active] .arc__card {
+    transform: none;
   }
 }
 
@@ -696,8 +684,14 @@ body {
     justify-content: center;
     min-height: 100vh;
     min-height: 100svh;
-    max-width: min(46%, 40rem);
+    width: 52%;
+    max-width: none;
     padding-block: clamp(6rem, 16vh, 9rem);
+    padding-left: max(
+      var(--section-px),
+      calc((100vw - var(--page-content)) / 2 + var(--section-px))
+    );
+    padding-right: clamp(2rem, 4vw, 4rem);
   }
 
   .home-hero__archive {
@@ -1019,7 +1013,13 @@ body {
  */
 .featured__layout {
   display: grid;
+  min-width: 0;
   gap: 1.5rem;
+}
+
+.featured__slider {
+  width: 100%;
+  min-width: 0;
 }
 
 @media (min-width: 1024px) {
@@ -1063,7 +1063,7 @@ body {
   text-align: left;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-soft);
-  background: color-mix(in srgb, var(--canvas) 40%, #ffffff);
+  background: var(--surface-raised);
   transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
 }
 
@@ -1100,7 +1100,7 @@ body {
 .featured__detail {
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-soft);
-  background: color-mix(in srgb, var(--canvas) 55%, #ffffff);
+  background: var(--surface-subtle);
   padding: clamp(1.5rem, 3vw, 2rem);
 }
 
@@ -1138,17 +1138,17 @@ body {
   padding: 0.85rem;
   overflow: hidden;
   border-radius: var(--radius-md);
-  color: #ffffff;
+  color: var(--ink-on-accent);
   background: var(--gradient-teal);
   isolation: isolate;
 }
 
 .build-media[data-state="blueprint"] {
-  background: linear-gradient(135deg, #185f92 0%, var(--arizmi-tech-blue) 100%);
+  background: var(--gradient-blueprint);
 }
 
 .build-media[data-state="concept"] {
-  background: linear-gradient(135deg, #4a35a0 0%, var(--arizmi-deep-violet) 100%);
+  background: var(--gradient-concept);
 }
 
 .build-media__grid {
@@ -1350,6 +1350,7 @@ body {
 
 .about-ticker__viewport {
   overflow: hidden;
+  padding-right: calc(var(--section-px) + 5.5rem);
 }
 
 .about-ticker__track {
@@ -1428,7 +1429,28 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .about-ticker__track {
+    width: 100%;
     animation: none;
+  }
+
+  .about-ticker__viewport {
+    padding-right: 0;
+  }
+
+  .about-ticker__group {
+    width: 100%;
+  }
+
+  .about-ticker__group:nth-child(2),
+  .about-ticker__item:not(:first-child) {
+    display: none;
+  }
+
+  .about-ticker__item {
+    width: 100%;
+    padding-inline: var(--section-px);
+    white-space: normal;
+    line-height: 1.15;
   }
 
   .about-ticker__toggle {

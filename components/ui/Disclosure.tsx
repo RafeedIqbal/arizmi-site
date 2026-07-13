@@ -16,6 +16,7 @@ export default function Disclosure({
   defaultOpen = false,
   open: controlledOpen,
   onOpenChange,
+  landmark = true,
   className,
   summaryClassName,
   panelClassName,
@@ -28,6 +29,8 @@ export default function Disclosure({
   defaultOpen?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /** Set false for long accordion lists where repeated regions add landmark noise. */
+  landmark?: boolean;
   className?: string;
   summaryClassName?: string;
   panelClassName?: string;
@@ -84,8 +87,8 @@ export default function Disclosure({
       {Heading ? <Heading className="m-0">{trigger}</Heading> : trigger}
       <div
         id={panelId}
-        role="region"
-        aria-labelledby={buttonId}
+        role={landmark ? "region" : undefined}
+        aria-labelledby={landmark ? buttonId : undefined}
         data-open={isOpen || undefined}
         className={["ui-disclosure__panel", panelClassName].filter(Boolean).join(" ")}
       >

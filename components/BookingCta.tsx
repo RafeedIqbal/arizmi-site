@@ -1,6 +1,6 @@
 import {
+  UnavailableCta,
   buttonClassName,
-  disabledCtaClassName,
   type ButtonVariant,
 } from "@/components/ui/Button";
 import { getBookingDestination } from "@/lib/server/config";
@@ -36,12 +36,5 @@ export default function BookingCta({
     );
   }
 
-  return (
-    <span aria-disabled="true" className={disabledCtaClassName()}>
-      {label}
-      <span className="font-meta text-xs uppercase tracking-wider">
-        Booking opens soon
-      </span>
-    </span>
-  );
+  return <UnavailableCta label={label} reason="Booking opens soon" />;
 }

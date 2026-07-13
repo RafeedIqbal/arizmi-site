@@ -16,7 +16,7 @@ import {
 import PrevNextControls from "@/components/ui/PrevNextControls";
 import LiveRegion from "@/components/ui/LiveRegion";
 import MetaLabel from "@/components/ui/MetaLabel";
-import { ButtonLink, buttonClassName, disabledCtaClassName } from "@/components/ui/Button";
+import { ButtonLink, UnavailableCta, buttonClassName } from "@/components/ui/Button";
 import { CTA_LABELS } from "@/lib/content/cta";
 import { HERO_CARDS, HERO_INITIAL_INDEX, type HeroCard } from "@/lib/content/heroArchive";
 import { clampIndex, isDragGesture } from "@/lib/interaction";
@@ -158,14 +158,7 @@ function DetailCta({ build }: { build: Build }) {
       <a href={cta.url} className={buttonClassName("solid")}>
         {cta.label}
       </a>
-    ) : (
-      <span aria-disabled="true" className={disabledCtaClassName()}>
-        {cta.label}
-        <span className="font-meta text-xs uppercase tracking-wider">
-          Link coming soon
-        </span>
-      </span>
-    );
+    ) : <UnavailableCta label={cta.label} reason="Link coming soon" />;
   }
   return <MetaLabel tone="muted">{cta.label}</MetaLabel>;
 }
@@ -567,12 +560,10 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
       <CtaArrow onDark />
     </a>
   ) : (
-    <span aria-disabled="true" className={disabledCtaClassName()}>
-      {CTA_LABELS.bookBuildCall}
-      <span className="font-meta text-xs uppercase tracking-wider">
-        Booking opens soon
-      </span>
-    </span>
+    <UnavailableCta
+      label={CTA_LABELS.bookBuildCall}
+      reason="Booking opens soon"
+    />
   );
 
   return (

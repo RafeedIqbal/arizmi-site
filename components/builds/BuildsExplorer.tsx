@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import BuildFilters from "@/components/builds/BuildFilters";
 import CompactArchive from "@/components/builds/CompactArchive";
@@ -17,32 +18,118 @@ import {
 
 const FILTER_LABELS = new Map(FILTER_TABS.map((tab) => [tab.id, tab.label]));
 
+function toUrl(pathname: string, params: URLSearchParams) {
+  const query = params.toString();
+  return query ? `${pathname}?${query}` : pathname;
+}
+
+function writeVisibleState(
+  params: URLSearchParams,
+  nextFeaturedId: string | null,
+  nextOpenIds: readonly string[],
+) {
+  if (nextFeaturedId) params.set("featured", nextFeaturedId);
+  else params.delete("featured");
+
+  params.delete("open");
+  for (const id of nextOpenIds) params.append("open", id);
+}
+
 /**
  * Client orchestrator for the Builds archive (TASK-008 → TASK-010). The active
  * filter is the single source of truth and lives in the `filter` query
  * parameter, so it is shareable and survives back/forward navigation; an
- * unknown value falls back to "All" without error. The featured selection and
- * per-row compact disclosures are deliberately component-local state, keeping
- * the three interactions independent so they cannot conflict.
+ * unknown value falls back to "All" without error. Featured selection and the
+ * independently open compact rows are URL state too, so the complete view can
+ * be shared and restored without turning every card interaction into a browser
+ * history entry.
  */
 export default function BuildsExplorer() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const active = parseFilterId(searchParams.get("filter"));
+  const rawFilter = searchParams.get("filter");
+  const active = parseFilterId(rawFilter);
+
+  const featured = filterBuilds(FEATURED_BUILDS, active);
+  const compact = filterBuilds(ARCHIVE_BUILDS, active);
+  const rawFeaturedId = searchParams.get("featured");
+  const selectedFeaturedId =
+    featured.find((build) => build.id === rawFeaturedId)?.id ??
+    featured[0]?.id ??
+    null;
+  const requestedOpenIds = new Set(searchParams.getAll("open"));
+  const openCompactIds = compact
+    .filter((build) => requestedOpenIds.has(build.id))
+    .map((build) => build.id);
+
+  // Canonicalise direct/shared URLs: discard unknown filter/build ids, remove
+  // duplicate or filtered-out rows, and select the first visible featured
+  // build whenever the requested selection is unavailable.
+  const currentQuery = searchParams.toString();
+  const canonicalParams = new URLSearchParams(currentQuery);
+  if (rawFilter !== null && active === ALL_FILTER_ID) {
+    canonicalParams.delete("filter");
+  }
+  writeVisibleState(
+    canonicalParams,
+    selectedFeaturedId,
+    openCompactIds,
+  );
+  const canonicalQuery = canonicalParams.toString();
+
+  useEffect(() => {
+    if (canonicalQuery !== currentQuery) {
+      router.replace(
+        canonicalQuery ? `${pathname}?${canonicalQuery}` : pathname,
+        { scroll: false },
+      );
+    }
+  }, [canonicalQuery, currentQuery, pathname, router]);
 
   const setFilter = (id: BuildFilterId) => {
     const params = new URLSearchParams(searchParams.toString());
     if (id === ALL_FILTER_ID) params.delete("filter");
     else params.set("filter", id);
-    const query = params.toString();
+
+    const nextFeatured = filterBuilds(FEATURED_BUILDS, id);
+    const nextCompact = filterBuilds(ARCHIVE_BUILDS, id);
+    const nextFeaturedId =
+      nextFeatured.find((build) => build.id === selectedFeaturedId)?.id ??
+      nextFeatured[0]?.id ??
+      null;
+    const nextCompactIds = new Set(nextCompact.map((build) => build.id));
+    const nextOpenIds = openCompactIds.filter((buildId) =>
+      nextCompactIds.has(buildId),
+    );
+    writeVisibleState(params, nextFeaturedId, nextOpenIds);
+
     // push (not replace) so browser back/forward restores prior filters.
-    router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    router.push(toUrl(pathname, params), { scroll: false });
   };
 
-  const featured = filterBuilds(FEATURED_BUILDS, active);
-  const compact = filterBuilds(ARCHIVE_BUILDS, active);
+  const setFeatured = (id: string) => {
+    if (!featured.some((build) => build.id === id)) return;
+    const params = new URLSearchParams(searchParams.toString());
+    writeVisibleState(params, id, openCompactIds);
+    router.replace(toUrl(pathname, params), { scroll: false });
+  };
+
+  const setCompactOpen = (id: string, isOpen: boolean) => {
+    if (!compact.some((build) => build.id === id)) return;
+    const requestedIds = new Set(openCompactIds);
+    if (isOpen) requestedIds.add(id);
+    else requestedIds.delete(id);
+    const nextOpenIds = compact
+      .filter((build) => requestedIds.has(build.id))
+      .map((build) => build.id);
+
+    const params = new URLSearchParams(searchParams.toString());
+    writeVisibleState(params, selectedFeaturedId, nextOpenIds);
+    router.replace(toUrl(pathname, params), { scroll: false });
+  };
+
   const total = featured.length + compact.length;
   const label = FILTER_LABELS.get(active) ?? "All";
 
@@ -82,7 +169,12 @@ export default function BuildsExplorer() {
               >
                 Featured builds
               </h3>
-              <FeaturedBuilds key={active} builds={featured} />
+              <FeaturedBuilds
+                key={active}
+                builds={featured}
+                selectedId={selectedFeaturedId ?? featured[0].id}
+                onSelect={setFeatured}
+              />
             </section>
           ) : null}
 
@@ -94,7 +186,11 @@ export default function BuildsExplorer() {
               >
                 More from the archive
               </h3>
-              <CompactArchive builds={compact} />
+              <CompactArchive
+                builds={compact}
+                openIds={openCompactIds}
+                onOpenChange={setCompactOpen}
+              />
             </section>
           ) : null}
         </>

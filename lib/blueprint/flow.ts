@@ -54,8 +54,7 @@ export const PHASE_NAMES: Record<ScreenPhase, string> = {
   reveal: "Your BluePrint",
 };
 
-export const PHASE_ORDER: readonly ScreenPhase[] = [
-  "intro",
+export const PHASE_ORDER: readonly Exclude<ScreenPhase, "intro">[] = [
   "qualifying",
   "intake",
   "diagnosis",

@@ -22,7 +22,7 @@ export default function Section({
   ...rest
 }: ComponentPropsWithoutRef<"section"> & {
   as?: "section" | "div" | "header" | "footer" | "article";
-  surface?: "canvas" | "card";
+  surface?: "canvas" | "subtle" | "raised" | "card";
   width?: keyof typeof WIDTH_CLASSES;
   /** "none" leaves vertical rhythm to containerClassName. */
   paddingY?: "default" | "none";
@@ -31,8 +31,13 @@ export default function Section({
 }) {
   return (
     <Tag
-      data-surface={surface}
-      className={[surface === "card" ? "bg-card text-ink-on-card" : "", className]
+      data-surface={surface === "card" ? "card" : "canvas"}
+      className={[
+        surface === "card" ? "bg-card text-ink-on-card" : "",
+        surface === "subtle" ? "bg-[var(--surface-subtle)] text-ink" : "",
+        surface === "raised" ? "bg-[var(--surface-raised)] text-ink" : "",
+        className,
+      ]
         .filter(Boolean)
         .join(" ")}
       {...rest}

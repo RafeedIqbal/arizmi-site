@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import ContactModal from "@/components/ContactModal";
+import { UnavailableCta } from "@/components/ui/Button";
 import {
   NAV_SUPPORTING_LINE,
   PRIMARY_NAV,
@@ -210,15 +211,11 @@ export default function SiteMenu({
                   ) : (
                     /* D-01: booking is unconfigured — meaningful disabled
                        semantics, never a "#" link. */
-                    <span
-                      aria-disabled="true"
-                      className="inline-flex min-h-11 items-center text-[clamp(2rem,6vw,3.25rem)] font-semibold leading-tight tracking-tight text-ink-on-card-muted"
-                    >
-                      {item.label}
-                      <span className="ml-4 align-middle font-meta text-xs uppercase tracking-wider">
-                        Booking opens soon
-                      </span>
-                    </span>
+                    <UnavailableCta
+                      label={item.label}
+                      reason="Booking opens soon"
+                      className="justify-start border-0 px-0 text-left text-[clamp(2rem,6vw,3.25rem)] leading-tight tracking-tight"
+                    />
                   )}
                 </li>
               ))}

@@ -4,6 +4,9 @@ import AboutTicker from "@/components/about/AboutTicker";
 import TeamGallery from "@/components/about/TeamGallery";
 import BookingCta from "@/components/BookingCta";
 import PageShell from "@/components/PageShell";
+import PageHeader from "@/components/ui/PageHeader";
+import Section from "@/components/ui/Section";
+import SectionHeading from "@/components/ui/SectionHeading";
 import { CTA_LABELS } from "@/lib/content/cta";
 import { ROUTES } from "@/lib/site";
 
@@ -46,28 +49,32 @@ const PRINCIPLES = [
 export default function AboutPage() {
   return (
     <PageShell>
-      <header className="mx-auto max-w-[var(--page-content)] px-[var(--section-px)] pb-[var(--space-2xl)] pt-[var(--space-3xl)]">
-        <h1 className="max-w-[22ch] text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
-          For people building something that does not exist yet.
-        </h1>
-        <p className="mt-6 max-w-[60ch] text-lg text-ink-muted">{HERO_COPY}</p>
-        <p className="mt-3 max-w-[60ch] text-lg text-ink-muted">
-          We bring together product thinking, technical build and commercial
-          judgement, so the thing in your head can become something people can
-          use.
-        </p>
-      </header>
+      <PageHeader
+        title="For people building something that does not exist yet."
+        titleClassName="max-w-[22ch]"
+        description={
+          <>
+            <p>{HERO_COPY}</p>
+            <p>
+              We bring together product thinking, technical build and commercial
+              judgement, so the thing in your head can become something people can
+              use.
+            </p>
+          </>
+        }
+      />
 
       {/* Statistics section is gated: no approved label/value pairs exist yet
           (D-10), so the reference-mockup numbers must never ship as facts. In
           production this branch is absent; in development it shows a labelled
           placeholder that holds the image-first layout for review. */}
       {SHOW_STATS_PLACEHOLDER ? (
-        <section
+        <Section
           aria-labelledby="stats-heading"
-          className="mx-auto max-w-[var(--page-content)] px-[var(--section-px)] pb-[var(--space-2xl)]"
+          paddingY="none"
+          containerClassName="pb-[var(--space-2xl)]"
         >
-          <div className="rounded-[var(--radius-lg)] border border-dashed border-warning/50 p-6">
+          <div className="rounded-[var(--radius-lg)] border border-dashed border-warning/50 bg-[var(--surface-subtle)] p-6">
             <p className="font-meta text-xs uppercase tracking-wider text-warning">
               Development only — awaiting approved statistics (D-10)
             </p>
@@ -88,30 +95,33 @@ export default function AboutPage() {
               ))}
             </ul>
           </div>
-        </section>
+        </Section>
       ) : null}
 
-      <section
+      <Section
         aria-labelledby="why-arizmi-heading"
-        className="mx-auto max-w-[var(--page-content)] px-[var(--section-px)] pb-[var(--space-2xl)]"
+        paddingY="none"
+        containerClassName="pb-[var(--space-2xl)]"
       >
         <div className="about-why">
           <div>
-            <h2
+            <SectionHeading
               id="why-arizmi-heading"
-              className="text-2xl font-semibold tracking-tight sm:text-3xl"
-            >
-              Why Arizmi?
-            </h2>
-            <p className="mt-4 text-ink-muted">
-              The name Arizmi is drawn from al-Khwarizmi, one of history’s great
-              system thinkers. His work helped give the world algebra, algorithms
-              and a new way to break complexity down into something solvable.
-            </p>
-            <p className="mt-3 text-ink-muted">
-              This is the idea behind the studio: take something complex, find
-              the logic inside it and turn it into something useful.
-            </p>
+              title="Why Arizmi?"
+              description={
+                <>
+                  <p>
+                    The name Arizmi is drawn from al-Khwarizmi, one of history’s great
+                    system thinkers. His work helped give the world algebra, algorithms
+                    and a new way to break complexity down into something solvable.
+                  </p>
+                  <p>
+                    This is the idea behind the studio: take something complex, find
+                    the logic inside it and turn it into something useful.
+                  </p>
+                </>
+              }
+            />
           </div>
           {/* D-12: no approved "Why Arizmi?" image exists, so this is an
               abstract brand-system panel (not stock imagery) built from brand
@@ -126,26 +136,23 @@ export default function AboutPage() {
             />
           </div>
         </div>
-      </section>
+      </Section>
 
-      <section
+      <Section
         aria-labelledby="principles-heading"
-        className="mx-auto max-w-[var(--page-content)] px-[var(--section-px)] pb-[var(--space-2xl)]"
+        paddingY="none"
+        containerClassName="pb-[var(--space-2xl)]"
       >
-        <h2
+        <SectionHeading
           id="principles-heading"
-          className="text-2xl font-semibold tracking-tight sm:text-3xl"
-        >
-          The way we think
-        </h2>
-        <p className="mt-4 text-ink-muted">
-          We work with three core principles in mind:
-        </p>
+          title="The way we think"
+          description={<p>We work with three core principles in mind:</p>}
+        />
         <ol className="mt-8 grid gap-6 sm:grid-cols-3">
           {PRINCIPLES.map((principle, index) => (
             <li
               key={principle.name}
-              className="rounded-[var(--radius-lg)] border border-border-soft bg-white/40 p-6"
+              className="rounded-[var(--radius-lg)] border border-border-soft bg-[var(--surface-raised)] p-6"
             >
               <p className="font-meta text-xs uppercase tracking-wider text-teal-ink">
                 {String(index + 1).padStart(2, "0")}
@@ -155,52 +162,57 @@ export default function AboutPage() {
             </li>
           ))}
         </ol>
-      </section>
+      </Section>
 
-      <section
+      <Section
         aria-labelledby="team-heading"
-        className="mx-auto max-w-[var(--page-content)] px-[var(--section-px)] pb-[var(--space-2xl)]"
+        paddingY="none"
+        containerClassName="pb-[var(--space-2xl)]"
       >
-        <h2
+        <SectionHeading
           id="team-heading"
-          className="text-2xl font-semibold tracking-tight sm:text-3xl"
-        >
-          The team in the lab
-        </h2>
-        <p className="mt-4 max-w-[60ch] text-ink-muted">
-          Arizmi brings together product, software, AI, strategy and operations
-          thinking, so ideas can be shaped, built and improved from more than
-          one angle.
-        </p>
+          title="The team in the lab"
+          description={
+            <p>
+              Arizmi brings together product, software, AI, strategy and operations
+              thinking, so ideas can be shaped, built and improved from more than
+              one angle.
+            </p>
+          }
+        />
         <TeamGallery />
-      </section>
+      </Section>
 
       <section className="pb-[var(--space-2xl)]">
         <AboutTicker />
       </section>
 
-      <section
+      <Section
         aria-labelledby="ready-heading"
-        className="mx-auto max-w-[var(--page-narrow)] px-[var(--section-px)] pb-[var(--section-py)]"
+        width="narrow"
+        paddingY="none"
+        containerClassName="pb-[var(--section-py)]"
       >
-        <h2
+        <SectionHeading
           id="ready-heading"
-          className="text-2xl font-semibold tracking-tight sm:text-3xl"
-        >
-          Ready to build?
-        </h2>
-        <p className="mt-4 text-ink-muted">
-          Early idea, messy workflow, ambitious product or system nobody has
-          built for you properly yet, this is where Arizmi is useful.
-        </p>
-        <p className="mt-3 text-ink-muted">
-          We help find the shape, build the system and move it towards
-          something people can use.
-        </p>
+          title="Ready to build?"
+          description={
+            <>
+              <p>
+                Early idea, messy workflow, ambitious product or system nobody has
+                built for you properly yet, this is where Arizmi is useful.
+              </p>
+              <p>
+                We help find the shape, build the system and move it towards
+                something people can use.
+              </p>
+            </>
+          }
+        />
         <div className="mt-8">
           <BookingCta label={CTA_LABELS.bookBuildCall} />
         </div>
-      </section>
+      </Section>
     </PageShell>
   );
 }

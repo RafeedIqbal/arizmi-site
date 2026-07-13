@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Suspense } from "react";
 import BookingCta from "@/components/BookingCta";
 import PageShell from "@/components/PageShell";
 import BuildsBaseList from "@/components/builds/BuildsBaseList";
 import BuildsExplorer from "@/components/builds/BuildsExplorer";
+import { ButtonLink } from "@/components/ui/Button";
+import PageHeader from "@/components/ui/PageHeader";
+import Section from "@/components/ui/Section";
+import SectionHeading from "@/components/ui/SectionHeading";
 import { BUILDS } from "@/lib/content/builds";
 import { CTA_LABELS, CTA_ROUTES } from "@/lib/content/cta";
-import { buttonClassName } from "@/components/ui/Button";
 import { ROUTES, SITE_URL } from "@/lib/site";
 
 const HERO_COPY =
@@ -62,35 +64,35 @@ export default function BuildsPage() {
   return (
     <PageShell>
       <BuildsStructuredData />
-      <header className="mx-auto max-w-[var(--page-content)] px-[var(--section-px)] pb-[var(--space-2xl)] pt-[var(--space-3xl)]">
-        <h1 className="max-w-[22ch] text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
-          A look inside the systems we’ve shaped, built and launched.
-        </h1>
-        <p className="mt-6 max-w-[60ch] text-lg text-ink-muted">{HERO_COPY}</p>
-        <div className="mt-8 flex flex-wrap items-center gap-4">
-          <Link href={CTA_ROUTES.blueprint} className={buttonClassName("solid")}>
+      <PageHeader
+        title="A look inside the systems we’ve shaped, built and launched."
+        titleClassName="max-w-[22ch]"
+        description={<p>{HERO_COPY}</p>}
+        actions={
+          <>
+          <ButtonLink href={CTA_ROUTES.blueprint} variant="solid">
             {CTA_LABELS.startBlueprint}
-          </Link>
+          </ButtonLink>
           <BookingCta label={CTA_LABELS.bookBuildCall} variant="secondary" />
-        </div>
-      </header>
+          </>
+        }
+      />
 
-      <section
+      <Section
         aria-labelledby="archive-heading"
-        className="mx-auto max-w-[var(--page-content)] px-[var(--section-px)] pb-[var(--section-py)]"
+        paddingY="none"
+        containerClassName="pb-[var(--section-py)]"
       >
-        <h2
+        <SectionHeading
           id="archive-heading"
-          className="text-2xl font-semibold tracking-tight sm:text-3xl"
-        >
-          Welcome to the Archive
-        </h2>
+          title="Welcome to the Archive"
+        />
         {/* useSearchParams in the explorer requires a Suspense boundary; the
             fallback is the semantic base list, which is also the no-JS view. */}
         <Suspense fallback={<BuildsBaseList />}>
           <BuildsExplorer />
         </Suspense>
-      </section>
+      </Section>
     </PageShell>
   );
 }

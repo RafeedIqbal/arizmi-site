@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import BookingCta from "@/components/BookingCta";
 import PageShell from "@/components/PageShell";
 import ServicesAccordion from "@/components/services/ServicesAccordion";
+import { ButtonLink } from "@/components/ui/Button";
+import PageHeader from "@/components/ui/PageHeader";
+import Section from "@/components/ui/Section";
+import SectionHeading from "@/components/ui/SectionHeading";
 import { CTA_LABELS, CTA_ROUTES } from "@/lib/content/cta";
 import { ROUTES } from "@/lib/site";
 
@@ -23,61 +26,54 @@ export const metadata: Metadata = {
 export default function ServicesPage() {
   return (
     <PageShell>
-      <header className="mx-auto max-w-[var(--page-content)] px-[var(--section-px)] pb-[var(--space-2xl)] pt-[var(--space-3xl)]">
-        <h1 className="max-w-[24ch] text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
-          Product and software development for ideas that need more than a
-          template.
-        </h1>
-        <p className="mt-6 max-w-[60ch] text-lg text-ink-muted">{HERO_COPY}</p>
-        <div className="mt-8">
-          <BookingCta label={CTA_LABELS.bookYourBuildCall} />
-        </div>
-      </header>
+      <PageHeader
+        title="Product and software development for ideas that need more than a template."
+        description={<p>{HERO_COPY}</p>}
+        actions={<BookingCta label={CTA_LABELS.bookYourBuildCall} />}
+      />
 
-      <section
+      <Section
         aria-labelledby="services-heading"
-        className="mx-auto max-w-[var(--page-content)] px-[var(--section-px)] pb-[var(--space-2xl)]"
+        paddingY="none"
+        containerClassName="pb-[var(--space-2xl)]"
       >
-        <p className="font-meta text-xs uppercase tracking-wider text-ink-muted">
-          What we do
-        </p>
-        <h2
+        <SectionHeading
           id="services-heading"
-          className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl"
-        >
-          Services
-        </h2>
+          eyebrow="What we do"
+          title="Services"
+        />
         <ServicesAccordion />
-      </section>
+      </Section>
 
-      <section
+      <Section
         aria-labelledby="blueprint-handoff-heading"
-        className="mx-auto max-w-[var(--page-narrow)] px-[var(--section-px)] pb-[var(--section-py)]"
+        width="narrow"
+        paddingY="none"
+        containerClassName="pb-[var(--section-py)]"
       >
-        <h2
+        <SectionHeading
           id="blueprint-handoff-heading"
-          className="text-2xl font-semibold tracking-tight sm:text-3xl"
-        >
-          Not sure what you need yet? Start with BluePrint AI
-        </h2>
-        <p className="mt-4 text-ink-muted">
-          If the product is still unclear, Arizmi BluePrint AI helps turn the
-          idea, workflow or opportunity into a Product Requirements Document
-          (PRD)-style plan before development begins.
-        </p>
-        <p className="mt-3 text-ink-muted">
-          It helps define the users, features, scope, complexity, risks and
-          first version, so the right service route becomes easier to choose.
-        </p>
+          title="Not sure what you need yet? Start with BluePrint AI"
+          description={
+            <>
+              <p>
+                If the product is still unclear, Arizmi BluePrint AI helps turn the
+                idea, workflow or opportunity into a Product Requirements Document
+                (PRD)-style plan before development begins.
+              </p>
+              <p>
+                It helps define the users, features, scope, complexity, risks and
+                first version, so the right service route becomes easier to choose.
+              </p>
+            </>
+          }
+        />
         <p className="mt-8">
-          <Link
-            href={CTA_ROUTES.blueprint}
-            className="inline-flex min-h-11 items-center justify-center rounded-full bg-card px-6 py-3 text-sm font-semibold text-ink-on-card"
-          >
+          <ButtonLink href={CTA_ROUTES.blueprint} variant="solid">
             {CTA_LABELS.startBlueprint}
-          </Link>
+          </ButtonLink>
         </p>
-      </section>
+      </Section>
     </PageShell>
   );
 }

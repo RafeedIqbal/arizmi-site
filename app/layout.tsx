@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Toaster } from "sonner";
-import { Analytics } from "@vercel/analytics/next"
+import { Analytics } from "@vercel/analytics/next";
 import SiteFooter from "@/components/SiteFooter";
 import SiteNav from "@/components/SiteNav";
 import { NAV_SUPPORTING_LINE } from "@/lib/content/navigation";
@@ -32,25 +32,6 @@ const spaceMono = localFont({
   display: "swap",
 });
 
-/*
- * Legacy fonts for the superseded dark theme. Existing components still
- * reference --font-inter / --font-instrument-serif; remove once every
- * section has migrated to the redesign (TASK-005+).
- */
-const inter = localFont({
-  src: "../public/fonts/Inter-Variable.woff2",
-  variable: "--font-inter",
-  display: "swap",
-  weight: "100 900",
-});
-
-const instrumentSerif = localFont({
-  src: "../public/fonts/InstrumentSerif-Regular.woff2",
-  variable: "--font-instrument-serif",
-  display: "swap",
-  weight: "400",
-});
-
 const siteUrl = SITE_URL;
 
 // Approved homepage copy (docs/specs/homepage.md hero + global menu
@@ -77,15 +58,6 @@ export const metadata: Metadata = {
     title: HOME_TITLE,
     description: HOME_DESCRIPTION,
   },
-  icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "48x48" },
-      { url: "/icon.svg", type: "image/svg+xml", sizes: "any" },
-      { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
-      { url: "/icon-512.png", type: "image/png", sizes: "512x512" },
-    ],
-    apple: { url: "/apple-icon.png", sizes: "180x180" },
-  },
   robots: {
     index: true,
     follow: true,
@@ -103,7 +75,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${manrope.variable} ${spaceMono.variable} ${inter.variable} ${instrumentSerif.variable} antialiased`}
+        className={`${manrope.variable} ${spaceMono.variable} antialiased`}
       >
         <a
           href="#main"
@@ -114,14 +86,18 @@ export default function RootLayout({
         <SiteNav />
         {children}
         <SiteFooter />
-        <Analytics />
+        {process.env.VERCEL ? <Analytics /> : null}
         <Toaster
           position="bottom-center"
+          theme="dark"
+          closeButton
           toastOptions={{
             style: {
-              background: "var(--surface-alt)",
-              border: "1px solid var(--border)",
-              color: "var(--text)",
+              background: "var(--surface-card)",
+              border: "1px solid var(--border-on-card)",
+              borderRadius: "var(--radius-md)",
+              boxShadow: "var(--shadow-lifted)",
+              color: "var(--ink-on-card)",
             },
           }}
         />

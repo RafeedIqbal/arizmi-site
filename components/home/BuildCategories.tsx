@@ -31,7 +31,7 @@ export default function BuildCategories() {
       <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {SERVICES.map((service, index) => (
           <li key={service.id}>
-            <article className="flex h-full flex-col gap-3 rounded-[var(--radius-lg)] border border-border-soft bg-white/40 p-6">
+            <article className="flex h-full flex-col gap-3 rounded-[var(--radius-lg)] border border-border-soft bg-[var(--surface-raised)] p-6">
               <MetaLabel className="text-teal-ink">
                 {String(index + 1).padStart(2, "0")}
               </MetaLabel>

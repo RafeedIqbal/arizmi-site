@@ -48,6 +48,7 @@ export default function ServicesAccordion() {
         <li key={service.id}>
           <Disclosure
             headingLevel={3}
+            landmark={false}
             summaryClassName="py-6"
             summary={
               <span className="flex flex-1 flex-col gap-2 pr-4">

@@ -44,7 +44,7 @@ export default function DiagnosisStep({
   if (status === "loading") {
     return (
       <div role="status" className="flex flex-col items-center gap-4 py-16 text-center">
-        <span className="bp-spinner" aria-hidden="true" />
+        <span className="bp-spinner motion-reduce:animate-none" aria-hidden="true" />
         <p className="text-ink-muted">Reading your answers and drafting a diagnosis. This can take a few seconds.</p>
       </div>
     );
@@ -52,7 +52,7 @@ export default function DiagnosisStep({
 
   if (status === "error" || !diagnosis) {
     return (
-      <div className="rounded-lg border border-border-soft p-6">
+      <div className="rounded-[var(--radius-lg)] border border-border-soft bg-[var(--surface-subtle)] p-6">
         <p className="text-ink">{error ?? "We couldn’t generate a diagnosis. Your answers are safe."}</p>
         <div className="mt-4 flex flex-wrap gap-3">
           <Button variant="solid" onClick={onRetry}>
@@ -98,7 +98,7 @@ export default function DiagnosisStep({
       </div>
 
       {showAddedDetail ? (
-        <div id="bp-added-detail" className="mt-6 rounded-lg border border-border-soft p-4">
+        <div id="bp-added-detail" className="mt-6 rounded-[var(--radius-lg)] border border-border-soft bg-[var(--surface-subtle)] p-4">
           <TextAreaField
             name="addedDetail"
             label={ADDED_DETAIL.label}
