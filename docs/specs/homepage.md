@@ -33,7 +33,7 @@ Secondary CTA: `Discover your BluePrint`
 
 ### Composition
 
-- Fill the first viewport.
+- Fill the first viewport on desktop. On mobile, use a readable stacked flow with `min-height: 100svh`; the hero may extend beyond one viewport rather than clipping copy or the archive.
 - Top-left: logomark only.
 - Top-right: minimal menu icon.
 - The visitor should feel that they have entered the Arizmi Labs product archive.
@@ -51,23 +51,29 @@ The initial state shows card backs only:
 | BluePrint | Tech blue | [`blueprint.webp`](../../public/assets/arizmi/card-backs/blueprint.webp) |
 | Concept | Deep violet | [`concept.webp`](../../public/assets/arizmi/card-backs/concept.webp) |
 
+The lossless WebP derivatives preserve the supplied PNG pixels exactly: only the transparent outer canvas is cropped and a minimal transparent normalization canvas is added. Serve them without further image optimization, and render shadows against the artwork alpha rather than on a rectangular card wrapper.
+
 ![Archive card system reference](../reference-images/hero-archive-card-system.png)
 
 ### Geometry and motion
 
-- Cards sit on a very large invisible wheel whose center is far offscreen to the right.
-- Visible cards form a broad, elegant sweep, not a tight circle.
-- Users can browse with vertical wheel input while over the archive, trackpad input, drag, touch drag, keyboard controls, and explicit previous/next controls for assistive fallback.
-- Cards rotate along the curved path. The active card is slightly more prominent; inactive cards remain partially visible.
+- On desktop, cards sit on a very large invisible wheel whose hub is beyond the right edge and vertically centered. Approximately 22 degrees between slots keeps at least five cards partially visible in a broad, elegant sweep rather than a tight circle.
+- Decorative rings align with the same hub and fade before they compete with the copy column.
+- Users can browse with vertical wheel input, the dominant horizontal or vertical trackpad delta, direction-locked horizontal dragging, and keyboard controls. Vertical touch movement remains available for normal page panning.
+- Do not show previous/next buttons or a numeric counter. The archive itself remains focusable and exposes instructions, live announcements, Arrow, Page Up/Down, Home/End, Enter/Space, and Escape behavior.
+- While an archive wheel/trackpad burst is active, keep the page position fixed and advance at a controlled rate of roughly one card every 220–240 ms. At the first or last card, consume the rest of that inertial burst; after about 140 ms of quiet, release the next outward gesture to normal page scrolling.
+- Cards rotate radially along the curved path: upper cards slope down toward the right-side hub and lower cards slope up toward it. The active card is slightly more prominent; inactive cards remain partially visible.
 - Motion is smooth, controlled, and bounded. Do not trap the page or create a fast prize wheel.
 - Hover/focus may lift a card slightly, move it a few pixels toward the main canvas, add a subtle border glint, and slightly deepen its shadow.
-- On click/tap/keyboard activation, distinguish selection from dragging. The selected card detaches, moves into the main canvas, flips to its front, and reveals key project impact details.
+- On click/tap/keyboard activation, distinguish selection from dragging. The selected card detaches, moves to the visible viewport center, flips to its front, and reveals qualitative project details.
 - While selected, the remaining archive stays visible on the right but becomes softer, dimmer, or slightly out of focus.
 - Escape or an explicit close/back control returns to the archive without losing the active index.
 - Mobile keeps a functional arc/archive, but stacks copy and archive with a safe touch/scroll boundary.
-- Reduced motion replaces large arc travel and 3D flip with direct index changes and a simple detail reveal.
+- Reduced motion replaces large arc travel, hover lift, blur animation, and 3D flip with direct index changes and an immediate centered detail reveal.
 
-Project-front content should come from the normalized Builds data. Resolve D-08 and D-09 before finalizing labels and featured order.
+Project-front content comes from the normalized Builds data and is limited to the archive state, project name, summary, `What Arizmi shaped`, capabilities, and a valid or deliberately disabled CTA. Do not duplicate the raw status label or invent quantitative impact claims.
+
+D-09 approves this seven-card order: Rive & Limn, Icon Training App, ALPAC London, BluePrint AI, Clinic Conversion Concept, Basenote Solutions, and Private AI Formulation Tool. BluePrint AI is initially active. The current mapping remains: live builds use teal, concept builds use violet, and Product, Launch, or Private builds use tech blue while D-08 remains unresolved.
 
 ### Interaction references
 
@@ -140,8 +146,9 @@ CTA: `Book a build call`
 
 - All approved copy and CTA labels match this spec.
 - Hero controls work with pointer, touch, keyboard, and reduced motion.
-- Normal page scrolling remains possible even when the pointer starts over the hero archive.
+- An owned archive gesture does not move the page; at an archive boundary, the next outward gesture after the inertial burst scrolls the page normally.
 - Selected-card content is not duplicated or hard-coded separately from Builds data.
+- No visible archive previous/next/count controls or rectangular matte appears around a card back.
 - Every section has a coherent 320 px layout and no horizontal overflow.
 - Homepage CTAs resolve to the centralized booking destination or `/blueprint-ai` as specified.
 - Visual references remain inspiration only; no external component is embedded without an explicit dependency and licensing decision.

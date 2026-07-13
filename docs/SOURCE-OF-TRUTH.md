@@ -34,9 +34,9 @@ Contrast-safe semantic tokens derived from these primitives (text, muted text, b
 
 | Runtime asset | Intended use |
 | --- | --- |
-| [`live.webp`](../public/assets/arizmi/card-backs/live.webp) | Live-build card back |
-| [`blueprint.webp`](../public/assets/arizmi/card-backs/blueprint.webp) | BluePrint card back |
-| [`concept.webp`](../public/assets/arizmi/card-backs/concept.webp) | Concept card back |
+| [`live.webp`](../public/assets/arizmi/card-backs/live.webp) | Lossless live-build card back with native pixels and a clean alpha canvas |
+| [`blueprint.webp`](../public/assets/arizmi/card-backs/blueprint.webp) | Lossless BluePrint card back with native pixels and a clean alpha canvas |
+| [`concept.webp`](../public/assets/arizmi/card-backs/concept.webp) | Lossless concept card back with native pixels and a clean alpha canvas |
 | [`logomark-gradient.svg`](../public/assets/arizmi/logos/logomark-gradient.svg) | Navigation logomark |
 | [`logomark-white.svg`](../public/assets/arizmi/logos/logomark-white.svg) | Logomark on card-black surfaces |
 | [`wordmark-gradient.svg`](../public/assets/arizmi/logos/wordmark-gradient.svg) | Compact footer wordmark |
@@ -44,7 +44,7 @@ Contrast-safe semantic tokens derived from these primitives (text, muted text, b
 | [`space-mono-regular.woff2`](../public/fonts/space-mono-regular.woff2) | Metadata regular |
 | [`space-mono-bold.woff2`](../public/fonts/space-mono-bold.woff2) | Metadata bold |
 
-Editable artwork, print files, original PNGs, full TTFs, and font licences remain untouched in [`brand-source/`](./brand-source/), outside the deployable web root. Legacy brand files and unwired project artwork are retained separately in [`reference-assets/`](./reference-assets/). Runtime transformation details are documented in [`runtime-assets.md`](./runtime-assets.md).
+Editable artwork, print files, canonical PNGs, full TTFs, and font licences remain untouched in [`brand-source/`](./brand-source/), outside the deployable web root. Legacy brand files and unwired project artwork are retained separately in [`reference-assets/`](./reference-assets/). Runtime transformation details are documented in [`runtime-assets.md`](./runtime-assets.md).
 
 ### Preserved Google Doc reference images
 
@@ -100,7 +100,7 @@ Every unresolved row below ships its safe default in the implementation (verifie
 | D-06 | Public project URLs for all “Open/Explore” CTAs | `cta.url` per entry in `lib/content/builds.ts` | Disabled “Link coming soon” semantics, not fake URLs | Pending |
 | D-07 | Featured build video/images | `components/builds/BuildMedia.tsx` | Brand-tinted “Preview coming soon” placeholder with fixed aspect ratio | Pending |
 | D-08 | Builds labels conflict: defined taxonomy vs “Product Build” and “Launch Build” statuses | `sourceStatus` vs `filterCategories` in `lib/content/builds.ts` | Raw statuses preserved; only unambiguous filter mappings (so e.g. Freedom Airlines is absent from “Live builds” and Growth Map only appears under “All”) | Pending |
-| D-09 | Hero project-card front content and which projects appear first | `HERO_BUILD_IDS` in `lib/content/heroArchive.ts` | Documented provisional subset reusing Builds data | Pending |
+| D-09 | Hero project-card front content and which projects appear first | `HERO_BUILD_IDS` in `lib/content/heroArchive.ts` | Seven-card order reusing qualitative Builds data; BluePrint AI initially active | Approved 2026-07-13: keep the current subset/order and do not invent impact metrics |
 | D-10 | About statistics | `SHOW_STATS_PLACEHOLDER` in `app/about/page.tsx` | Stats section renders in dev only; absent from production | Pending |
 | D-11 | About team card images are referenced but absent from the supplied brand archive | `lib/content/team.ts`, `components/about/TeamGallery.tsx` | Gradient monogram placeholder, clearly marked for replacement | Pending |
 | D-12 | About “Why Arizmi?” image | `app/about/page.tsx` (`.about-why__visual`) | Abstract brand-system logomark treatment, no stock imagery | Pending — shipped treatment may be approved as final |

@@ -35,6 +35,12 @@ export default function SiteMenu({
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
+  const [chromeTones, setChromeTones] = useState<{
+    logo: "light" | "dark";
+    menu: "light" | "dark";
+  }>({ logo: "light", menu: "light" });
+  const headerRef = useRef<HTMLElement>(null);
+  const logoRef = useRef<HTMLAnchorElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   /* "Get in touch" must open the contact dialog only after the menu's
@@ -48,6 +54,52 @@ export default function SiteMenu({
     if (open && !dialog.open) dialog.showModal();
     if (!open && dialog.open) dialog.close();
   }, [open]);
+
+  // The closed chrome has no visual container, so its mark/glyph follows the
+  // full-bleed surface currently passing beneath the top of the viewport.
+  useEffect(() => {
+    let rafId: number | null = null;
+    const readTone = () => {
+      rafId = null;
+      const header = headerRef.current;
+      const toneBelow = (control: HTMLElement | null): "light" | "dark" => {
+        if (!control || !header) return "light";
+        const rect = control.getBoundingClientRect();
+        const x = Math.max(1, Math.min(window.innerWidth - 1, rect.left + rect.width / 2));
+        const y = Math.max(1, Math.min(window.innerHeight - 1, rect.top + rect.height / 2));
+        const surface = document
+          .elementsFromPoint(x, y)
+          .filter((element) => !header.contains(element))
+          .map((element) => element.closest<HTMLElement>("[data-surface]"))
+          .find((element): element is HTMLElement => Boolean(element));
+        return surface?.dataset.surface === "card" ? "dark" : "light";
+      };
+      const next = {
+        logo: toneBelow(logoRef.current),
+        menu: toneBelow(triggerRef.current),
+      } as const;
+      setChromeTones((current) =>
+        current.logo === next.logo && current.menu === next.menu ? current : next,
+      );
+    };
+    const scheduleRead = () => {
+      if (rafId !== null) return;
+      rafId = window.requestAnimationFrame(readTone);
+    };
+
+    scheduleRead();
+    const settleTimer = window.setTimeout(scheduleRead, 120);
+    window.addEventListener("scroll", scheduleRead, { passive: true });
+    window.addEventListener("resize", scheduleRead);
+    document.addEventListener("transitionend", scheduleRead, true);
+    return () => {
+      window.removeEventListener("scroll", scheduleRead);
+      window.removeEventListener("resize", scheduleRead);
+      document.removeEventListener("transitionend", scheduleRead, true);
+      window.clearTimeout(settleTimer);
+      if (rafId !== null) window.cancelAnimationFrame(rafId);
+    };
+  }, [pathname]);
 
   // Body scroll is locked only while the menu is open.
   useEffect(() => {
@@ -83,21 +135,30 @@ export default function SiteMenu({
 
   return (
     <>
-      <header className="pointer-events-none fixed inset-x-0 top-0 z-[100]">
+      <header
+        ref={headerRef}
+        className="pointer-events-none fixed inset-x-0 top-0 z-[100]"
+      >
         <nav
           aria-label="Site"
           className="flex items-center justify-between pl-[max(env(safe-area-inset-left),var(--section-px))] pr-[max(env(safe-area-inset-right),var(--section-px))] pt-[max(env(safe-area-inset-top),1rem)]"
         >
           <Link
+            ref={logoRef}
             href={ROUTES.home}
             aria-current={pathname === ROUTES.home ? "page" : undefined}
-            className="chrome-chip h-11 w-11"
+            className="site-chrome-control"
+            data-tone={chromeTones.logo}
           >
             <Image
-              src="/assets/arizmi/logos/logomark-gradient.svg"
+              src={
+                chromeTones.logo === "dark"
+                  ? "/assets/arizmi/logos/logomark-white.svg"
+                  : "/assets/arizmi/logos/logomark-gradient.svg"
+              }
               alt="Arizmi Labs — home"
-              width={26}
-              height={26}
+              width={38}
+              height={38}
               priority
             />
           </Link>
@@ -113,7 +174,8 @@ export default function SiteMenu({
             aria-haspopup="dialog"
             aria-expanded={open}
             aria-label="Open menu"
-            className="chrome-chip h-11 w-11 text-ink transition-colors hover:text-teal-ink"
+            className="site-chrome-control"
+            data-tone={chromeTones.menu}
           >
             <svg
               width="18"
@@ -123,9 +185,9 @@ export default function SiteMenu({
               aria-hidden="true"
             >
               <path
-                d="M1 1h16M1 11h16"
+                d="M1 1h16M1 6h16M1 11h16"
                 stroke="currentColor"
-                strokeWidth="1.5"
+                strokeWidth="1.25"
                 strokeLinecap="round"
               />
             </svg>
@@ -148,7 +210,7 @@ export default function SiteMenu({
               className="inline-flex h-11 items-center"
             >
               <Image
-                src="/assets/arizmi/logos/logomark-gradient.svg"
+                src="/assets/arizmi/logos/logomark-white.svg"
                 alt="Arizmi Labs — home"
                 width={36}
                 height={36}

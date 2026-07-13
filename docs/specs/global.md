@@ -31,7 +31,8 @@ Build semantic CSS tokens in `app/globals.css`; components should not repeat raw
 
 - Top-left uses the Arizmi logomark only.
 - Top-right uses a minimal menu icon.
-- The controls remain legible on warm off-white and card-black contexts.
+- Both controls use bare, transparent 44 × 44 CSS-pixel hit targets with no circular container, border, background, blur, or shadow.
+- On light surfaces, use the gradient logomark and an ink menu glyph. On card-black surfaces, use the white logomark and a white menu glyph, selected through the shared surface markers.
 - The current route is exposed to assistive technology even if the visual design stays minimal.
 
 ### Open state
