@@ -591,9 +591,9 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
       pointerType: event.pointerType,
       intent: "pending",
     };
-    // Capture immediately so a fast mouse/pen movement outside the archive
-    // still delivers pointerup/cancel. Touch panning remains governed by
-    // `touch-action: pan-y` and is handed back through pointercancel.
+    // Capture immediately so a fast movement outside the archive still
+    // delivers pointerup/cancel. Touches that begin between cards retain the
+    // archive's vertical page-pan behavior; cards opt into direct dragging.
     try {
       event.currentTarget.setPointerCapture(event.pointerId);
     } catch {
@@ -609,10 +609,9 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
     const dy = event.clientY - info.y;
     if (info.intent === "pending" && isDragGesture(dx, dy)) {
       if (Math.abs(dy) > Math.abs(dx)) {
-        // A vertical touch gesture belongs to the page. Mouse and pen input,
-        // however, should be able to grab the fan along its natural vertical
-        // tangent and rotate it directly.
-        if (info.pointerType === "touch") {
+        // A touch that begins in the gaps belongs to the page. Touches that
+        // begin on a card can grab the fan along its natural vertical tangent.
+        if (info.pointerType === "touch" && info.downIndex === null) {
           info.intent = "page";
           return;
         }

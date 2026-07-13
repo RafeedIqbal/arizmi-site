@@ -755,8 +755,8 @@ body {
   /* Contain slot z-indexes below the copy while browsing… */
   z-index: 1;
   width: 100%;
-  height: clamp(20rem, 48svh, 31rem);
-  min-height: 20rem;
+  height: clamp(30rem, 72svh, 40rem);
+  min-height: 30rem;
   margin-top: -0.75rem;
   touch-action: pan-y;
   user-select: none;
@@ -792,6 +792,7 @@ body {
   position: absolute;
   top: 0;
   left: 0;
+  touch-action: none;
   transform-origin: center center;
   transition: transform 0.52s cubic-bezier(0.2, 0.8, 0.2, 1),
     opacity 0.36s ease, filter 0.32s ease;
