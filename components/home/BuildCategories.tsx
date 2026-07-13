@@ -41,10 +41,13 @@ export default function BuildCategories() {
 
   const toggleTile = useCallback(
     (id: string) => {
-      animationsRef.current.forEach((animation) => animation.cancel());
-      animationsRef.current = [];
+      const useFlipAnimation =
+        !reducedMotion && window.matchMedia("(min-width: 40rem)").matches;
 
-      if (!reducedMotion) {
+      // Capture the currently painted geometry before cancelling an in-flight
+      // animation. A rapid second selection then continues from what the user
+      // can actually see instead of snapping to the previous end state first.
+      if (useFlipAnimation) {
         previousRectsRef.current = new Map(
           Array.from(tileRefs.current, ([tileId, tile]) => [
             tileId,
@@ -53,8 +56,13 @@ export default function BuildCategories() {
         );
         previousGridHeightRef.current =
           gridRef.current?.getBoundingClientRect().height ?? null;
+      } else {
+        previousRectsRef.current = new Map();
+        previousGridHeightRef.current = null;
       }
 
+      animationsRef.current.forEach((animation) => animation.cancel());
+      animationsRef.current = [];
       setExpandedId((current) => (current === id ? null : id));
     },
     [reducedMotion],
