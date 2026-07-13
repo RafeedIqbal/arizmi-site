@@ -102,7 +102,7 @@ function slotStyle(pos: number, frame: Frame, cardW: number): CSSProperties {
   // though its interactive region is confined to the right-hand column.
   const activeX = desktop
     ? frame.sectionW * 0.75 - frame.offsetX
-    : frame.w * 0.68;
+    : frame.w * 0.62;
   const centerX = activeX + radius;
   const activeNudge = desktop ? 16 : 10;
   const angle = pos * ARC_STEP_RAD;
@@ -307,6 +307,7 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
     id: number;
     x: number;
     y: number;
+    lastY: number;
     startActive: number;
     downIndex: number | null;
     pointerType: string;
@@ -489,8 +490,8 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
   }, [selectedIndex, closeCard]);
 
   // Wheel/trackpad: an owned burst advances the archive without moving the
-  // page. Once a bound is reached, that burst remains owned; a new outward
-  // gesture after the quiet window is released to normal page scrolling.
+  // page. Outward travel at either bound is released immediately so the same
+  // gesture can continue into normal page scrolling.
   useEffect(() => {
     const el = archiveRef.current;
     if (!el) return;
@@ -525,10 +526,19 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
       const newBurst =
         burst.direction === 0 || now - burst.lastAt > WHEEL_BURST_QUIET_MS;
 
+      if (outward) {
+        wheelAccRef.current = 0;
+        burst.direction = direction;
+        burst.owned = false;
+        burst.cooldownUntil = 0;
+        burst.lastAt = now;
+        return;
+      }
+
       if (newBurst) {
         wheelAccRef.current = 0;
         burst.direction = direction;
-        burst.owned = !outward;
+        burst.owned = true;
         burst.cooldownUntil = 0;
       } else if (burst.direction !== direction) {
         // Direction jitter is still part of the current inertial burst. Reset
@@ -586,6 +596,7 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
       id: event.pointerId,
       x: event.clientX,
       y: event.clientY,
+      lastY: event.clientY,
       startActive: activeRef.current,
       downIndex: Number.isInteger(downIndex) ? downIndex : null,
       pointerType: event.pointerType,
@@ -607,12 +618,35 @@ export default function HomeHero({ bookingUrl }: { bookingUrl: string | null }) 
     if (!info || info.id !== event.pointerId) return;
     const dx = event.clientX - info.x;
     const dy = event.clientY - info.y;
+    const incrementalY = event.clientY - info.lastY;
+    info.lastY = event.clientY;
+    const touchStartedOnCard =
+      info.pointerType === "touch" && info.downIndex !== null;
+
+    if (info.intent === "page") {
+      if (touchStartedOnCard) {
+        event.preventDefault();
+        window.scrollBy(0, -incrementalY);
+      }
+      return;
+    }
+
     if (info.intent === "pending" && isDragGesture(dx, dy)) {
       if (Math.abs(dy) > Math.abs(dx)) {
         // A touch that begins in the gaps belongs to the page. Touches that
         // begin on a card can grab the fan along its natural vertical tangent.
         if (info.pointerType === "touch" && info.downIndex === null) {
           info.intent = "page";
+          return;
+        }
+        const direction = dy < 0 ? 1 : -1;
+        const outward =
+          (direction < 0 && info.startActive <= 0) ||
+          (direction > 0 && info.startActive >= LAST);
+        if (touchStartedOnCard && outward) {
+          info.intent = "page";
+          event.preventDefault();
+          window.scrollBy(0, -dy);
           return;
         }
         info.intent = "vertical";
