@@ -28,7 +28,7 @@ export default function ProcessSection() {
       // Pin/scrub only when there is genuine vertical room and motion is
       // allowed; every other case keeps the plain readable flow.
       mm.add(
-        "(min-width: 900px) and (min-height: 700px) and (prefers-reduced-motion: no-preference)",
+        "(min-width: 900px) and (min-height: 700px) and (prefers-reduced-motion: no-preference), (max-width: 899px) and (min-height: 640px) and (prefers-reduced-motion: no-preference)",
         () => {
           const steps = gsap.utils.toArray<HTMLElement>(".process__step", root);
           const counters = gsap.utils.toArray<HTMLElement>(
@@ -49,7 +49,10 @@ export default function ProcessSection() {
             const progress = gsap.utils.clamp(0, 1, rawProgress);
             const stepPosition = progress * (steps.length - 1);
             const activeIndex = Math.round(stepPosition);
-            const stepPitch = gsap.utils.clamp(112, 136, window.innerHeight * 0.18);
+            const isMobile = window.innerWidth < 900;
+            const stepPitch = isMobile
+              ? gsap.utils.clamp(136, 160, window.innerHeight * 0.2)
+              : gsap.utils.clamp(112, 136, window.innerHeight * 0.18);
 
             track.style.setProperty(
               "--track-y",
