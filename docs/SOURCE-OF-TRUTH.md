@@ -6,7 +6,8 @@
 - Google Doc ID: `1X_7Q1O-kl6DjNw7rXmlaWj18yjpy45b78S-5mGQ9Trs`
 - Capture date: 2026-07-10
 - Original asset folder retained for provenance: [Google Drive asset folder](https://drive.google.com/drive/folders/1HUSyg73IWvpOhloBEzV_e4pQJIH90PUK?usp=drive_link)
-- Authoritative local asset set for implementation: [`public/New_Assets`](../public/New_Assets/)
+- Authoritative supplied asset archive: [`brand-source`](./brand-source/)
+- Production-ready web derivatives: [`public/assets/arizmi`](../public/assets/arizmi/)
 
 The source Doc contains tabs for Design details, Homepage and its sections, Navigation, Builds, BluePrint AI, Services, and About. The page specs in [`specs/`](./specs/) preserve that content and the links embedded in those tabs.
 
@@ -31,21 +32,19 @@ Contrast-safe semantic tokens derived from these primitives (text, muted text, b
 
 ### Production assets
 
-| Asset | Intended use |
+| Runtime asset | Intended use |
 | --- | --- |
-| [`arizmi_card_back_live_teal.png`](../public/New_Assets/arizmi_card_back_live_teal.png) | Live-build card back |
-| [`arizmi_card_back_blueprint_tech_blue.png`](../public/New_Assets/arizmi_card_back_blueprint_tech_blue.png) | BluePrint card back |
-| [`arizmi_card_back_concept_deep_violet.png`](../public/New_Assets/arizmi_card_back_concept_deep_violet.png) | Concept card back |
-| [`ArizmiLabs_Logomark_Gradient SVG File -01.svg`](<../public/New_Assets/Logo/2. Logomark/ArizmiLabs_Logomark_Gradient SVG File -01.svg>) | Preferred light-canvas hero/nav logomark |
-| [`ArizmiLabs_Logomark_Black-01.svg`](<../public/New_Assets/Logo/2. Logomark/ArizmiLabs_Logomark_Black-01.svg>) | Black single-colour mark |
-| [`ArizmiLabs_Logomark_Solid SVG File-01.svg`](<../public/New_Assets/Logo/2. Logomark/ArizmiLabs_Logomark_Solid SVG File-01.svg>) | Solid teal single-colour mark |
-| [`ArizmiLabs_Primary_Gradient SVG File-01.svg`](<../public/New_Assets/Logo/1. Primary_Logo/ArizmiLabs_Primary_Gradient SVG File-01.svg>) | Full primary logo where the wordmark is needed |
-| [`Wordmark Gradient Color SVG -01.svg`](<../public/New_Assets/Logo/3. Logo workmark/Wordmark Gradient Color SVG -01.svg>) | Standalone wordmark |
-| [`Manrope-VariableFont_wght.ttf`](../public/New_Assets/Fonts/Manrope/Manrope-VariableFont_wght.ttf) | Main variable font, preferred over multiple static files |
-| [`SpaceMono-Regular.ttf`](../public/New_Assets/Fonts/Space_Mono/SpaceMono-Regular.ttf) | Metadata regular |
-| [`SpaceMono-Bold.ttf`](../public/New_Assets/Fonts/Space_Mono/SpaceMono-Bold.ttf) | Metadata bold |
+| [`live.webp`](../public/assets/arizmi/card-backs/live.webp) | Live-build card back |
+| [`blueprint.webp`](../public/assets/arizmi/card-backs/blueprint.webp) | BluePrint card back |
+| [`concept.webp`](../public/assets/arizmi/card-backs/concept.webp) | Concept card back |
+| [`logomark-gradient.svg`](../public/assets/arizmi/logos/logomark-gradient.svg) | Navigation logomark |
+| [`logomark-white.svg`](../public/assets/arizmi/logos/logomark-white.svg) | Logomark on card-black surfaces |
+| [`wordmark-gradient.svg`](../public/assets/arizmi/logos/wordmark-gradient.svg) | Compact footer wordmark |
+| [`manrope-variable.woff2`](../public/fonts/manrope-variable.woff2) | Main variable font, weights 200–800 |
+| [`space-mono-regular.woff2`](../public/fonts/space-mono-regular.woff2) | Metadata regular |
+| [`space-mono-bold.woff2`](../public/fonts/space-mono-bold.woff2) | Metadata bold |
 
-Other black, solid, white, PNG, AI, and PDF logo variants remain available in `public/New_Assets/Logo`. Components reference only the URL-safe runtime aliases under `public/assets/arizmi/`, documented in [`runtime-assets.md`](./runtime-assets.md); the supplied originals are preserved untouched.
+Editable artwork, print files, original PNGs, full TTFs, and font licences remain untouched in [`brand-source/`](./brand-source/), outside the deployable web root. Legacy brand files and unwired project artwork are retained separately in [`reference-assets/`](./reference-assets/). Runtime transformation details are documented in [`runtime-assets.md`](./runtime-assets.md).
 
 ### Preserved Google Doc reference images
 
@@ -103,7 +102,7 @@ Every unresolved row below ships its safe default in the implementation (verifie
 | D-08 | Builds labels conflict: defined taxonomy vs “Product Build” and “Launch Build” statuses | `sourceStatus` vs `filterCategories` in `lib/content/builds.ts` | Raw statuses preserved; only unambiguous filter mappings (so e.g. Freedom Airlines is absent from “Live builds” and Growth Map only appears under “All”) | Pending |
 | D-09 | Hero project-card front content and which projects appear first | `HERO_BUILD_IDS` in `lib/content/heroArchive.ts` | Documented provisional subset reusing Builds data | Pending |
 | D-10 | About statistics | `SHOW_STATS_PLACEHOLDER` in `app/about/page.tsx` | Stats section renders in dev only; absent from production | Pending |
-| D-11 | About team card images are referenced but absent from `New_Assets` | `lib/content/team.ts`, `components/about/TeamGallery.tsx` | Gradient monogram placeholder, clearly marked for replacement | Pending |
+| D-11 | About team card images are referenced but absent from the supplied brand archive | `lib/content/team.ts`, `components/about/TeamGallery.tsx` | Gradient monogram placeholder, clearly marked for replacement | Pending |
 | D-12 | About “Why Arizmi?” image | `app/about/page.tsx` (`.about-why__visual`) | Abstract brand-system logomark treatment, no stock imagery | Pending — shipped treatment may be approved as final |
 | D-13 | Footer content is empty in the brief | `components/SiteFooter.tsx` | Wordmark, primary links, booking/contact actions, copyright; no invented legal/social/address | Pending |
 | D-14 | Careers route/content | `lib/content/navigation.ts`, `components/SiteMenu.tsx` | Non-linked “Careers — Soon” menu item; no route, nothing indexed | Pending |
@@ -115,4 +114,3 @@ Every unresolved row below ships its safe default in the implementation (verifie
 ## Implementation status
 
 The redesign implementation pack (18 bounded task files that previously lived in `docs/redesign/tasks/`) was completed and removed on 2026-07-13; see git history before commit `01e5d68` for the task definitions. All five routes, the BluePrint AI flow, and the shared foundation are on `main` and `npm run ci` passes. Remaining launch work is tracked in [`PRODUCTION.md`](./PRODUCTION.md).
-

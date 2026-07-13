@@ -9,7 +9,7 @@ import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const manrope = localFont({
-  src: "../public/New_Assets/Fonts/Manrope/Manrope-VariableFont_wght.ttf",
+  src: "../public/fonts/manrope-variable.woff2",
   variable: "--font-manrope",
   display: "swap",
   weight: "200 800",
@@ -18,12 +18,12 @@ const manrope = localFont({
 const spaceMono = localFont({
   src: [
     {
-      path: "../public/New_Assets/Fonts/Space_Mono/SpaceMono-Regular.ttf",
+      path: "../public/fonts/space-mono-regular.woff2",
       weight: "400",
       style: "normal",
     },
     {
-      path: "../public/New_Assets/Fonts/Space_Mono/SpaceMono-Bold.ttf",
+      path: "../public/fonts/space-mono-bold.woff2",
       weight: "700",
       style: "normal",
     },

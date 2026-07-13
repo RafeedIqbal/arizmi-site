@@ -8,7 +8,9 @@ The 2026 redesign described in the [Arizmi Labs website brief](https://docs.goog
 | --- | --- |
 | [`PRODUCTION.md`](./PRODUCTION.md) | What remains to reach production, and the Vercel deployment runbook. Start here. |
 | [`SOURCE-OF-TRUTH.md`](./SOURCE-OF-TRUTH.md) | Captured brief, brand foundation, asset inventory, external references, and the open-decision registry (D-01–D-18). |
-| [`runtime-assets.md`](./runtime-assets.md) | Mapping from supplied originals in `public/New_Assets/` to the URL-safe runtime aliases in `public/assets/arizmi/`. |
+| [`runtime-assets.md`](./runtime-assets.md) | Mapping from preserved brand masters to optimized runtime images and fonts. |
+| [`brand-source/`](./brand-source/) | Supplied brand artwork, font sources, licences, and editable/print files preserved outside the public web root. |
+| [`reference-assets/`](./reference-assets/) | Legacy brand and unwired project artwork retained for provenance, not runtime use. |
 | [`specs/`](./specs/) | Per-page content specifications preserving the Google Doc brief verbatim (global, homepage, builds, blueprint-ai, services, about). The approved copy source of truth. |
 | [`reference-images/`](./reference-images/) | Layout reference images extracted from the brief. |
 
@@ -18,7 +20,7 @@ When sources disagree, use this order:
 
 1. a written decision in the Open decisions table in [`SOURCE-OF-TRUTH.md`](./SOURCE-OF-TRUTH.md)
 2. the Google Doc redesign brief
-3. files in [`public/New_Assets`](../public/New_Assets/)
+3. files in [`brand-source/`](./brand-source/)
 4. the page specifications in [`specs/`](./specs/)
 5. the current site implementation
 

@@ -128,7 +128,7 @@ export default function AboutPage() {
               tokens and the gradient logomark. Decorative only. */}
           <div className="about-why__visual" aria-hidden="true">
             <Image
-              src="/assets/arizmi/logomark-white.png"
+              src="/assets/arizmi/logos/logomark-white.svg"
               alt=""
               width={140}
               height={140}

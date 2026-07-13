@@ -19,8 +19,7 @@ Because BluePrint AI fails closed on its own, the site can launch in phases: the
 | 2 | Contact recipient (D-15) | `CONTACT_RECIPIENT` env var | Falls back to a hardcoded `mish@icontraining.app` in `lib/server/config.ts`. Confirm or override — this address will silently receive production contact mail otherwise. |
 | 3 | Mail transport | `GMAIL_USER`, `GMAIL_APP_PASSWORD` env vars | Without them the contact form returns "Messaging is temporarily unavailable". Uses Gmail SMTP via Nodemailer. |
 | 4 | Production domain | `SITE_URL` in `lib/site.ts` | Hardcoded to `https://www.arizmilabs.com`; drives canonical URLs, sitemap, robots, and OG metadata. Confirm this is the launch domain or change it. |
-| 5 | Favicon / app icons | `app/icon.svg`, `app/apple-icon.tsx`, `public/icon*.png`, `public/apple-icon.png` | Still the **old blue-violet brand** (`#009EDC` → `#3C2F88`), not the teal identity. Regenerate on the teal gradient and consolidate the duplicate icon declarations (`metadata.icons` in `app/layout.tsx` overlaps the file-convention icons). |
-| 6 | Owner release QA | — | The manual smoke-test pass (matrix below) has not been run. It is the final gate before promoting to production. |
+| 5 | Owner release QA | — | The manual smoke-test pass (matrix below) has not been run. It is the final gate before promoting to production. |
 
 ## Phase 2 — enable BluePrint AI
 
@@ -55,10 +54,9 @@ These improve the site but nothing breaks while they wait:
 Smaller fixes, roughly by value:
 
 1. **Accessibility bugs (BluePrint form):** the error-summary links for the four choice groups point at `#bp-<field>` anchors that don't exist (`ChoiceGroup`'s fieldset has no `id` — `components/blueprint/Fields.tsx`), and the progress bar's width transition ignores `prefers-reduced-motion` (`Fields.tsx`). Both are small, worth fixing before Phase 2.
-2. **Retire the legacy dark theme:** `components/ContactModal.tsx` still uses the superseded dark tokens (`--surface: #111318`, `--accent: #59b0ff`, …) and its own focus-trap instead of the `Dialog` primitive. `app/layout.tsx` still loads Inter + Instrument Serif for it. Restyling the modal onto the design system lets you delete the legacy tokens in `globals.css` and both legacy font files (~2 unused font downloads today).
-3. **Disabled booking control isn't focusable** — keyboard/screen-reader users can't discover the "Booking opens soon" reason. Moot once `BOOKING_URL` is set.
-4. **Builds page state:** the expanded archive entry and featured selection don't survive back/forward navigation (only the filter does), and the featured selection resets when the filter changes.
-5. **Cosmetic spec residue:** the hero card hover "foil glint" from the brief was never implemented; six `role="region"` landmarks on the Services accordion are noisy; `.DS_Store` files exist on disk (git-ignored, but the brief asked for their removal).
+2. **Disabled booking control isn't focusable** — keyboard/screen-reader users can't discover the "Booking opens soon" reason. Moot once `BOOKING_URL` is set.
+3. **Builds page state:** the expanded archive entry and featured selection don't survive back/forward navigation (only the filter does), and the featured selection resets when the filter changes.
+4. **Accordion landmarks:** six `role="region"` landmarks on the Services accordion are noisy.
 
 ## Release QA — owner smoke tests
 

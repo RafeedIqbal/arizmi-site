@@ -23,7 +23,7 @@ Potential `/careers`, `/contact`, and `/privacy` routes are not defined by the s
 - Visual tone: premium product archive, clear and technical without looking like generic “AI” software.
 - Repeated motifs may include fine rules, broad arcs, grid/coordinate marks, restrained foil glints, black cards, and concise Space Mono metadata.
 
-Build semantic CSS tokens in `app/globals.css`; components should not repeat raw brand hex values. Retire the current Inter/Instrument Serif theme only after every existing component has been migrated or replaced.
+Build semantic CSS tokens in `app/globals.css`; components should not repeat raw brand hex values. The superseded Inter/Instrument Serif theme and its unused font files have been retired now that every component uses the current design system.
 
 ## Navigation
 
@@ -115,4 +115,3 @@ Centralize destinations rather than scattering environment lookups. External act
 - Keep AI prompt templates versioned and editable in one server-only location.
 - Use schema validation at form, API, AI-output, and persistence boundaries.
 - Keep page sections reusable where content truly overlaps, but do not force visually distinct sections into a single overly generic component.
-

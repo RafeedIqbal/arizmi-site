@@ -50,16 +50,16 @@ Legacy dark-theme tokens (`--bg`, `--surface`, `--accent: #59b0ff`, …) remain 
 
 ## Fonts
 
-Self-hosted via `next/font/local` in `app/layout.tsx` from `public/New_Assets/Fonts/`:
+Self-hosted via `next/font/local` in `app/layout.tsx` from optimized WOFF2 files in `public/fonts/`:
 
 - **Manrope** (`--font-manrope`, weights 200–800) — main typeface, default body font.
 - **Space Mono** (`--font-space-mono`, 400/700) — metadata, via `font-mono` or `.font-meta` / `MetaLabel`.
 
-Inter and Instrument Serif are legacy leftovers kept only for `ContactModal`; remove them when that modal is restyled.
+The supplied TTF files, unused weights/styles, and OFL licences are preserved outside the web root in `docs/brand-source/Fonts/`.
 
 ## Brand assets
 
-Components reference only the URL-safe aliases in `public/assets/arizmi/` (logomarks, wordmarks, card backs). The supplied originals in `public/New_Assets/` are provenance copies — never rename or delete them. Mapping: `docs/runtime-assets.md`.
+Components reference only the URL-safe, runtime-ready derivatives in `public/assets/arizmi/` (logomarks, wordmark, and card backs). The supplied originals are preserved outside the web root in `docs/brand-source/`; legacy and unapproved project artwork lives in `docs/reference-assets/`. Never edit the supplied masters in place. Mapping: `docs/runtime-assets.md`.
 
 ## Animation
 

@@ -47,9 +47,9 @@ The initial state shows card backs only:
 
 | State | Color | Production asset |
 | --- | --- | --- |
-| Live build | Arizmi mid teal | [`arizmi_card_back_live_teal.png`](../../public/New_Assets/arizmi_card_back_live_teal.png) |
-| BluePrint | Tech blue | [`arizmi_card_back_blueprint_tech_blue.png`](../../public/New_Assets/arizmi_card_back_blueprint_tech_blue.png) |
-| Concept | Deep violet | [`arizmi_card_back_concept_deep_violet.png`](../../public/New_Assets/arizmi_card_back_concept_deep_violet.png) |
+| Live build | Arizmi mid teal | [`live.webp`](../../public/assets/arizmi/card-backs/live.webp) |
+| BluePrint | Tech blue | [`blueprint.webp`](../../public/assets/arizmi/card-backs/blueprint.webp) |
+| Concept | Deep violet | [`concept.webp`](../../public/assets/arizmi/card-backs/concept.webp) |
 
 ![Archive card system reference](../reference-images/hero-archive-card-system.png)
 
@@ -145,4 +145,3 @@ CTA: `Book a build call`
 - Every section has a coherent 320 px layout and no horizontal overflow.
 - Homepage CTAs resolve to the centralized booking destination or `/blueprint-ai` as specified.
 - Visual references remain inspiration only; no external component is embedded without an explicit dependency and licensing decision.
-

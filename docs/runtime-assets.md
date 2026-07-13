@@ -1,55 +1,55 @@
-# Runtime asset aliases
+# Runtime asset map
 
-Created by `TASK-001`. The supplied originals in [`public/New_Assets`](../public/New_Assets/) are the
-provenance copies and remain unchanged; components must reference only the URL-safe runtime aliases
-under `public/assets/arizmi/`.
+`public/` is runtime-only. Supplied masters and reference artwork live outside the web root in [`brand-source/`](./brand-source/) and [`reference-assets/`](./reference-assets/), so source files are preserved without making them publicly downloadable.
 
-All aliases are byte-identical copies of their source files unless a row says "Derived". Every
-source SVG carries a `viewBox="0 0 2000 2000"`, so intrinsic aspect ratio is preserved when sized
-via CSS or `next/image`.
+## Public layout
 
-## Logos
+```text
+public/
+├── assets/arizmi/
+│   ├── card-backs/
+│   │   ├── blueprint.webp
+│   │   ├── concept.webp
+│   │   └── live.webp
+│   └── logos/
+│       ├── logomark-gradient.svg
+│       ├── logomark-white.svg
+│       └── wordmark-gradient.svg
+├── fonts/
+│   ├── manrope-variable.woff2
+│   ├── space-mono-bold.woff2
+│   └── space-mono-regular.woff2
+└── llms.txt
+```
 
-| Runtime path (`/assets/arizmi/…`) | Source (`public/New_Assets/Logo/…`) | Intended use |
-| --- | --- | --- |
-| `logomark-gradient.svg` | `2. Logomark/ArizmiLabs_Logomark_Gradient SVG File -01.svg` | Preferred light-canvas hero/nav logomark |
-| `logomark-black.svg` | `2. Logomark/ArizmiLabs_Logomark_Black-01.svg` | Black single-colour mark |
-| `logomark-solid-teal.svg` | `2. Logomark/ArizmiLabs_Logomark_Solid SVG File-01.svg` | Solid teal single-colour mark |
-| `logomark-white.png` | `2. Logomark/ArizmiLabs_Logomark_White PNG File-01.png` | Logomark on card-black surfaces |
-| `logo-primary-gradient.svg` | `1. Primary_Logo/ArizmiLabs_Primary_Gradient SVG File-01.svg` | Full primary logo where the wordmark is needed |
-| `logo-primary-black.svg` | `1. Primary_Logo/ArizmiLabs_Primary_Black SVG File-01.svg` | Black primary logo |
-| `logo-primary-solid-teal.svg` | `1. Primary_Logo/ArizmiLabs_Primary_Solid SVG File -01.svg` | Solid teal primary logo |
-| `logo-primary-white.png` | `1. Primary_Logo/ArizmiLabs_Primary_White PNG File-01.png` | Primary logo on card-black surfaces |
-| `wordmark-gradient.svg` | `3. Logo workmark/Wordmark Gradient Color SVG -01.svg` | Standalone wordmark |
-| `wordmark-gradient-tight.svg` | Derived from `wordmark-gradient.svg` (TASK-003): viewBox cropped to the artwork (`262 845 1476 310`, ≈4.76:1) because the original's square 2000×2000 viewBox leaves large transparent padding | Wordmark in compact chrome (footer) |
-| `wordmark-black.svg` | `3. Logo workmark/Wordmark Black Color SVG File-01.svg` | Black wordmark |
-| `wordmark-white.png` | `3. Logo workmark/Wordmark White PNG File-01.png` | Wordmark on card-black surfaces |
-| `logo-horizontal-full-color.png` | `Horizantal-Logo-Full-Color.png` | Horizontal full-colour lockup |
-| `logo-vertical-full-color.png` | `Vertical-Logo-Full-Color-Logo-PNG-File.png` | Vertical full-colour lockup |
+Next.js metadata images use the file-convention sources in `app/` (`favicon.ico`, `icon.svg`, `apple-icon.tsx`, and `opengraph-image.tsx`) and are deliberately not duplicated in `public/`.
 
-## Card backs
+The standards-aligned discovery file is `/llms.txt`; `next.config.ts` permanently redirects the previous singular `/llm.txt` URL for compatibility.
 
-| Runtime path (`/assets/arizmi/…`) | Source (`public/New_Assets/…`) | Intended use |
-| --- | --- | --- |
-| `card-back-live-teal.png` | `arizmi_card_back_live_teal.png` | Live-build card back |
-| `card-back-blueprint-tech-blue.png` | `arizmi_card_back_blueprint_tech_blue.png` | BluePrint card back |
-| `card-back-concept-deep-violet.png` | `arizmi_card_back_concept_deep_violet.png` | Concept card back |
+## Image derivatives
 
-## Fonts
+| Runtime path | Source master | Processing | Use |
+| --- | --- | --- | --- |
+| `assets/arizmi/card-backs/live.webp` | `brand-source/arizmi_card_back_live_teal.png` | High-fidelity near-lossless WebP; transparent canvas normalized to 428×652 | Live-build hero cards |
+| `assets/arizmi/card-backs/blueprint.webp` | `brand-source/arizmi_card_back_blueprint_tech_blue.png` | High-fidelity near-lossless WebP; transparent canvas normalized to 428×652 | BluePrint hero cards |
+| `assets/arizmi/card-backs/concept.webp` | `brand-source/arizmi_card_back_concept_deep_violet.png` | High-fidelity near-lossless WebP; transparent canvas normalized to 428×652 | Concept hero cards |
+| `assets/arizmi/logos/logomark-gradient.svg` | `brand-source/Logo/2. Logomark/ArizmiLabs_Logomark_Gradient SVG File -01.svg` | Illustrator metadata and wrapper groups removed | Navigation |
+| `assets/arizmi/logos/logomark-white.svg` | `brand-source/Logo/2. Logomark/ArizmiLabs_Logomark_Black-01.svg` | Matching vector geometry with a white fill | Dark About panel |
+| `assets/arizmi/logos/wordmark-gradient.svg` | `brand-source/Logo/3. Logo workmark/Wordmark Gradient Color SVG -01.svg` | ViewBox cropped to artwork (`262 845 1476 310`) and optimized with SVGO | Footer |
 
-Fonts are not copied into `public/assets/arizmi`; `next/font/local` in `app/layout.tsx` loads them
-directly from their source paths (which contain no spaces) and serves hashed, self-hosted copies:
+## Font derivatives
 
-| Source (`public/New_Assets/Fonts/…`) | CSS variable | Role |
-| --- | --- | --- |
-| `Manrope/Manrope-VariableFont_wght.ttf` (weights 200–800) | `--font-manrope` | Main UI typeface, default via `--font-sans` / body |
-| `Space_Mono/SpaceMono-Regular.ttf` (400) | `--font-space-mono` | Metadata typeface, via Tailwind `font-mono` or the `.font-meta` class |
-| `Space_Mono/SpaceMono-Bold.ttf` (700) | `--font-space-mono` | Metadata bold |
+`next/font/local` in `app/layout.tsx` loads the WOFF2 files below and emits hashed, self-hosted font assets. The runtime files retain Latin, Latin Extended, punctuation, currency, and arrow characters used by the English-language site; full source fonts and OFL licences remain in `docs/brand-source/Fonts/`.
 
-Legacy Inter/Instrument Serif files under `public/fonts/` remain loaded only for the superseded
-dark-theme components and are removed once every section migrates.
+| Runtime path | Source master | CSS variable | Weight |
+| --- | --- | --- | --- |
+| `fonts/manrope-variable.woff2` | `brand-source/Fonts/Manrope/Manrope-VariableFont_wght.ttf` | `--font-manrope` | 200–800 |
+| `fonts/space-mono-regular.woff2` | `brand-source/Fonts/Space_Mono/SpaceMono-Regular.ttf` | `--font-space-mono` | 400 |
+| `fonts/space-mono-bold.woff2` | `brand-source/Fonts/Space_Mono/SpaceMono-Bold.ttf` | `--font-space-mono` | 700 |
 
-## Remaining source-only variants
+## Rules
 
-AI/PDF source files (`Logo/4. Logo Source File/…`) and unused PNG/SVG variants stay available in
-`public/New_Assets/Logo` without runtime aliases. Add an alias here if a downstream task needs one.
+- Keep public filenames lowercase and kebab-case.
+- Add only files with a current runtime consumer.
+- Keep editable, print, provenance, and unapproved content outside `public/`.
+- Re-run visual checks and `npm run ci` after changing a derivative or its path.

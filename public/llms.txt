@@ -1,0 +1,18 @@
+# Arizmi Labs
+
+> For founders and teams building beyond the obvious. Arizmi Labs shapes ideas, builds systems, and ships digital products that need more than a dev shop.
+
+Arizmi Labs is a product and software studio helping founders, operators, and teams turn early ideas into working digital products, platforms, and AI-enabled systems.
+
+## Main pages
+
+- [Home](https://www.arizmilabs.com/): Studio overview, process, capabilities, and ways to start a build.
+- [Builds](https://www.arizmilabs.com/builds): The public build archive, spanning websites, platforms, AI systems, internal tools, and product concepts.
+- [BluePrint AI](https://www.arizmilabs.com/blueprint-ai): A guided tool that turns a rough idea, workflow, or product opportunity into a PRD-style plan before development begins.
+- [Services](https://www.arizmilabs.com/services): Product and software development services for digital products, platforms, AI systems, and operational tools.
+- [About](https://www.arizmilabs.com/about): Arizmi Labs’ approach, principles, and team.
+
+## Discovery
+
+- [Sitemap](https://www.arizmilabs.com/sitemap.xml): Canonical index of public pages.
+- [Robots](https://www.arizmilabs.com/robots.txt): Crawler directives.

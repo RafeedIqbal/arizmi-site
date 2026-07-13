@@ -94,7 +94,7 @@ export default function SiteMenu({
             className="chrome-chip h-11 w-11"
           >
             <Image
-              src="/assets/arizmi/logomark-gradient.svg"
+              src="/assets/arizmi/logos/logomark-gradient.svg"
               alt="Arizmi Labs — home"
               width={26}
               height={26}
@@ -148,7 +148,7 @@ export default function SiteMenu({
               className="inline-flex h-11 items-center"
             >
               <Image
-                src="/assets/arizmi/logomark-gradient.svg"
+                src="/assets/arizmi/logos/logomark-gradient.svg"
                 alt="Arizmi Labs — home"
                 width={36}
                 height={36}

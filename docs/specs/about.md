@@ -59,7 +59,7 @@ Interaction references:
 - [Team Carousel V1](https://www.framer.com/community/marketplace/components/team-carousel-v1/)
 - [Tilt Profile Card](https://www.framer.com/community/marketplace/components/tilt-profile-card/)
 
-The source expects compact cards with `Read more`, opening an accessible dialog or adjacent detail view for the full bio. Team cards are said to be in the asset folder but are absent from `public/New_Assets`; see D-11. Do not use unrelated stock portraits.
+The source expects compact cards with `Read more`, opening an accessible dialog or adjacent detail view for the full bio. Team cards are said to be in the asset folder but are absent from `docs/brand-source`; see D-11. Do not use unrelated stock portraits.
 
 ### Kaynat Choudhury
 
@@ -142,4 +142,3 @@ CTA: `Book a build call`
 - Team data is typed and separated from presentation.
 - The ticker does not create duplicate screen-reader output or unavoidable motion.
 - The page preserves the source copy and route metadata.
-

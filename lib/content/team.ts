@@ -3,7 +3,7 @@
  * exactly from docs/specs/about.md.
  *
  * No image field yet: team card images are referenced by the brief but absent
- * from public/New_Assets (D-11). TASK-016 adds a clearly-marked placeholder
+ * from the supplied docs/brand-source archive (D-11). TASK-016 adds a clearly-marked placeholder
  * treatment; do not use unrelated stock portraits.
  */
 export interface TeamMember {

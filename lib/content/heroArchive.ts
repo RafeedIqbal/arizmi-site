@@ -31,19 +31,19 @@ interface CardBackArt {
 
 const CARD_BACKS: Record<CardBackState, CardBackArt> = {
   live: {
-    src: "/assets/arizmi/card-back-live-teal.png",
+    src: "/assets/arizmi/card-backs/live.webp",
     alt: "Arizmi Labs live-build archive card",
     stateLabel: "Live build",
     stateCode: "ARZ-LIVE",
   },
   blueprint: {
-    src: "/assets/arizmi/card-back-blueprint-tech-blue.png",
+    src: "/assets/arizmi/card-backs/blueprint.webp",
     alt: "Arizmi Labs BluePrint archive card",
     stateLabel: "BluePrint",
     stateCode: "ARZ-BLUEPRINT",
   },
   concept: {
-    src: "/assets/arizmi/card-back-concept-deep-violet.png",
+    src: "/assets/arizmi/card-backs/concept.webp",
     alt: "Arizmi Labs concept archive card",
     stateLabel: "Concept",
     stateCode: "ARZ-CONCEPT",

@@ -31,7 +31,7 @@ export default function SiteFooter() {
         <div className="flex flex-col justify-between gap-[var(--space-xl)] sm:flex-row sm:items-start">
           <Link href={ROUTES.home} className="inline-flex" aria-label="Arizmi Labs — home">
             <Image
-              src="/assets/arizmi/wordmark-gradient-tight.svg"
+              src="/assets/arizmi/logos/wordmark-gradient.svg"
               alt=""
               width={168}
               height={35}
