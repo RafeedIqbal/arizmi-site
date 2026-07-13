@@ -763,7 +763,7 @@ body {
     right: 0;
     bottom: 0;
     left: auto;
-    width: 62%;
+    width: 50%;
     height: auto;
     margin-top: 0;
   }
@@ -932,15 +932,16 @@ body {
 /*
  * ------------------------------------------------------------------
  * Homepage process — "How ideas become systems" (TASK-006).
- * Baseline is a plain, fully legible stacked list. On wide, tall
- * viewports with motion allowed, ProcessSection pins the section and
- * moves emphasis down the steps; the emphasis is supplementary only,
- * so inactive steps stay at contrast-safe text (never hidden/blurred).
+ * Baseline is a fully legible dark timeline. On wide, tall viewports
+ * with motion allowed, ProcessSection pins a two-column counter and
+ * timeline while continuously synchronising scroll progress.
  * ------------------------------------------------------------------
  */
 .process {
-  background: var(--canvas);
-  color: var(--ink);
+  position: relative;
+  overflow: clip;
+  background: var(--surface-card);
+  color: var(--ink-on-card);
 }
 
 .process__inner {
@@ -948,16 +949,51 @@ body {
 }
 
 .process__head {
-  margin-bottom: clamp(2rem, 5vw, 3.5rem);
+  margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
+}
+
+.process__heading {
+  margin: 0;
+  max-width: 16ch;
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 650;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
 }
 
 .process__body {
-  display: grid;
-  gap: 1.5rem;
+  width: 100%;
+  max-width: 48rem;
+}
+
+.process__visual {
+  display: none;
+}
+
+.process__timeline {
+  position: relative;
+}
+
+.process__track {
+  position: relative;
 }
 
 .process__rail {
-  display: none;
+  --progress: 0%;
+  position: absolute;
+  top: 0.45rem;
+  bottom: 0.45rem;
+  left: 0.34375rem;
+  width: 1px;
+  overflow: hidden;
+  background: var(--border-on-card);
+}
+
+.process__rail-fill {
+  display: block;
+  width: 100%;
+  height: var(--progress);
+  background: var(--teal-light);
 }
 
 .process__steps {
@@ -965,104 +1001,262 @@ body {
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 1rem;
+  gap: clamp(1.75rem, 5vw, 2.75rem);
 }
 
 .process__step {
-  border-left: 2px solid var(--border-soft);
-  padding: 0.75rem 0 0.75rem 1.5rem;
+  --step-top: 0px;
+  --step-opacity: 1;
+  --step-offset: 0px;
+  --step-scale: 1;
+  --node-scale: 1;
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 0.75rem minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.process__node {
+  position: relative;
+  z-index: 1;
+  width: 0.75rem;
+  height: 0.75rem;
+  margin-top: 0.1875rem;
+  border: 1px solid var(--border-on-card-strong);
+  border-radius: 50%;
+  background: var(--surface-card);
+  transform: scale(var(--node-scale));
+  transform-origin: center;
+}
+
+.process__content {
+  min-width: 0;
+  transform: translateX(var(--step-offset)) scale(var(--step-scale));
+  transform-origin: left top;
 }
 
 .process__index {
   margin: 0;
-  font-size: 0.8rem;
+  font-size: 0.72rem;
+  line-height: 1.4;
   letter-spacing: 0.14em;
-  color: var(--teal-ink);
+  color: var(--teal-light);
 }
 
 .process__title {
-  margin: 0.5rem 0 0;
-  font-size: clamp(1.25rem, 2.5vw, 1.6rem);
+  margin: 0.3rem 0 0;
+  font-size: clamp(1.35rem, 3vw, 1.75rem);
   font-weight: 700;
+  line-height: 1.2;
   letter-spacing: -0.01em;
 }
 
+.process__desc-reveal {
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
+.process__desc-clip {
+  min-height: 0;
+  overflow: hidden;
+}
+
 .process__desc {
-  margin: 0.5rem 0 0;
+  margin: 0.65rem 0 0;
   max-width: 52ch;
-  color: var(--ink-muted);
-  line-height: 1.55;
+  color: var(--ink-on-card-muted);
+  line-height: 1.6;
 }
 
 @media (min-width: 900px) {
-  .process {
-    display: flex;
-    align-items: center;
-  }
-
-  .process__inner {
+  .process[data-enhanced="true"] .process__inner {
     display: flex;
     flex-direction: column;
     justify-content: center;
     min-height: 100vh;
     min-height: 100svh;
+    padding-block: clamp(4rem, 8vh, 6rem);
   }
 
-  .process__body {
-    grid-template-columns: 3px 1fr;
-    gap: 3rem;
-    align-items: stretch;
+  .process[data-enhanced="true"] .process__head {
+    margin-bottom: clamp(2rem, 5vh, 3.5rem);
   }
 
-  .process__rail {
+  .process[data-enhanced="true"] .process__body {
+    display: grid;
+    grid-template-columns: minmax(18rem, 0.8fr) minmax(28rem, 1.2fr);
+    gap: clamp(3rem, 8vw, 7rem);
+    align-items: center;
+    max-width: none;
+  }
+
+  .process[data-enhanced="true"] .process__visual {
     display: block;
+  }
+
+  .process__counter-panel {
     position: relative;
-    width: 3px;
-    border-radius: 2px;
-    background: var(--border-soft);
+    width: min(100%, 24rem);
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border: 1px solid var(--border-on-card);
+    border-radius: var(--radius-lg);
+    background: color-mix(in srgb, var(--canvas) 4%, var(--surface-card));
+    box-shadow: 0 1.5rem 5rem color-mix(in srgb, var(--surface-card) 70%, transparent);
   }
 
-  .process__rail-fill {
+  .process__counter-stack {
     position: absolute;
-    inset: 0 0 auto 0;
-    height: calc(var(--progress, 0) * 100%);
-    border-radius: 2px;
-    background: var(--gradient-teal);
+    inset: 0;
+    display: grid;
+    place-items: center;
   }
 
-  .process__steps {
-    gap: clamp(1.75rem, 5vh, 3.5rem);
+  .process__counter-number {
+    --counter-opacity: 0;
+    --counter-scale: 0.96;
+    position: absolute;
+    font-size: clamp(6rem, 12vw, 9.5rem);
+    font-weight: 650;
+    line-height: 1;
+    letter-spacing: -0.075em;
+    color: color-mix(in srgb, var(--teal-light) 35%, var(--surface-card));
+    opacity: var(--counter-opacity);
+    transform: scale(var(--counter-scale));
+    will-change: opacity, transform;
   }
 
-  .process__step {
-    border-left: none;
-    padding: 0;
+  .process__counter-badge {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    border: 1px solid var(--border-on-card);
+    border-radius: var(--radius-sm);
+    padding: 0.35rem 0.55rem;
+    background: var(--surface-card);
+    color: var(--ink-on-card-muted);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
   }
 
-  /* Supplementary emphasis while pinned — inactive stays legible. */
-  .process__step[data-state] .process__title {
-    color: var(--ink-muted);
-    transition: color 0.4s ease, transform 0.4s ease;
+  .process__counter-current {
+    color: var(--teal-light);
   }
 
-  .process__step[data-state="active"] .process__title {
-    color: var(--ink);
-    transform: translateX(4px);
+  .process[data-enhanced="true"] .process__timeline {
+    width: 100%;
+    max-width: 40rem;
+    height: clamp(24rem, 58vh, 34rem);
+    overflow: hidden;
   }
 
-  .process__step[data-state] .process__index {
-    transition: opacity 0.4s ease;
-    opacity: 0.55;
+  .process[data-enhanced="true"] .process__track {
+    --track-y: 0px;
+    --track-length: 0px;
+    position: absolute;
+    top: 50%;
+    right: 0;
+    /* Preserve room for the active node's pulse inside the clipped viewport. */
+    left: 1rem;
+    height: 0;
+    transform: translate3d(0, var(--track-y), 0);
+    will-change: transform;
   }
 
-  .process__step[data-state="active"] .process__index {
-    opacity: 1;
+  .process[data-enhanced="true"] .process__steps {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    display: block;
+  }
+
+  .process[data-enhanced="true"] .process__step {
+    position: absolute;
+    top: var(--step-top);
+    right: 0;
+    left: 0;
+  }
+
+  .process[data-enhanced="true"] .process__content {
+    opacity: var(--step-opacity);
+    transform: translateX(var(--step-offset)) scale(var(--step-scale));
+    transform-origin: left top;
+    will-change: opacity, transform;
+  }
+
+  .process[data-enhanced="true"] .process__rail {
+    top: 0.375rem;
+    bottom: auto;
+    height: var(--track-length);
+  }
+
+  .process[data-enhanced="true"] .process__title {
+    color: var(--ink-on-card-muted);
+    transition: color 0.28s ease;
+  }
+
+  .process[data-enhanced="true"] .process__index {
+    color: var(--ink-on-card-muted);
+    transition: color 0.28s ease;
+  }
+
+  .process[data-enhanced="true"] .process__desc-reveal {
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .process[data-enhanced="true"] .process__desc {
+    transform: translateY(-0.35rem);
+    transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .process[data-enhanced="true"] .process__step[data-state="past"] .process__node {
+    border-color: var(--teal-light);
+    background: var(--teal-light);
+  }
+
+  .process[data-enhanced="true"] .process__step[data-state="active"] .process__node {
+    border-color: var(--teal-light);
+    background: var(--teal-light);
+    box-shadow: 0 0 0 0.35rem color-mix(in srgb, var(--teal-light) 18%, transparent);
+    animation: process-node-pulse 1.8s ease-in-out infinite;
+  }
+
+  .process[data-enhanced="true"] .process__step[data-state="active"] .process__index {
+    color: var(--teal-light);
+  }
+
+  .process[data-enhanced="true"] .process__step[data-state="active"] .process__title {
+    color: var(--ink-on-card);
+  }
+
+  .process[data-enhanced="true"] .process__step[data-state="active"] .process__desc-reveal {
+    grid-template-rows: 1fr;
+  }
+
+  .process[data-enhanced="true"] .process__step[data-state="active"] .process__desc {
+    transform: translateY(0);
+  }
+}
+
+@keyframes process-node-pulse {
+  50% {
+    box-shadow: 0 0 0 0.55rem color-mix(in srgb, var(--teal-light) 8%, transparent);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .process__step .process__title,
-  .process__step .process__index {
+  .process__content,
+  .process__title,
+  .process__index,
+  .process__desc-reveal,
+  .process__desc,
+  .process__node,
+  .process__counter-number {
+    animation: none;
     transition: none;
     transform: none;
   }

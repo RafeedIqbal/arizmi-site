@@ -45,7 +45,7 @@ const CARD_RATIO = HERO_CARD_BACK_SIZE.height / HERO_CARD_BACK_SIZE.width;
 const BASE_ROTATION_DEG = 90; // radial orientation: active card is landscape
 const ARC_STEP_DEG = 22; // broad angular gap between adjacent cards
 const ARC_STEP_RAD = (ARC_STEP_DEG * Math.PI) / 180;
-const DRAG_STEP_PX = 96; // pointer travel that advances one card
+const DRAG_STEP_PX = 160; // pointer travel that advances one card
 const WHEEL_STEP_PX = 48;
 const WHEEL_STEP_COOLDOWN_MS = 230;
 const WHEEL_BURST_QUIET_MS = 140;
@@ -83,7 +83,7 @@ type Frame = {
 function cardWidthFor(frame: Frame) {
   return Math.round(
     frame.sectionW >= 900
-      ? clamp(frame.w * 0.292, 168, 264)
+      ? clamp(frame.sectionW * 0.18, 168, 264)
       : clamp(frame.w * 0.45, 148, 204),
   );
 }
@@ -98,7 +98,11 @@ function slotStyle(pos: number, frame: Frame, cardW: number): CSSProperties {
   const centerY = frame.h / 2;
   // The active card (pos 0) sits landscape inside the right column; the
   // wheel centre is `radius` further right, i.e. far off-screen.
-  const activeX = frame.w * (desktop ? 0.6 : 0.68);
+  // Keep the desktop fan anchored at three quarters of the full hero even
+  // though its interactive region is confined to the right-hand column.
+  const activeX = desktop
+    ? frame.sectionW * 0.75 - frame.offsetX
+    : frame.w * 0.68;
   const centerX = activeX + radius;
   const activeNudge = desktop ? 16 : 10;
   const angle = pos * ARC_STEP_RAD;
