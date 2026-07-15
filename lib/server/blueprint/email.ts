@@ -15,6 +15,7 @@ import "server-only";
  * production is blocked until sender identity is configured.
  */
 import nodemailer from "nodemailer";
+import { INTAKE_QUESTIONS, nextStepLabel } from "@/lib/blueprint/content";
 import {
   getMailConfigResult,
 } from "@/lib/server/config";
@@ -143,12 +144,20 @@ function row(label: string, value: string): string {
   return `<p style="margin:4px 0;"><strong>${escapeHtml(label)}:</strong> ${escapeHtml(value || "—")}</p>`;
 }
 
+function audienceLabel(record: LeadRecord): string {
+  const q = record.qualifying;
+  return q.audience === "Other" && q.audienceOther ? `Other (${q.audienceOther})` : q.audience;
+}
+
+const HR = `<hr style="border:none;border-top:1px solid #e0e0e0;margin:12px 0;" />`;
+
 function internalSummaryHtml(record: LeadRecord): string {
   const c = record.contact;
+  const q = record.qualifying;
   const d = record.diagnosis;
   return `<div style="font-family: sans-serif; max-width: 560px; color:#101313;">
     <h2 style="margin-bottom:4px;">New BluePrint lead</h2>
-    <hr style="border:none;border-top:1px solid #e0e0e0;margin:12px 0;" />
+    ${HR}
     ${row("Name", c.name)}
     ${row("Email", c.email)}
     ${row("Phone", c.phone)}
@@ -156,26 +165,37 @@ function internalSummaryHtml(record: LeadRecord): string {
     ${row("Role", c.role)}
     ${row("Budget range", c.budgetRange)}
     ${row("Timeline", c.timeline)}
-    <hr style="border:none;border-top:1px solid #e0e0e0;margin:12px 0;" />
+    ${HR}
     ${row("Marketing consent", record.consent.marketingConsent ? `Yes (${record.consent.consentTimestamp})` : "No")}
     ${row("Consent copy version", record.consent.consentCopyVersion)}
-    <hr style="border:none;border-top:1px solid #e0e0e0;margin:12px 0;" />
+    ${HR}
+    ${row("Build type (answer)", q.buildType)}
+    ${row("Stage (answer)", q.stage)}
+    ${row("Audience", audienceLabel(record))}
+    ${row("Main goal", q.mainGoal)}
+    ${HR}
+    ${INTAKE_QUESTIONS.map((question) => row(question.label, record.intake[question.field])).join("\n    ")}
+    ${row("Added detail", record.addedDetail ?? "")}
+    ${HR}
     ${row("Build type", d.buildType)}
     ${row("Stage", d.stage)}
     ${row("Main users", d.mainUsers)}
     ${row("Core need", d.coreNeed)}
     ${row("Likely complexity", d.likelyComplexity)}
     ${row("Conversion category", d.conversionCategory)}
-    ${row("Recommended next step", d.recommendedNextStep)}
-    <hr style="border:none;border-top:1px solid #e0e0e0;margin:12px 0;" />
+    ${row("Recommended next step", nextStepLabel(d.recommendedNextStep))}
+    ${HR}
     ${row("Submitted", record.submittedAt)}
     ${row("Generation", `${record.generation.mode} / ${record.generation.providerId} / ${record.generation.status}`)}
     ${row("Prompt / schema", `${record.generation.promptVersion} / ${record.generation.schemaVersion}`)}
+    ${HR}
+    ${renderBlueprintHtml(record.plan, record.diagnosis, { recipientName: record.contact.name })}
   </div>`;
 }
 
 function internalSummaryText(record: LeadRecord): string {
   const c = record.contact;
+  const q = record.qualifying;
   const d = record.diagnosis;
   return [
     "New BluePrint lead",
@@ -188,15 +208,27 @@ function internalSummaryText(record: LeadRecord): string {
     `Timeline: ${c.timeline || "—"}`,
     `Marketing consent: ${record.consent.marketingConsent ? `Yes (${record.consent.consentTimestamp})` : "No"}`,
     `Consent copy version: ${record.consent.consentCopyVersion}`,
+    `Build type (answer): ${q.buildType}`,
+    `Stage (answer): ${q.stage}`,
+    `Audience: ${audienceLabel(record)}`,
+    `Main goal: ${q.mainGoal}`,
+    ...INTAKE_QUESTIONS.map(
+      (question) => `${question.label} ${record.intake[question.field] || "—"}`,
+    ),
+    `Added detail: ${record.addedDetail || "—"}`,
     `Build type: ${d.buildType}`,
     `Stage: ${d.stage}`,
     `Main users: ${d.mainUsers}`,
     `Core need: ${d.coreNeed}`,
     `Likely complexity: ${d.likelyComplexity}`,
     `Conversion category: ${d.conversionCategory}`,
-    `Recommended next step: ${d.recommendedNextStep}`,
+    `Recommended next step: ${nextStepLabel(d.recommendedNextStep)}`,
     `Submitted: ${record.submittedAt}`,
     `Generation: ${record.generation.mode} / ${record.generation.providerId} / ${record.generation.status}`,
     `Prompt / schema: ${record.generation.promptVersion} / ${record.generation.schemaVersion}`,
+    "",
+    "---",
+    "",
+    renderBlueprintText(record.plan, record.diagnosis, { recipientName: record.contact.name }),
   ].join("\n");
 }

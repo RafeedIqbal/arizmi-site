@@ -39,7 +39,7 @@ function writeVisibleState(
  * Client orchestrator for the Builds archive (TASK-008 → TASK-010). The active
  * filter is the single source of truth and lives in the `filter` query
  * parameter, so it is shareable and survives back/forward navigation; an
- * unknown value falls back to "All" without error. Featured selection and the
+ * unknown value falls back to "All" without error. The open featured detail and the
  * independently open compact rows are URL state too, so the complete view can
  * be shared and restored without turning every card interaction into a browser
  * history entry.
@@ -55,18 +55,16 @@ export default function BuildsExplorer() {
   const featured = filterBuilds(FEATURED_BUILDS, active);
   const compact = filterBuilds(ARCHIVE_BUILDS, active);
   const rawFeaturedId = searchParams.get("featured");
-  const selectedFeaturedId =
-    featured.find((build) => build.id === rawFeaturedId)?.id ??
-    featured[0]?.id ??
-    null;
+  const openFeaturedId =
+    featured.find((build) => build.id === rawFeaturedId)?.id ?? null;
   const requestedOpenIds = new Set(searchParams.getAll("open"));
   const openCompactIds = compact
     .filter((build) => requestedOpenIds.has(build.id))
     .map((build) => build.id);
 
   // Canonicalise direct/shared URLs: discard unknown filter/build ids, remove
-  // duplicate or filtered-out rows, and select the first visible featured
-  // build whenever the requested selection is unavailable.
+  // duplicate or filtered-out rows, and remove a featured detail whenever the
+  // requested build is unavailable in the active filter.
   const currentQuery = searchParams.toString();
   const canonicalParams = new URLSearchParams(currentQuery);
   if (rawFilter !== null && active === ALL_FILTER_ID) {
@@ -74,7 +72,7 @@ export default function BuildsExplorer() {
   }
   writeVisibleState(
     canonicalParams,
-    selectedFeaturedId,
+    openFeaturedId,
     openCompactIds,
   );
   const canonicalQuery = canonicalParams.toString();
@@ -96,9 +94,7 @@ export default function BuildsExplorer() {
     const nextFeatured = filterBuilds(FEATURED_BUILDS, id);
     const nextCompact = filterBuilds(ARCHIVE_BUILDS, id);
     const nextFeaturedId =
-      nextFeatured.find((build) => build.id === selectedFeaturedId)?.id ??
-      nextFeatured[0]?.id ??
-      null;
+      nextFeatured.find((build) => build.id === openFeaturedId)?.id ?? null;
     const nextCompactIds = new Set(nextCompact.map((build) => build.id));
     const nextOpenIds = openCompactIds.filter((buildId) =>
       nextCompactIds.has(buildId),
@@ -109,10 +105,16 @@ export default function BuildsExplorer() {
     router.push(toUrl(pathname, params), { scroll: false });
   };
 
-  const setFeatured = (id: string) => {
+  const openFeatured = (id: string) => {
     if (!featured.some((build) => build.id === id)) return;
     const params = new URLSearchParams(searchParams.toString());
     writeVisibleState(params, id, openCompactIds);
+    router.replace(toUrl(pathname, params), { scroll: false });
+  };
+
+  const closeFeatured = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    writeVisibleState(params, null, openCompactIds);
     router.replace(toUrl(pathname, params), { scroll: false });
   };
 
@@ -126,7 +128,7 @@ export default function BuildsExplorer() {
       .map((build) => build.id);
 
     const params = new URLSearchParams(searchParams.toString());
-    writeVisibleState(params, selectedFeaturedId, nextOpenIds);
+    writeVisibleState(params, openFeaturedId, nextOpenIds);
     router.replace(toUrl(pathname, params), { scroll: false });
   };
 
@@ -172,8 +174,9 @@ export default function BuildsExplorer() {
               <FeaturedBuilds
                 key={active}
                 builds={featured}
-                selectedId={selectedFeaturedId ?? featured[0].id}
-                onSelect={setFeatured}
+                openId={openFeaturedId}
+                onOpen={openFeatured}
+                onClose={closeFeatured}
               />
             </section>
           ) : null}

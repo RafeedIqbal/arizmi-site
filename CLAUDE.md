@@ -17,22 +17,22 @@ There is no test suite and none should be added: the owner smoke-tests manually 
 
 ## Architecture
 
-Next.js 16 App Router, TypeScript, Tailwind CSS v4, React 19. Marketing site for Arizmi Labs with five public routes — `/`, `/builds`, `/blueprint-ai`, `/services`, `/about` — defined once in `lib/site.ts` (`ROUTES`, `SITE_URL`). All routes prerender statically; the only server code paths are the server actions (`app/actions/contact.ts` for the contact form, `app/blueprint-ai/actions.ts` for the BluePrint flow).
+Next.js 16 App Router, TypeScript, Tailwind CSS v4, React 19. Marketing site for Arizmi Labs with six public routes — `/`, `/builds`, `/blueprint-ai`, `/services`, `/about`, `/privacy` — defined once in `lib/site.ts` (`ROUTES`, `SITE_URL`). All routes prerender statically; the only server code paths are the server actions (`app/actions/contact.ts` for the contact form, `app/blueprint-ai/actions.ts` for the BluePrint flow).
 
 - `app/` — routes, root layout (self-hosted fonts, metadata), `robots.ts`, `sitemap.ts`, OG/apple-icon generators.
 - `components/` — site chrome (`SiteNav`, `SiteMenu`, `SiteFooter`, `PageShell`, `BookingCta`, `ContactModal`, `HomeHero`) plus per-page directories (`home/`, `builds/`, `blueprint/`, `about/`, `services/`).
 - `components/ui/` — shared accessible primitives (`Button`, `Dialog`, `Disclosure`, `LiveRegion`, `MetaLabel`, `PageHeader`, `PrevNextControls`, `Section`, `SectionHeading`, `VisuallyHidden`). Reuse these instead of reimplementing dialogs/disclosures.
 - `lib/content/` — typed page copy and data (builds, services, team, process, hero archive, navigation, CTA vocabulary). **Copy here is approved verbatim — do not reword without owner sign-off.**
 - `lib/blueprint/` — browser-safe BluePrint logic: flow state machine (`flow.ts`), schemas, validation, question content, action IO types.
-- `lib/server/` — server-only modules (guarded by `import "server-only"`): env-backed config in `config.ts`, and under `blueprint/` the AI adapter, prompts, lead repository, email delivery, document rendering, and rate limiting.
+- `lib/server/` — server-only modules (guarded by `import "server-only"`): env-backed config in `config.ts`, and under `blueprint/` the AI adapters (`ai.ts` harness/selector, `gemini.ts` provider), prompts, lead repository (`leads.ts`, Upstash-backed via `redis.ts`), Google Sheets mirror (`sheets.ts`), email delivery, document rendering, and rate limiting (Redis-backed with in-memory dev fallback).
 
 ### Client/server trust boundary
 
-Environment variables are read **only** in `lib/server/config.ts` and `lib/server/blueprint/{ai,leads}.ts` — never in components or directly in server actions. The server actions re-validate every input, and the full BluePrint plan is generated behind the lead gate and never sent to the client (only a six-field preview); the plan is referenced by opaque lead id for emailing.
+Environment variables are read **only** in `lib/server/config.ts` and `lib/server/blueprint/{ai,leads}.ts` — never in components or directly in server actions; the other server modules (`gemini.ts`, `redis.ts`, `sheets.ts`) consume resolved config only. The server actions re-validate every input, and the full BluePrint plan is generated behind the lead gate and never sent to the client (only a six-field preview); the plan is referenced by opaque lead id for emailing.
 
 ### Environment variables
 
-`BOOKING_URL` (falls back to `NEXT_PUBLIC_CALENDLY_LINK`), `PRIVACY_POLICY_URL`, `GMAIL_USER` / `GMAIL_APP_PASSWORD`, `CONTACT_RECIPIENT`, `BLUEPRINT_LEAD_RECIPIENT`, `BLUEPRINT_AI_PROVIDER`, `LEAD_STORAGE`.
+`BOOKING_URL` (falls back to `NEXT_PUBLIC_CALENDLY_LINK`), `PRIVACY_POLICY_URL` (optional override of `/privacy`), `GMAIL_USER` / `GMAIL_APP_PASSWORD`, `CONTACT_RECIPIENT`, `BLUEPRINT_LEAD_RECIPIENT`, `BLUEPRINT_AI_PROVIDER` (`gemini`) with `GEMINI_API_KEY` / `BLUEPRINT_AI_MODEL`, `LEAD_STORAGE` (`upstash`) with `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` (`KV_*` fallbacks), and the optional `GOOGLE_SHEETS_CLIENT_EMAIL` / `GOOGLE_SHEETS_PRIVATE_KEY` / `GOOGLE_SHEETS_SPREADSHEET_ID` mirror. Reference template: `example.env`; go-live steps: `docs/PRODUCTION.md`.
 
 ## Design tokens
 

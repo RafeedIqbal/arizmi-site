@@ -64,17 +64,20 @@ docs/
 
 ## Environment Variables
 
-All server env reads centralize in `lib/server/config.ts` (plus provider selectors in `lib/server/blueprint/`). Unconfigured features fail closed with a disabled state.
+All server env reads centralize in `lib/server/config.ts` (plus provider selectors in `lib/server/blueprint/{ai,leads}.ts`). Unconfigured features fail closed with a disabled state. See `example.env` for a copy-ready template with setup notes.
 
 | Variable | Purpose |
 |---|---|
 | `BOOKING_URL` | Booking CTA destination (falls back to `NEXT_PUBLIC_CALENDLY_LINK`) |
-| `PRIVACY_POLICY_URL` | Consent link; production lead capture is blocked until configured |
+| `PRIVACY_POLICY_URL` | Optional override of the built-in `/privacy` page with an external policy URL |
 | `GMAIL_USER` / `GMAIL_APP_PASSWORD` | Shared SMTP identity for all outbound email |
 | `CONTACT_RECIPIENT` | Contact form recipient override |
 | `BLUEPRINT_LEAD_RECIPIENT` | BluePrint lead notification recipient override |
-| `BLUEPRINT_AI_PROVIDER` | AI provider selector (dev mock refuses to run in production) |
-| `LEAD_STORAGE` | Lead persistence selector (in-memory dev adapter refuses production) |
+| `BLUEPRINT_AI_PROVIDER` | AI provider selector — `gemini` is wired; dev falls back to a mock that refuses to run in production |
+| `GEMINI_API_KEY` / `BLUEPRINT_AI_MODEL` | Google AI Studio key + optional model override (default `gemini-2.5-flash`) |
+| `LEAD_STORAGE` | Lead persistence selector — `upstash` is wired; the in-memory dev adapter refuses production |
+| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis for lead storage + shared rate limiting (`KV_REST_API_URL` / `KV_REST_API_TOKEN` accepted as fallbacks) |
+| `GOOGLE_SHEETS_CLIENT_EMAIL` / `GOOGLE_SHEETS_PRIVATE_KEY` / `GOOGLE_SHEETS_SPREADSHEET_ID` | Optional best-effort Google Sheets lead mirror (service account) |
 
 ## Deployment
 
@@ -85,7 +88,7 @@ npm run build
 npm run start
 ```
 
-Fonts are self-hosted — no external network fetches required during build. Security headers (CSP, X-Frame-Options, etc.) are set in `next.config.ts`.
+Fonts are self-hosted — no external network fetches required during build. Security headers (CSP, X-Frame-Options, etc.) are set in `next.config.ts`. The full go-live checklist (Vercel env setup, Upstash provisioning, Google Sheet + service account, Gemini key, copy sign-off) lives in `docs/PRODUCTION.md`.
 
 ## Release Checklist
 

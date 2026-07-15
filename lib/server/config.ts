@@ -7,6 +7,7 @@ import "server-only";
  *
  * D-15: contact recipient/config centralizes here in TASK-017.
  */
+import { ROUTES } from "@/lib/site";
 
 export type BookingDestination =
   | { readonly status: "configured"; readonly url: string }
@@ -31,25 +32,76 @@ export type PrivacyPolicy =
   | { readonly status: "placeholder" };
 
 /**
- * D-02: the Privacy Policy URL and approved consent language are unresolved.
- * PRIVACY_POLICY_URL backs the consent link. Development renders a local
- * placeholder; production lead capture must be blocked while it is a
- * placeholder (see isBlueprintLeadCaptureProductionReady).
+ * D-02: the site now ships an internal /privacy route (draft copy pending
+ * owner approval), so the consent link always resolves. PRIVACY_POLICY_URL
+ * overrides it with an external policy when set. The "placeholder" variant is
+ * kept for the union's consumers but is no longer returned.
  */
 export function getPrivacyPolicy(): PrivacyPolicy {
   const url = process.env.PRIVACY_POLICY_URL?.trim();
-  if (!url) return { status: "placeholder" };
-  return { status: "configured", url };
+  return { status: "configured", url: url || ROUTES.privacy };
 }
 
 /**
- * Guards production lead capture: a real Privacy Policy must be configured
- * (D-02) before any lead can be stored in production. In non-production the
- * placeholder is allowed so the flow is testable end to end.
+ * Guards production lead capture: a Privacy Policy must resolve (D-02) before
+ * any lead can be stored in production. Always satisfied now that the internal
+ * /privacy route exists; kept as the seam in case the policy is ever unset.
  */
 export function isBlueprintLeadCaptureProductionReady(): boolean {
   if (process.env.NODE_ENV !== "production") return true;
   return getPrivacyPolicy().status === "configured";
+}
+
+export type UpstashRedisConfig =
+  | { readonly ok: true; readonly url: string; readonly token: string }
+  | { readonly ok: false; readonly reason: string };
+
+/**
+ * Upstash Redis (REST) backs durable lead storage and the shared rate limiter
+ * (resolves D-04). The KV_* names are accepted because Vercel Marketplace
+ * integrations inject them under that legacy naming.
+ */
+export function getUpstashRedisConfig(): UpstashRedisConfig {
+  const url =
+    process.env.UPSTASH_REDIS_REST_URL?.trim() || process.env.KV_REST_API_URL?.trim();
+  const token =
+    process.env.UPSTASH_REDIS_REST_TOKEN?.trim() || process.env.KV_REST_API_TOKEN?.trim();
+  if (!url || !token) {
+    return {
+      ok: false,
+      reason:
+        "Upstash Redis is not configured (UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN).",
+    };
+  }
+  return { ok: true, url, token };
+}
+
+export type GoogleSheetsConfig =
+  | {
+      readonly ok: true;
+      readonly clientEmail: string;
+      readonly privateKey: string;
+      readonly spreadsheetId: string;
+    }
+  | { readonly ok: false; readonly reason: string };
+
+/**
+ * Optional Google Sheets lead mirror, authenticated with a service account.
+ * The Vercel env UI stores the PEM with literal "\n" sequences, so they are
+ * unescaped here; the replace is a no-op when real newlines are present.
+ */
+export function getGoogleSheetsConfig(): GoogleSheetsConfig {
+  const clientEmail = process.env.GOOGLE_SHEETS_CLIENT_EMAIL?.trim();
+  const rawKey = process.env.GOOGLE_SHEETS_PRIVATE_KEY;
+  const spreadsheetId = process.env.GOOGLE_SHEETS_SPREADSHEET_ID?.trim();
+  if (!clientEmail || !rawKey || !spreadsheetId) {
+    return {
+      ok: false,
+      reason:
+        "Google Sheets mirror is not configured (GOOGLE_SHEETS_CLIENT_EMAIL / GOOGLE_SHEETS_PRIVATE_KEY / GOOGLE_SHEETS_SPREADSHEET_ID).",
+    };
+  }
+  return { ok: true, clientEmail, spreadsheetId, privateKey: rawKey.replace(/\\n/g, "\n") };
 }
 
 /**

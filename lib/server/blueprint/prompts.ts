@@ -6,9 +6,9 @@ import "server-only";
  * the browser bundle. Bump PROMPT_VERSION on any wording change; the value is
  * persisted with each lead for supportability.
  *
- * These templates are consumed by a real provider adapter once D-03 is
- * resolved. The development mock adapter does not use them, but they are
- * defined and validated here so the seam is real and reviewable.
+ * These templates are consumed by the Gemini adapter (gemini.ts). The
+ * development mock adapter does not use them, but exercises the seam so the
+ * prompts stay real and reviewable without an API key.
  */
 import {
   COMPLEXITIES,
@@ -19,7 +19,7 @@ import {
 } from "@/lib/blueprint/schema";
 import { INTAKE_QUESTIONS } from "@/lib/blueprint/content";
 
-export const PROMPT_VERSION = "2026-07-13.1";
+export const PROMPT_VERSION = "2026-07-15.1";
 
 /** Vague marketing phrases the brief bans from generated output. */
 export const BANNED_PHRASES = [
@@ -84,6 +84,95 @@ const PLAN_SCHEMA_HINT = `Return JSON with all of these keys (no others):
   "openQuestions": string[],
   "recommendedNextStep": { "steps": [${NEXT_STEP_IDS.map((s) => `"${s}"`).join(" | ")}], "rationale": string }
 }`;
+
+/* ------------------------------------------------------------------ *
+ * Machine-readable response schemas (JSON Schema) for providers that
+ * support structured output. These constrain generation; the runtime
+ * validators in lib/blueprint/schema.ts remain the source of truth.
+ * ------------------------------------------------------------------ */
+
+const nonEmptyString = { type: "string" } as const;
+const stringArray = { type: "array", items: { type: "string" } } as const;
+
+export const DIAGNOSIS_RESPONSE_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    buildType: nonEmptyString,
+    stage: nonEmptyString,
+    mainUsers: nonEmptyString,
+    coreNeed: nonEmptyString,
+    likelyComplexity: { type: "string", enum: [...COMPLEXITIES] },
+    recommendedNextStep: { type: "string", enum: [...NEXT_STEP_IDS] },
+    conversionCategory: { type: "string", enum: [...CONVERSION_CATEGORIES] },
+  },
+  required: [
+    "buildType",
+    "stage",
+    "mainUsers",
+    "coreNeed",
+    "likelyComplexity",
+    "recommendedNextStep",
+    "conversionCategory",
+  ],
+} as const;
+
+export const PLAN_RESPONSE_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    productSummary: nonEmptyString,
+    problemStatement: nonEmptyString,
+    targetUsers: {
+      type: "object",
+      additionalProperties: false,
+      properties: { primary: nonEmptyString, secondary: nonEmptyString },
+      required: ["primary", "secondary"],
+    },
+    userGoals: stringArray,
+    coreFeatures: stringArray,
+    mvpScope: {
+      type: "object",
+      additionalProperties: false,
+      properties: { now: stringArray, later: stringArray },
+      required: ["now", "later"],
+    },
+    userJourneys: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        properties: { title: nonEmptyString, steps: stringArray },
+        required: ["title", "steps"],
+      },
+    },
+    technicalConsiderations: stringArray,
+    risksAndComplexity: stringArray,
+    openQuestions: stringArray,
+    recommendedNextStep: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        steps: { type: "array", items: { type: "string", enum: [...NEXT_STEP_IDS] } },
+        rationale: nonEmptyString,
+      },
+      required: ["steps", "rationale"],
+    },
+  },
+  required: [
+    "productSummary",
+    "problemStatement",
+    "targetUsers",
+    "userGoals",
+    "coreFeatures",
+    "mvpScope",
+    "userJourneys",
+    "technicalConsiderations",
+    "risksAndComplexity",
+    "openQuestions",
+    "recommendedNextStep",
+  ],
+} as const;
 
 export interface PromptMessages {
   readonly system: string;

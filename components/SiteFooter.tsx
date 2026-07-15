@@ -20,9 +20,9 @@ const BOOKING_LABEL =
 
 /**
  * Restrained global footer (D-13 safe default): wordmark, the five primary
- * destinations, booking/contact actions, and a dynamic copyright year.
- * Careers (D-14) and legal links (D-02) are intentionally absent until their
- * routes exist; no address, company number, or social accounts are invented.
+ * destinations, booking/contact actions, the privacy policy link (D-02), and
+ * a dynamic copyright year. Careers (D-14) is intentionally absent until its
+ * route exists; no address, company number, or social accounts are invented.
  */
 export default function SiteFooter() {
   return (
@@ -60,9 +60,17 @@ export default function SiteFooter() {
             className="inline-flex min-h-11 items-center justify-center rounded-full px-6 py-3 text-sm font-semibold text-ink underline-offset-4 hover:underline"
           />
         </div>
-        <p className="font-meta text-xs text-ink-muted">
-          © <CopyrightYear /> Arizmi Labs
-        </p>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+          <p className="font-meta text-xs text-ink-muted">
+            © <CopyrightYear /> Arizmi Labs
+          </p>
+          <Link
+            href={ROUTES.privacy}
+            className="font-meta text-xs text-ink-muted underline-offset-4 hover:underline"
+          >
+            Privacy Policy
+          </Link>
+        </div>
       </div>
     </footer>
   );

@@ -80,6 +80,7 @@ export default function BuildsPage() {
 
       <Section
         aria-labelledby="archive-heading"
+        width="max"
         paddingY="none"
         containerClassName="pb-[var(--section-py)]"
       >

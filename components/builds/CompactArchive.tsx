@@ -1,11 +1,13 @@
 import BuildDetail from "@/components/builds/BuildDetail";
+import BuildMedia from "@/components/builds/BuildMedia";
 import Disclosure from "@/components/ui/Disclosure";
 import MetaLabel from "@/components/ui/MetaLabel";
 import type { Build } from "@/lib/content/builds";
 
 /**
- * Compact archive rows (TASK-010). Closed content is project name plus status
- * label; activating a row expands the full detail directly underneath it.
+ * Portfolio-card archive (TASK-010). Closed content is a branded project
+ * preview with the project name and status; activating a card expands the full
+ * detail directly underneath it.
  *
  * Disclosure choice — multi-open, independent rows. Each row owns its own
  * expanded state (the Disclosure primitive generates unique button/panel ids),
@@ -26,30 +28,58 @@ export default function CompactArchive({
   const openIdSet = new Set(openIds);
 
   return (
-    <ul className="mt-8 flex flex-col divide-y divide-border-soft border-y border-border-soft">
-      {builds.map((build) => (
-        <li key={build.id}>
-          <Disclosure
-            headingLevel={3}
-            open={openIdSet.has(build.id)}
-            onOpenChange={(open) => onOpenChange(build.id, open)}
-            summaryClassName="py-5"
-            panelClassName="text-ink"
-            summary={
-              <span className="flex flex-1 flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                <span className="text-lg font-semibold">{build.name}</span>
-                <MetaLabel as="span" tone="muted">
-                  {build.sourceStatus}
-                </MetaLabel>
-              </span>
-            }
-          >
-            <div className="pb-6 pt-1">
-              <BuildDetail build={build} />
-            </div>
-          </Disclosure>
-        </li>
-      ))}
+    <ul className="build-archive mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+      {builds.map((build) => {
+        const isOpen = openIdSet.has(build.id);
+
+        return (
+          <li key={build.id} className="build-archive__item min-w-0">
+            <Disclosure
+              headingLevel={4}
+              open={isOpen}
+              onOpenChange={(open) => onOpenChange(build.id, open)}
+              className="build-archive-card overflow-hidden rounded-[var(--radius-lg)] border border-[var(--ui-border)] bg-[var(--surface-raised)]"
+              summaryClassName="build-archive-card__trigger relative isolate aspect-[4/3] min-h-0 overflow-hidden p-0"
+              panelClassName="build-archive-card__panel text-ink"
+              summary={
+                <span className="build-archive-card__summary absolute inset-0 flex flex-1 flex-col justify-end overflow-hidden">
+                  <BuildMedia
+                    build={build}
+                    variant="archive"
+                    className="build-archive-card__media absolute inset-0 h-full w-full"
+                  />
+                  <span
+                    className="build-archive-card__scrim absolute inset-0"
+                    aria-hidden="true"
+                  />
+                  <span
+                    aria-hidden="true"
+                    className="build-archive-card__affordance absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-[var(--radius-pill)] border border-[var(--ui-border)] bg-canvas px-4 py-2 text-sm font-semibold"
+                  >
+                    {isOpen ? "Hide details" : "View details"}
+                  </span>
+                  <span className="build-archive-card__caption relative z-10 flex w-full flex-wrap items-end justify-between gap-x-4 gap-y-1 p-5 sm:p-6">
+                    <span className="build-archive-card__name text-lg font-semibold">
+                      {build.name}
+                    </span>
+                    <MetaLabel
+                      as="span"
+                      tone="muted"
+                      className="build-archive-card__status"
+                    >
+                      {build.sourceStatus}
+                    </MetaLabel>
+                  </span>
+                </span>
+              }
+            >
+              <div className="build-archive-card__detail border-t border-[var(--ui-border)] p-5 sm:p-6">
+                <BuildDetail build={build} />
+              </div>
+            </Disclosure>
+          </li>
+        );
+      })}
     </ul>
   );
 }

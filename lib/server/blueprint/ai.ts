@@ -3,8 +3,10 @@ import "server-only";
 /**
  * Provider-agnostic BluePrint generation (TASK-012). Server-only.
  *
- * D-03 is unresolved, so no production vendor is wired here. The module ships:
- *   - a structured adapter interface (the seam a real provider plugs into),
+ * D-03 resolved: Google Gemini is the wired production provider
+ * (BLUEPRINT_AI_PROVIDER=gemini + GEMINI_API_KEY; see gemini.ts). The module
+ * ships:
+ *   - a structured adapter interface (the seam providers plug into),
  *   - a deterministic development mock adapter (works with no API key),
  *   - a selector that switches adapters by explicit env configuration and
  *     refuses to silently return mock output in production,
@@ -27,6 +29,7 @@ import {
   type QualifyingAnswers,
 } from "@/lib/blueprint/schema";
 import { PROMPT_VERSION, buildDiagnosisPrompt, buildPlanPrompt } from "./prompts";
+import { createGeminiAdapter } from "./gemini";
 
 export type GenerationErrorKind =
   | "unconfigured" // no usable provider (e.g. production without a real vendor)
@@ -54,14 +57,14 @@ export type GenerationResult<T> =
   | { readonly ok: true; readonly value: T; readonly meta: GenerationMeta }
   | { readonly ok: false; readonly error: GenerationError; readonly meta: GenerationMeta };
 
-interface GenerationInput {
+export interface GenerationInput {
   readonly qualifying: QualifyingAnswers;
   readonly intake: IntakeAnswers;
   readonly addedDetail?: string;
 }
 
-/** The seam a real provider implements once D-03 is resolved. */
-interface BlueprintAdapter {
+/** The seam every provider implements (see gemini.ts for the real one). */
+export interface BlueprintAdapter {
   readonly id: string;
   readonly mode: GenerationMode;
   diagnose(input: GenerationInput, signal: AbortSignal): Promise<unknown>;
@@ -201,6 +204,11 @@ const mockAdapter: BlueprintAdapter = {
  * Adapter selection — explicit env config, no silent prod fallback.
  * ------------------------------------------------------------------ */
 
+const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
+
+// Memoized per instance; recreated only if the resolved key/model changes.
+let geminiAdapter: { key: string; adapter: BlueprintAdapter } | null = null;
+
 function selectAdapter(): { adapter: BlueprintAdapter } | { error: GenerationError; providerId: string } {
   const configured = process.env.BLUEPRINT_AI_PROVIDER?.trim().toLowerCase();
   const isProduction = process.env.NODE_ENV === "production";
@@ -211,8 +219,7 @@ function selectAdapter(): { adapter: BlueprintAdapter } | { error: GenerationErr
       return {
         error: {
           kind: "unconfigured",
-          detail:
-            "The mock generator cannot run in production. Set BLUEPRINT_AI_PROVIDER to a wired provider (D-03).",
+          detail: "The mock generator cannot run in production. Set BLUEPRINT_AI_PROVIDER=gemini.",
         },
         providerId,
       };
@@ -220,12 +227,31 @@ function selectAdapter(): { adapter: BlueprintAdapter } | { error: GenerationErr
     return { adapter: mockAdapter };
   }
 
-  // A real provider was named but none is wired yet (D-03 pending). Refusing
-  // here keeps production visibly blocked instead of shipping fake output.
+  if (providerId === "gemini") {
+    const apiKey = process.env.GEMINI_API_KEY?.trim();
+    if (!apiKey) {
+      return {
+        error: {
+          kind: "unconfigured",
+          detail: "BLUEPRINT_AI_PROVIDER=gemini but GEMINI_API_KEY is not set.",
+        },
+        providerId,
+      };
+    }
+    const model = process.env.BLUEPRINT_AI_MODEL?.trim() || DEFAULT_GEMINI_MODEL;
+    const memoKey = `${model}:${apiKey}`;
+    if (geminiAdapter?.key !== memoKey) {
+      geminiAdapter = { key: memoKey, adapter: createGeminiAdapter(apiKey, model) };
+    }
+    return { adapter: geminiAdapter.adapter };
+  }
+
+  // An unknown provider was named. Refusing here keeps production visibly
+  // blocked instead of shipping fake output.
   return {
     error: {
       kind: "unconfigured",
-      detail: `AI provider "${providerId}" is not wired. Resolve D-03 and add its adapter before enabling generation.`,
+      detail: `AI provider "${providerId}" is not wired. Supported: "gemini" (or "mock" in development).`,
     },
     providerId,
   };

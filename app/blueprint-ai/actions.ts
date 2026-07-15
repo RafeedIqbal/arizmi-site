@@ -45,6 +45,7 @@ import {
   deliverUserBlueprint,
 } from "@/lib/server/blueprint/email";
 import { checkRateLimit } from "@/lib/server/blueprint/rateLimit";
+import { appendLeadToSheet } from "@/lib/server/blueprint/sheets";
 import { isBlueprintLeadCaptureProductionReady } from "@/lib/server/config";
 
 async function clientIp(): Promise<string | null> {
@@ -94,7 +95,7 @@ function validateAnswers(req: { qualifying: Record<string, string>; intake: Reco
 }
 
 export async function diagnoseAction(req: DiagnoseRequest): Promise<DiagnoseResponse> {
-  if (!checkRateLimit("generate", await clientIp()).allowed) {
+  if (!(await checkRateLimit("generate", await clientIp())).allowed) {
     return fail("rate_limited", RATE_LIMIT_MESSAGE);
   }
 
@@ -112,7 +113,7 @@ export async function diagnoseAction(req: DiagnoseRequest): Promise<DiagnoseResp
 }
 
 export async function submitLeadAction(req: LeadRequest): Promise<LeadResponse> {
-  if (!checkRateLimit("lead", await clientIp()).allowed) {
+  if (!(await checkRateLimit("lead", await clientIp())).allowed) {
     return fail("rate_limited", RATE_LIMIT_MESSAGE);
   }
 
@@ -197,6 +198,10 @@ export async function submitLeadAction(req: LeadRequest): Promise<LeadResponse> 
 
   const created = await repository.create(record);
 
+  // Best-effort Sheets mirror; skipped when an idempotency race returned an
+  // earlier record (different id) so a lead is never mirrored twice.
+  if (created.id === record.id) await appendLeadToSheet(created);
+
   // Internal notification is part of the same successful submission. A failure
   // here does not discard the stored lead; the reveal still succeeds.
   const internal = await deliverInternalNotification(repository, created.id);
@@ -212,7 +217,7 @@ export async function submitLeadAction(req: LeadRequest): Promise<LeadResponse> 
 }
 
 export async function emailBlueprintAction(req: EmailRequest): Promise<EmailResponse> {
-  if (!checkRateLimit("lead", await clientIp()).allowed) {
+  if (!(await checkRateLimit("lead", await clientIp())).allowed) {
     return fail("rate_limited", RATE_LIMIT_MESSAGE);
   }
   if (!req.leadId || !req.idempotencyKey) {

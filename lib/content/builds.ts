@@ -414,27 +414,9 @@ export function filterBuilds(
     : list.filter((build) => matchesFilter(build, filter));
 }
 
-/* ------------------------------------------------------------------ */
-/* Display state (D-08)                                                */
-/* ------------------------------------------------------------------ */
-
-/**
- * Brand card-back state derived from the unresolved source status (D-08),
- * used for the featured media placeholder accent and state chips. Same rule
- * the hero archive documents: shipped public work is "live" (teal), strategic
- * concepts are "concept" (violet), and everything still in flight
- * (Product / Launch / Private builds) is "blueprint" (tech blue). Revisit when
- * D-08 normalizes the taxonomy.
- */
-export type BuildDisplayState = "live" | "blueprint" | "concept";
-
-export function buildDisplayState(build: Build): BuildDisplayState {
-  switch (build.sourceStatus) {
-    case "Live Build":
-      return "live";
-    case "Concept Build":
-      return "concept";
-    default:
-      return "blueprint";
-  }
-}
+/* Compatibility exports for existing build-content consumers. The canonical
+ * display-state rule and approved art mapping live in buildVisuals.ts. */
+export {
+  buildDisplayState,
+  type BuildDisplayState,
+} from "@/lib/content/buildVisuals";
