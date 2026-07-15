@@ -3,7 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import ContactModal from "@/components/ContactModal";
 import { UnavailableCta } from "@/components/ui/Button";
 import {
@@ -14,6 +20,7 @@ import {
 } from "@/lib/content/navigation";
 import { lockBodyScroll } from "@/lib/scrollLock";
 import { ROUTES } from "@/lib/site";
+import { useReducedMotion } from "@/lib/useReducedMotion";
 
 const ROUTE_ITEMS = PRIMARY_NAV.filter(
   (item): item is Extract<NavItem, { kind: "route" }> => item.kind === "route",
@@ -22,9 +29,9 @@ const ROUTE_ITEMS = PRIMARY_NAV.filter(
 /**
  * Global navigation: fixed logomark + menu trigger on every route, opening a
  * full-screen card-black menu. Built on the native <dialog> element so focus
- * containment, Escape handling, and focus restoration come from the platform
- * (D-18: no Rive & Limn reference URL was supplied, so the written spec in
- * docs/specs/global.md is authoritative).
+ * containment and top-layer isolation come from the platform. A short visual
+ * state machine keeps the dialog mounted long enough for a true exit sequence
+ * before focus is restored.
  */
 export default function SiteMenu({
   bookingUrl,
@@ -33,7 +40,10 @@ export default function SiteMenu({
   bookingUrl: string | null;
 }) {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
+  const reducedMotion = useReducedMotion();
+  const [menuState, setMenuState] = useState<
+    "closed" | "opening" | "open" | "closing"
+  >("closed");
   const [contactOpen, setContactOpen] = useState(false);
   const [chromeTones, setChromeTones] = useState<{
     logo: "light" | "dark";
@@ -48,12 +58,38 @@ export default function SiteMenu({
      underneath it and be inert. */
   const pendingContactRef = useRef(false);
 
-  useEffect(() => {
+  const openMenu = () => {
     const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
-    if (!open && dialog.open) dialog.close();
-  }, [open]);
+    if (!dialog || menuState !== "closed") return;
+    dialog.showModal();
+    setMenuState("opening");
+  };
+
+  const closeMenu = useCallback(() => {
+    setMenuState((current) =>
+      current === "closed" || current === "closing" ? current : "closing",
+    );
+  }, []);
+
+  // Commit the hidden opening frame before revealing the panel and its
+  // contents. This gives every browser a reliable transition start point.
+  useEffect(() => {
+    if (menuState !== "opening") return;
+    const frame = window.requestAnimationFrame(() => setMenuState("open"));
+    return () => window.cancelAnimationFrame(frame);
+  }, [menuState]);
+
+  // Native dialogs disappear immediately when closed. Defer that final close
+  // until the CSS exit sequence has finished so closing feels as intentional
+  // as opening.
+  useEffect(() => {
+    if (menuState !== "closing") return;
+    const timer = window.setTimeout(
+      () => dialogRef.current?.close(),
+      reducedMotion ? 120 : 720,
+    );
+    return () => window.clearTimeout(timer);
+  }, [menuState, reducedMotion]);
 
   // The closed chrome has no visual container, so its mark/glyph follows the
   // full-bleed surface currently passing beneath the top of the viewport.
@@ -102,16 +138,17 @@ export default function SiteMenu({
   }, [pathname]);
 
   // Body scroll is locked only while the menu is open.
+  const menuVisible = menuState !== "closed";
   useEffect(() => {
-    if (!open) return;
+    if (!menuVisible) return;
     return lockBodyScroll();
-  }, [open]);
+  }, [menuVisible]);
 
   // Route changes (link activation, back/forward) close the menu.
   const [lastPathname, setLastPathname] = useState(pathname);
   if (lastPathname !== pathname) {
     setLastPathname(pathname);
-    setOpen(false);
+    closeMenu();
   }
 
   const isCurrent = (href: string) =>
@@ -125,7 +162,7 @@ export default function SiteMenu({
       : ROUTE_ITEMS.find((item) => isCurrent(item.href))?.label;
 
   const handleDialogClose = () => {
-    setOpen(false);
+    setMenuState("closed");
     triggerRef.current?.focus();
     if (pendingContactRef.current) {
       pendingContactRef.current = false;
@@ -170,9 +207,9 @@ export default function SiteMenu({
           <button
             ref={triggerRef}
             type="button"
-            onClick={() => setOpen(true)}
+            onClick={openMenu}
             aria-haspopup="dialog"
-            aria-expanded={open}
+            aria-expanded={menuState === "opening" || menuState === "open"}
             aria-label="Open menu"
             className="site-chrome-control"
             data-tone={chromeTones.menu}
@@ -198,67 +235,73 @@ export default function SiteMenu({
       <dialog
         ref={dialogRef}
         aria-label="Site menu"
+        data-state={menuState}
+        data-surface="card"
         className="site-menu"
         onClose={handleDialogClose}
+        onCancel={(event) => {
+          event.preventDefault();
+          closeMenu();
+        }}
       >
-        <div className="flex min-h-full flex-col gap-[var(--space-xl)] pb-[max(env(safe-area-inset-bottom),1.5rem)] pl-[max(env(safe-area-inset-left),var(--section-px))] pr-[max(env(safe-area-inset-right),var(--section-px))] pt-[max(env(safe-area-inset-top),1rem)]">
-          <div className="flex items-center justify-between">
+        <div className="site-menu__frame">
+          <header className="site-menu__header">
             <Link
               href={ROUTES.home}
               aria-current={pathname === ROUTES.home ? "page" : undefined}
-              onClick={() => setOpen(false)}
-              className="inline-flex h-11 items-center"
+              onClick={closeMenu}
+              className="site-menu__brand"
             >
               <Image
                 src="/assets/arizmi/logos/logomark-white.svg"
                 alt="Arizmi Labs — home"
-                width={36}
-                height={36}
+                width={42}
+                height={42}
               />
             </Link>
             <button
               type="button"
-              onClick={() => setOpen(false)}
+              onClick={closeMenu}
               aria-label="Close menu"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--border-on-card-strong)] text-ink-on-card transition-colors hover:border-teal-light hover:text-teal-light"
+              className="site-menu__close"
             >
               <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
+                width="22"
+                height="22"
+                viewBox="0 0 22 22"
                 fill="none"
                 aria-hidden="true"
               >
                 <path
-                  d="M1.5 1.5l13 13M14.5 1.5l-13 13"
+                  d="M2 2l18 18M20 2L2 20"
                   stroke="currentColor"
-                  strokeWidth="1.5"
+                  strokeWidth="1.4"
                   strokeLinecap="round"
                 />
               </svg>
             </button>
-          </div>
+          </header>
 
-          <nav aria-label="Primary" className="flex flex-1 items-center">
-            <ol className="flex flex-col gap-2">
+          <nav aria-label="Primary" className="site-menu__primary">
+            <ol className="site-menu__list">
               {PRIMARY_NAV.map((item, index) => (
-                <li key={item.label} className="flex items-baseline gap-4">
-                  <span
-                    aria-hidden="true"
-                    className="font-meta text-xs text-ink-on-card-muted"
-                  >
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
+                <li
+                  key={item.label}
+                  className="site-menu__item"
+                  style={
+                    {
+                      "--menu-open-delay": `${150 + index * 55}ms`,
+                      "--menu-close-delay": `${index * 18}ms`,
+                    } as CSSProperties
+                  }
+                >
                   {item.kind === "route" ? (
                     <Link
                       href={item.href}
                       aria-current={isCurrent(item.href) ? "page" : undefined}
-                      onClick={() => setOpen(false)}
-                      className={`inline-flex min-h-11 items-center text-[clamp(2rem,6vw,3.25rem)] font-semibold leading-tight tracking-tight transition-colors ${
-                        isCurrent(item.href)
-                          ? "text-teal-light"
-                          : "text-ink-on-card hover:text-teal-light"
-                      }`}
+                      data-current={isCurrent(item.href) || undefined}
+                      onClick={closeMenu}
+                      className="site-menu__link"
                     >
                       {item.label}
                     </Link>
@@ -266,7 +309,8 @@ export default function SiteMenu({
                     <a
                       href={bookingUrl}
                       rel="noreferrer"
-                      className="inline-flex min-h-11 items-center text-[clamp(2rem,6vw,3.25rem)] font-semibold leading-tight tracking-tight text-ink-on-card transition-colors hover:text-teal-light"
+                      onClick={closeMenu}
+                      className="site-menu__link"
                     >
                       {item.label}
                     </a>
@@ -276,7 +320,7 @@ export default function SiteMenu({
                     <UnavailableCta
                       label={item.label}
                       reason="Booking opens soon"
-                      className="justify-start border-0 px-0 text-left text-[clamp(2rem,6vw,3.25rem)] leading-tight tracking-tight"
+                      className="site-menu__link site-menu__link--unavailable"
                     />
                   )}
                 </li>
@@ -284,8 +328,8 @@ export default function SiteMenu({
             </ol>
           </nav>
 
-          <div className="flex flex-col gap-6 border-t border-border-on-card pt-6">
-            <ul className="flex flex-wrap items-center gap-x-8 gap-y-3">
+          <footer className="site-menu__footer">
+            <ul className="site-menu__secondary">
               {SECONDARY_NAV.map((item) => (
                 <li key={item.label}>
                   {item.kind === "contact" ? (
@@ -293,9 +337,9 @@ export default function SiteMenu({
                       type="button"
                       onClick={() => {
                         pendingContactRef.current = true;
-                        setOpen(false);
+                        closeMenu();
                       }}
-                      className="inline-flex min-h-11 items-center text-base text-ink-on-card transition-colors hover:text-teal-light"
+                      className="site-menu__secondary-link"
                     >
                       {item.label}
                     </button>
@@ -304,10 +348,10 @@ export default function SiteMenu({
                        it is marked unavailable rather than linked anywhere. */
                     <span
                       aria-disabled="true"
-                      className="inline-flex min-h-11 items-center gap-2 text-base text-ink-on-card-muted"
+                      className="site-menu__secondary-link site-menu__secondary-link--unavailable"
                     >
                       {item.label}
-                      <span className="rounded-full border border-[var(--border-on-card-strong)] px-2 py-0.5 font-meta text-[0.65rem] uppercase tracking-wider">
+                      <span className="site-menu__soon">
                         Soon
                       </span>
                     </span>
@@ -315,10 +359,10 @@ export default function SiteMenu({
                 </li>
               ))}
             </ul>
-            <p className="font-meta text-xs text-ink-on-card-muted sm:text-sm">
-              {NAV_SUPPORTING_LINE}
+            <p className="site-menu__supporting-line">
+              <span>{NAV_SUPPORTING_LINE}</span>
             </p>
-          </div>
+          </footer>
         </div>
       </dialog>
 
