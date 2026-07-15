@@ -20,6 +20,7 @@ import { useReducedMotion } from "@/lib/useReducedMotion";
 
 const SLIDE_DURATION_SECONDS = 0.65;
 const AUTO_SCROLL_SLIDES_PER_SECOND = 1 / 14;
+const PARALLAX_TRAVEL_RATIO = 0.44;
 const DETAIL_TRANSITION_MS = 620;
 const MANUAL_AUTOSCROLL_HOLD_MS = 3_500;
 const WHEEL_STEP_PX = 48;
@@ -236,15 +237,15 @@ export default function FeaturedBuilds({
       const visibleEdge = metrics.viewportWidth / 2 + metrics.cardWidth / 2;
       items.forEach((item, index) => {
         const distance = circularDistance(index, position.value, length);
-        const depthDistance = reducedMotion
+        const screenOffset = distance * metrics.step;
+        const apertureProgress = reducedMotion
           ? 0
-          : Math.max(-1.5, Math.min(1.5, distance));
-        const depthMagnitude = Math.min(1.5, Math.abs(depthDistance));
+          : Math.max(-1, Math.min(1, screenOffset / metrics.step));
         const x =
           metrics.viewportWidth / 2 -
           metrics.cardWidth / 2 +
-          distance * metrics.step;
-        const visible = Math.abs(distance) * metrics.step <= visibleEdge;
+          screenOffset;
+        const visible = Math.abs(screenOffset) <= visibleEdge;
         const opacity = visible ? 1 : 0;
         item.style.transform = `translate3d(${x.toFixed(2)}px, -50%, 0)`;
         item.style.opacity = opacity.toFixed(3);
@@ -255,34 +256,9 @@ export default function FeaturedBuilds({
           item.setAttribute("aria-hidden", "true");
         }
         item.style.zIndex = String(100 - Math.round(Math.abs(distance) * 10));
-        item.style.setProperty("--featured-distance", distance.toFixed(4));
         item.style.setProperty(
-          "--featured-card-x",
-          `${(depthDistance * -8).toFixed(2)}px`,
-        );
-        item.style.setProperty(
-          "--featured-card-z",
-          `${(depthMagnitude * -64).toFixed(2)}px`,
-        );
-        item.style.setProperty(
-          "--featured-card-tilt",
-          `${Math.max(-18, Math.min(18, depthDistance * -14)).toFixed(2)}deg`,
-        );
-        item.style.setProperty(
-          "--featured-card-scale",
-          (1 - depthMagnitude * 0.015).toFixed(4),
-        );
-        item.style.setProperty(
-          "--featured-parallax-far",
-          `${(depthDistance * 18).toFixed(2)}px`,
-        );
-        item.style.setProperty(
-          "--featured-parallax-near",
-          `${(depthDistance * -32).toFixed(2)}px`,
-        );
-        item.style.setProperty(
-          "--featured-parallax-shine",
-          `${(depthDistance * -40).toFixed(2)}px`,
+          "--featured-image-x",
+          `${(-apertureProgress * metrics.cardWidth * PARALLAX_TRAVEL_RATIO).toFixed(2)}px`,
         );
       });
     };

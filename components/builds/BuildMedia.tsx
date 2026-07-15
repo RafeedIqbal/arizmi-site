@@ -17,10 +17,10 @@ interface BuildMediaProps {
 /**
  * Build media uses only approved Arizmi artwork and token-generated decoration.
  *
- * Featured cards show the approved portrait card back at its natural ratio.
- * Independent decorative overlays can move at different depths without
- * transforming or cropping the artwork itself. Archive cards use a fixed-ratio
- * CSS placeholder with no visible placeholder copy.
+ * Featured cards treat the approved portrait card back as an overscanned image
+ * behind a fixed aperture. The reel counter-moves that image layer to create
+ * the window-style parallax treatment. Archive cards use a fixed-ratio CSS
+ * placeholder with no visible placeholder copy.
  */
 export default function BuildMedia({
   build,
@@ -42,24 +42,26 @@ export default function BuildMedia({
         data-variant={variant}
         className={classes}
       >
-        <span className="build-media__depth" />
-        <span className="build-media__decoration" />
-        <span className="build-media__shine" />
-        <Image
-          src={art.src}
-          alt=""
-          width={BUILD_CARD_BACK_SIZE.width}
-          height={BUILD_CARD_BACK_SIZE.height}
-          draggable={false}
-          unoptimized
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "contain",
-            display: "block",
-          }}
-          className="build-media__image"
-        />
+        <span className="build-media__aperture">
+          <span className="build-media__image-layer">
+            <Image
+              src={art.src}
+              alt=""
+              width={BUILD_CARD_BACK_SIZE.width}
+              height={BUILD_CARD_BACK_SIZE.height}
+              draggable={false}
+              unoptimized
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                display: "block",
+              }}
+              className="build-media__image"
+            />
+          </span>
+          <span className="build-media__glass" />
+        </span>
       </span>
     );
   }
